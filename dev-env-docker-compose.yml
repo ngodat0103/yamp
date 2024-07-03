@@ -1,0 +1,26 @@
+name: development-environment
+services:
+  share_db:
+    image: postgres:16.3-bullseye
+    container_name: share_db
+    environment:
+      - POSTGRES_USER=share
+      - POSTGRES_PASSWORD=share
+      - POSTGRES_DB=share
+    ports:
+      - 5432:5432
+    volumes:
+        - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+#  web-management-db:
+#   image: dbeaver/cloudbeaver:latest
+#   container_name: web-management-db
+#   network_mode: host
+#   ports:
+#      - 8080:8978
+#   volumes:
+#      - dbeaver:/opt/cloudbeaver/workspace
+#   restart: unless-stopped
+volumes:
+    db_data:
+    dbeaver:

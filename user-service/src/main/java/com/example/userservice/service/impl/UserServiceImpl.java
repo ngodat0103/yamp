@@ -3,11 +3,10 @@ package com.example.userservice.service.impl;
 import com.example.userservice.dto.model.UserDto;
 import com.example.userservice.dto.model.mapper.UserMapper;
 import com.example.userservice.entity.Users;
-import com.example.userservice.exception.ApiException;
+import com.example.userservice.exceptions.InvalidInputException;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +19,11 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDto createUser(UserDto userDto) throws ApiException {
+    public UserDto createUser(UserDto userDto) throws InvalidInputException {
         if(userRepository.existsByUsername(userDto.getUsername()))
-            throw new ApiException(HttpStatus.CONFLICT, "Username is already exists");
+            throw new InvalidInputException("Username is already exists");
         if(userRepository.existsByEmail(userDto.getEmail()))
-            throw new ApiException(HttpStatus.CONFLICT,"Email is already exist");
+            throw new InvalidInputException("Email is already exist");
 
         Users newUsers = this.userMapper.mapToEntity(userDto);
         Users usersResponse = userRepository.save(newUsers);

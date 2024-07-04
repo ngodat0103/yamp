@@ -12,9 +12,45 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-server:
-  port: 8001
 eureka:
   client:
     register-with-eureka: false
     fetch-registry: false
+api:
+  common:
+    version: 1.0.0
+    title: User service API
+    description: Description
+    termsOfService: Apache License
+    license: MY LICENSE
+    licenseUrl: MY LICENSE URL
+    externalDocDesc: MY WIKI PAGE
+    externalDocUrl: MY WIKI URL
+    contact:
+      name: Ngô Vũ Minh Đạt
+      url: github.com/NGODAT0103
+      email: 21521935@gm.uit.edu.vn
+
+  create-user:
+    summary: "Create a new user"
+    description: "Create a new user"
+  responseCodes:
+    ok:
+      description: OK
+    badRequest:
+      description: "Bad request, invalid format of the request. See response message for more information"
+    notFound:
+      description: "Not Found, the specific id does not exists"
+    unprocessableEntity:
+      description: "Unprocessable entity, input parameters
+caused the processing to fail. See response message for more information"
+
+springdoc:
+  swagger-ui.path: /openapi/swagger-ui.html
+  api-docs.path: /openapi/v3/api-docs
+  packagesToScan: com.example.userservice
+  swagger-ui:
+    enabled: true
+  pathsToMatch: /**
+server:
+  port: 8001

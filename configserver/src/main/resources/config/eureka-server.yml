@@ -1,6 +1,7 @@
 server:
-  port: 9001
+  port: 8761
 eureka:
+  server:
   instance:
     hostname: localhost
   client:

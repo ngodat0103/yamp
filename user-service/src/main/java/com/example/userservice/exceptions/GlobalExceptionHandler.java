@@ -1,5 +1,6 @@
 package com.example.userservice.exceptions;
 import com.example.userservice.util.HttpErrorInfo;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,6 +32,11 @@ public class GlobalExceptionHandler {
             errorMap.put(field.getField(),field.getDefaultMessage());
         }
         return errorMap;
+    }
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public @ResponseBody HttpErrorInfo handleNotFound(Exception ex){
+        return createHttpErrorInfo(HttpStatus.NOT_FOUND,ex);
     }
 
 

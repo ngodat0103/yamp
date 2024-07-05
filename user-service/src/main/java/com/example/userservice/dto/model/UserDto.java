@@ -1,4 +1,5 @@
 package com.example.userservice.dto.model;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -13,15 +14,10 @@ import lombok.*;
 public class UserDto {
     @Nullable
     private Long id;
-    @NotNull
-    private String name;
     @Email
-    @NotNull
-    private String email;
-    @NotNull
-    @Size
-    private String username;
-    @NotNull
-    @Size
-    private String password;
+    @NotNull private String email;
+    @NotNull private String username;
+    @NotNull private String password;
+    @NotNull private String firstName;
+    @NotNull private String lastName;
 }

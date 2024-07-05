@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 @Configuration
@@ -50,7 +51,7 @@ public class UserServiceApplication {
 		return new ModelMapper();
 	}
 	@Bean
-	BCryptPasswordEncoder password(){
+	PasswordEncoder passwordEncoder(){
 		return new BCryptPasswordEncoder();
 	}
 

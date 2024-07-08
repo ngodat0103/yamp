@@ -12,6 +12,9 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+#  config:
+#    activate:
+#      on-profile: docker
 eureka:
   client:
     register-with-eureka: false

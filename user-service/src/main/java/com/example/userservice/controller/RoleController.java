@@ -29,11 +29,11 @@ public class RoleController {
     public List<RoleDto> getAllRoles(){
         return roleService.getAllRoles();
     }
-    @GetMapping(value = "/{roleName}", produces = "application/json")
+    @GetMapping(value = "/{roleId}", produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public RoleDto getRole(@PathVariable String roleName){
-        return roleService.getRole(roleName);
+    public RoleDto getRole(@PathVariable String roleId){
+        return roleService.getRole(roleId);
     }
 
     @DeleteMapping(value = "/{roleID}", produces = "application/json")

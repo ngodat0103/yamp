@@ -6,6 +6,7 @@ import com.example.userservice.service.RoleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class RoleController {
     @PostMapping(produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("#{hasRole('ROLE_ADMIN')}")
     public RoleDto createRole(@RequestBody @Valid RoleDto newRoleDto){
         return roleService.createRole(newRoleDto);
     }

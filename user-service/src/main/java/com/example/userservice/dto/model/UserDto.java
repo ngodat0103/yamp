@@ -13,7 +13,7 @@ import lombok.*;
 @Setter
 public class UserDto {
     @Nullable
-    private Long id;
+    private Long user_id;
     @Email
     @NotNull private String email;
     @NotNull private String username;

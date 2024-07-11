@@ -14,7 +14,8 @@ import java.util.*;
 @AllArgsConstructor
 @Data
 @Entity
-public class Users implements UserDetails {
+@Table(name = "_User")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long user_id;
@@ -37,28 +38,5 @@ public class Users implements UserDetails {
     private boolean is_active = true;
     private boolean is_superuser = false;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-    }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

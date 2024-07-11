@@ -1,20 +1,17 @@
 package com.example.userservice.repositories;
 
-import com.example.userservice.entity.Users;
-import jakarta.validation.constraints.NotNull;
-import org.apache.catalina.User;
-import org.springframework.data.domain.Pageable;
+import com.example.userservice.entity.User;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
-public interface UserRepository extends CrudRepository<Users,Long>{
+@Repository
+public interface UserRepository extends CrudRepository<User,Long>{
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
-    Users save( Users users);
-    Users findByUsername(String username);
+    User save(User user);
+    User findByUsername(String username);
 
     //  ArrayList<User> getAll(Pageable pageable);
 //   User findById(long id);

@@ -2,18 +2,15 @@ package com.example.userservice.service.impl;
 
 import com.example.userservice.dto.model.UserDto;
 import com.example.userservice.dto.model.mapper.UserMapper;
-import com.example.userservice.entity.Users;
+import com.example.userservice.entity.User;
 import com.example.userservice.exceptions.InvalidInputException;
 import com.example.userservice.repositories.UserRepository;
 import com.example.userservice.service.UserService;
 import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 
 @Service
 @AllArgsConstructor
@@ -29,11 +26,11 @@ public class UserServiceImpl implements UserService {
         if(userRepository.existsByEmail(userDto.getEmail()))
             throw new InvalidInputException("Email is already exist");
 
-        Users newUsers = this.userMapper.mapToEntity(userDto);
-        newUsers.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        Users usersResponse = userRepository.save(newUsers);
+        User newUser = this.userMapper.mapToEntity(userDto);
+        newUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        User userResponse = userRepository.save(newUser);
 
-        return userMapper.mapToDto(usersResponse);
+        return userMapper.mapToDto(userResponse);
 
     }
 
@@ -47,7 +44,7 @@ public class UserServiceImpl implements UserService {
         if(!userRepository.existsByUsername(username)){
             throw new NotFoundException("Username not found");
         }
-        Users user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username);
         return userMapper.mapToDto(user);
     }
 

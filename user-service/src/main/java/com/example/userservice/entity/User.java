@@ -1,24 +1,20 @@
 package com.example.userservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.*;
 
 import java.util.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "_User")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long user_id;
+    private long userId;
     @Column(unique = true,nullable = false)
     private String username;
     @Column(nullable = false)
@@ -38,5 +34,7 @@ public class User {
     private boolean is_active = true;
     private boolean is_superuser = false;
 
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
+    Set<Role> roles;
 
 }

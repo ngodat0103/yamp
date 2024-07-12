@@ -1,5 +1,6 @@
 package com.example.userservice.security;
 
+import com.example.userservice.entity.Role;
 import com.example.userservice.entity.User;
 import com.example.userservice.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserAuthenticationProvider implements AuthenticationProvider {
@@ -33,12 +35,19 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
         if(user == null)
             throw new UsernameNotFoundException("Invalid username or password");
         if(passwordEncoder.matches(pwd,user.getPassword())){
-            List<GrantedAuthority> authorityList = new ArrayList<>();
-            authorityList.add(new SimpleGrantedAuthority("admin"));
-            return new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword(),authorityList);
+            return new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword(),getAuthorities(user.getRoles()));
         }
         else
             throw new BadCredentialsException("Invalid username or password");
+
+    }
+
+    private List<GrantedAuthority> getAuthorities(Set<Role> roles){
+        List<GrantedAuthority> authorityList = new ArrayList<>();
+        for (Role role: roles)
+            authorityList.add(new SimpleGrantedAuthority(role.getRoleName()));
+
+        return authorityList;
 
     }
 

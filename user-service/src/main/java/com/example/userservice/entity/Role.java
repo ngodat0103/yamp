@@ -2,11 +2,10 @@ package com.example.userservice.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Setter
+@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,4 +15,7 @@ public class Role {
     private long roleID;
     private String roleName;
     private String roleDescription;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

@@ -20,7 +20,6 @@ public class RoleController {
     @PostMapping(produces = "application/json")
     @ResponseBody
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("#{hasRole('ROLE_ADMIN')}")
     public RoleDto createRole(@RequestBody @Valid RoleDto newRoleDto){
         return roleService.createRole(newRoleDto);
     }

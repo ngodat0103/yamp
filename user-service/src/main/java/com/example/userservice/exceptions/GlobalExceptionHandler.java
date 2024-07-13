@@ -1,14 +1,16 @@
 package com.example.userservice.exceptions;
 import com.example.userservice.util.HttpErrorInfo;
+import io.jsonwebtoken.JwtException;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,13 @@ public class GlobalExceptionHandler {
     public @ResponseBody HttpErrorInfo handleNotFound(Exception ex){
         return createHttpErrorInfo(HttpStatus.NOT_FOUND,ex);
     }
+
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public @ResponseBody HttpErrorInfo handleBadCredential(Exception ex){
+        return createHttpErrorInfo(HttpStatus.UNAUTHORIZED,ex);
+    }
+
 
 
 

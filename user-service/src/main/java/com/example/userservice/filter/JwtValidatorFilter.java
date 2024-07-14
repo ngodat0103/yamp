@@ -51,8 +51,13 @@ public class JwtValidatorFilter extends OncePerRequestFilter {
                 contextHolder.setAuthentication(auth);
             }
         } catch (JwtException exception){
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED,"Invalid JWT",null,null);
-
+            HttpErrorInfo httpErrorInfo = new HttpErrorInfo(HttpStatus.UNAUTHORIZED,"Invalid JWT token",request);
+            response.setContentType("application/json");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            PrintWriter writer = response.getWriter();
+            writer.write(httpErrorInfo.toJson());
+            writer.flush();
+            return;
         }
 
 

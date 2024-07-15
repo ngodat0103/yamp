@@ -60,6 +60,6 @@ springdoc:
     enabled: true
   pathsToMatch: /**
 server:
-  port: 8001
+  port: 8080
 
 

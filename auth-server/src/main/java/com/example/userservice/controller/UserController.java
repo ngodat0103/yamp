@@ -42,11 +42,13 @@ public class UserController {
     {
         return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
     }
-    @ResponseBody
-    @GetMapping(path = "/login")
-    public String loginUser(){
-        return "Login ok ";
-    }
+//    @ResponseBody
+//    @GetMapping(path = "/login")
+//    public String loginUser(){
+//        return "Login ok ";
+//    }
+
+
 
 
 

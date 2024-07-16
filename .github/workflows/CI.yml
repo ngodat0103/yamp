@@ -18,6 +18,7 @@ jobs:
           with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             ignore: "**/+(.github)"
+            format: "csv"
             foldersOnly: true # to only include folders in the output
         - name: Echo
           run: echo ${{ steps.get_changed.outputs.changed }}

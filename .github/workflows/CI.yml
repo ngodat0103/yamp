@@ -8,7 +8,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      has_user_service_changes: ${{steps.get_changed.outputs.changed}}
+      service_changes: ${{steps.get_changed.outputs.changed}}
     steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -23,18 +23,20 @@ jobs:
           run: echo ${{ steps.get_changed.outputs.changed }}
 
 
-#  build-and-push:
-#    runs-on: home
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#      - name: Set up Maven
-#        uses: actions/setup-java@v2
-#        with:
-#          java-version: 17
-#          distribution: "temurin"
-
-
-
+  user-service-build-and-push:
+    needs: detect-changes
+    if: contains(needs.detect_changes.outputs.service_changes,'user-service')
+    runs-on: home
+    steps:
+      - name: docker login
+        uses: docker/login-action@v3.2.0
+        with:
+          registry: ${{secrets.REGISTRY_URL}}
+          username: ${{secrets.REGISTRY_USERNAME}}
+          password: ${{secrets.REGISTRY_PASSWORD}}
+      - name: build
+        run: docker compose build user-service
+      - name: push
+        run: docker compose push user-service
 
 

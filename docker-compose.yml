@@ -1,0 +1,8 @@
+services:
+  user-service:
+    build:
+      args:
+        JAR_FILE: ${USER_SERVICE_JAR_FILE}
+      context: user-service
+      dockerfile: ../Dockerfile
+    image: ${USER_SERVICE_IMAGE}

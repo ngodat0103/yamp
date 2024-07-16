@@ -28,10 +28,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http.authorizeHttpRequests(authorize->authorize
-//                        .requestMatchers( HttpMethod.GET,"/api/v1/user/*").hasAnyRole("ADMIN","REGULAR")
-//                        .anyRequest().permitAll()
-//                );
+        http.authorizeHttpRequests(authorize->authorize
+                        .requestMatchers( HttpMethod.GET,"/api/v1/user/*").hasAnyRole("ADMIN","REGULAR")
+                        .anyRequest().permitAll()
+                );
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());

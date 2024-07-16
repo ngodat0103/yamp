@@ -167,6 +167,7 @@
                 <configuration>
                     <repository>registry-harbor.ngodat0103.me/kltn/${project.name}</repository>
                     <tag>${project.version}</tag>
+
                     <buildArgs>
                         <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>

@@ -1,0 +1,40 @@
+name: CI
+on:
+  push:
+    paths:
+      - "user-service/**"
+      - '.github/workflows/**'
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      has_user_service_changes: ${{steps.get_changed.outputs.changed}}
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Set changes
+          uses: Stockopedia/action-get-changed-files@v2
+          id: get_changed
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            ignore: "**/+(.github)"
+            foldersOnly: true # to only include folders in the output
+        - name: Echo
+          run: echo ${{ steps.get_changed.outputs.changed }}
+
+
+#  build-and-push:
+#    runs-on: home
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#      - name: Set up Maven
+#        uses: actions/setup-java@v2
+#        with:
+#          java-version: 17
+#          distribution: "temurin"
+
+
+
+
+

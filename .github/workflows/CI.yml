@@ -8,7 +8,7 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      service_changes: ${{steps.get_changed.outputs.changed}}
+      service_changes: ${{steps.get_changed.outputs.service_changes}}
     steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
             ignore: "**/+(.github)"
             foldersOnly: true # to only include folders in the output
         - name: Echo
-          run: echo ${{ steps.get_changed.outputs.changed }}
+          run: echo ${{ steps.get_changed.outputs.service_changes }}
 
 
   user-service-build-and-push:

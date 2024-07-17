@@ -70,6 +70,8 @@ jobs:
         uses: actions/upload-artifact@v4.3.4
         with:
           name: user-service-report-${{github.sha}}
+          if-no-files-found: warn
+          path: user-service-report-${{github.sha}}
 
 
 

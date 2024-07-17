@@ -42,10 +42,10 @@ jobs:
       - name: Scan security
         id: generate-report
         uses: aquasecurity/trivy-action@0.24.0
-        continue-on-error: true
         with:
           image-ref: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.service_name}}:${{github.sha}}
-          severity: 'HIGH'
+          severity: HIGH,CRITICAL
+          vuln-type: os,library
           exit-code: 1
           format: template
           template: '@/contrib/html.tpl'

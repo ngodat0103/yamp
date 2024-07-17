@@ -8,7 +8,7 @@ on:
         type: string
 jobs:
   build-and-push:
-    name: Build and push for ${{inputs.name_service}}
+    name: Build and push
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -21,7 +21,7 @@ jobs:
           registry: ${{secrets.REGISTRY_URL}}
           username: ${{secrets.REGISTRY_USERNAME}}
           password: ${{secrets.REGISTRY_PASSWORD}}
-      - name: build and push for ${{inputs.name_service}}
+      - name: build and push
         uses: docker/build-push-action@v6.4.0
         with:
           context: ${{inputs.name_service}}
@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Scan security for ${{inputs.name_service}} docker image
+      - name: Scan security
         id: generate-report
         uses: aquasecurity/trivy-action@0.24.0
         with:

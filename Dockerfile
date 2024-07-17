@@ -5,9 +5,8 @@ RUN mvn clean install -DskipTests
 
 FROM eclipse-temurin:17-jre AS layers
 WORKDIR /
-ARG JAR_FILE
-COPY --from=builder /build/target/$JAR_FILE $JAR_FILE
-RUN java -Djarmode=tools -jar $JAR_FILE extract --layers --launcher --destination layers
+COPY --from=builder /build/target/user-service-0.0.1-SNAPSHOT app.jar
+RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination layers
 
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /opt/app

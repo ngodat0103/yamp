@@ -8,6 +8,7 @@
     },
     "ghcr.io/itsmechlark/features/trivy:1": {
       "version": "0.53.0"
-    }
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   }
 }

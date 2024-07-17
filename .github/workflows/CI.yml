@@ -42,9 +42,9 @@ jobs:
           touch .env
           echo REGISTRY_URL=${{secrets.REGISTRY_URL}} >> .env
           echo PROECT_NAME=kltn >> .env
-          echo USER_SERVICE_TAG=${{github.sha}} > .env 
-          echo USER_SERVICE_IMAGE=${REGISTRY_URL}/${PROJECT_NAME}/user-service:${USER_SERVICE_TAG} > .env
-          echo USER_SERVICE_JAR_FILE=user-service-${USER_SERVICE_TAG}.jar >> .env
+          echo USER_SERVICE_TAG=${{github.sha}} >> .env 
+          echo 'USER_SERVICE_IMAGE=${REGISTRY_URL}/${PROJECT_NAME}/user-service:${USER_SERVICE_TAG}' >> .env
+          echo 'USER_SERVICE_JAR_FILE=user-service-${USER_SERVICE_TAG}.jar' >> .env
 
       - name: test .env
         run: cat .env

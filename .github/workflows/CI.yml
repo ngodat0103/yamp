@@ -63,7 +63,7 @@ jobs:
           exit-code: 1
           output: user-service-report-${{github.sha}}
         env:
-          TRIVY_USERNAME: ${{secret.REGISTRY_USERNAME}}
+          TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
           TRIVY_PASSWORD: ${{secrets.REGISTRY_PASSWORD}}
       - name: Upload security report to artifact tab
         if: ${{steps.generate-report.outcome == 'success'}}

@@ -6,7 +6,6 @@ on:
         description: "name of the service to trigger the CI"
         required: true
         type: string
-    secrets: inherit
 jobs:
   build-and-push:
     name: Build and push for ${{inputs.name_service}}

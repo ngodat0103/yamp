@@ -32,5 +32,5 @@ jobs:
     if: ${{contains(needs.detect_changes.outputs.changed,'config-service')}}
     uses: ./.github/workflows/reusable_workflow.yml
     with:
-      name_service: config-server
+      name_service: config-service
     secrets: inherit

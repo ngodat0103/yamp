@@ -1,0 +1,28 @@
+name: detect changes workflow
+on:
+  push:
+    paths:
+      - "user-service/**"
+      - '.github/workflows/**'
+jobs:
+  detect_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{steps.get_changed.outputs.changed}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set changes
+        uses: Stockopedia/action-get-changed-files@v2
+        id: get_changed
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          ignore: "**/+(.github)"
+          format: "csv"
+          foldersOnly: true
+  user-service:
+    needs: detect_changes
+    if: ${{contains(needs.detect_changes.outputs.changed,'user-service')}}
+    uses: ./.github/workflows/reusable_workflow.yml
+    with:
+      name_service: user-service

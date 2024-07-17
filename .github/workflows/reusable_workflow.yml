@@ -30,7 +30,7 @@ jobs:
           tags: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.name_service}}:${{github.sha}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: service_name=${{inputs.name_service}}
+          build-args: name_service=${{inputs.name_service}}
 
   security_check:
     name: Security check for ${{inputs.name_service}}

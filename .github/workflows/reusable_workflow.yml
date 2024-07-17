@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-push:
     name: Build and push for ${{inputs.name_service}}
-    runs-on: home
+    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -26,6 +26,8 @@ jobs:
           file: Dockerfile
           push: true
           tags: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.name_service}}:${{github.sha}}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   security_check:
     name: Security check for ${{inputs.name_service}}

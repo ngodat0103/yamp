@@ -20,12 +20,9 @@ jobs:
           username: ${{secrets.REGISTRY_USERNAME}}
           password: ${{secrets.REGISTRY_PASSWORD}}
       - name: build and push
-        uses: docker/build-push-action@v6.4.0
-        with:
-          context: ${{github.workspace}}/${{inputs.name_service}}
-          file: ${{github.workspace}}/Dockerfile
-          push: true
-          tags: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.name_service}}:${{github.sha}}
+        run: |
+          docker build -f Dockerfile -t ${{secrets.REGISTRY_URL}}/kltn/${{inputs.name_service}}:${{github.sha}} ./${{inputs.name_service}}
+          docker push ${{secrets.REGISTRY_URL}}/kltn/${{inputs.name_service}}:${{github.sha}}
   security_check:
     name: Security check for ${{inputs.name_service}}
     needs: build-and-push

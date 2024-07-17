@@ -43,7 +43,7 @@ jobs:
         run: docker compose push user-service
   debug:
     runs-on: ubuntu-latest
-    if: always()
+    needs: detect-changes
     steps:
       - name: log
         run: |

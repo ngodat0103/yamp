@@ -29,7 +29,7 @@ jobs:
     runs-on: home
     steps:
       - name: test
-        run: echo ${{needs.detect-changes.outputs.changed}}
+        run: echo ${{contains(needs.detect-changes.outputs.changed,'user-service')}}
       - name: docker login
         uses: docker/login-action@v3.2.0
         with:

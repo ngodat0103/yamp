@@ -42,5 +42,11 @@ jobs:
       - name: push
         run: docker compose push user-service
   debug:
-    
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: log
+        run: |
+          echo ${{contains(needs.detect-changes.outputs.changed,'user-service')}}
+
 

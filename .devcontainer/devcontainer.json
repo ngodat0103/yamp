@@ -6,6 +6,8 @@
       "jdkDistro": "tem",
       "installMaven": true
     },
-    "ghcr.io/devcontainers-contrib/features/trivy:1": {}
+    "ghcr.io/itsmechlark/features/trivy:1": {
+      "version": "0.53.0"
+    }
   }
 }

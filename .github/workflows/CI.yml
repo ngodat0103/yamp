@@ -27,7 +27,7 @@ jobs:
   user-service-build-and-push:
     needs: detect-changes
     runs-on: home
-    if: contains(needs.detect-changes.outputs.changed,'user-service') == 'true'
+    if: ${{contains(needs.detect-changes.outputs.changed,'user-service')}}
     steps:
       - name: checkout
         uses: actions/checkout@v4

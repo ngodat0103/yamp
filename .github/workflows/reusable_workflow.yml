@@ -2,7 +2,7 @@ name: reusable_workflow
 on:
   workflow_call:
     inputs:
-      name_service:
+      service_name:
         description: "name of the service to trigger the CI"
         required: true
         type: string
@@ -24,16 +24,16 @@ jobs:
       - name: build and push
         uses: docker/build-push-action@v6.4.0
         with:
-          context: ${{inputs.name_service}}
+          context: ${{inputs.service_name}}
           file: Dockerfile
           push: true
-          tags: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.name_service}}:${{github.sha}}
+          tags: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.service_name}}:${{github.sha}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: name_service=${{inputs.name_service}}
+          build-args: service_name=${{inputs.service_name}}
 
   security_check:
-    name: Security check for ${{inputs.name_service}}
+    name: Security check for ${{inputs.service_name}}
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
@@ -43,16 +43,16 @@ jobs:
         id: generate-report
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.name_service}}:${{github.sha}}
+          image-ref: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.service_name}}:${{github.sha}}
           severity: 'HIGH'
           exit-code: 1
           format: template
           template: 'contrib/html.tpl'
-          output: user-service-report-${{github.sha}}.html
+          output: ${{inputs.service_name}}-report-${{github.sha}}.html
         env:
           TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
           TRIVY_PASSWORD: ${{secrets.REGISTRY_PASSWORD}}
-      - name: Upload ${{inputs.name_service}} security report to artifact tab
+      - name: Upload ${{inputs.service_name}} security report to artifact tab
         if: always()
         uses: actions/upload-artifact@v4.3.4
         with:

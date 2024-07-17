@@ -47,6 +47,7 @@ jobs:
     steps:
       - name: log
         run: |
+          echo ${{needs.detect-changes.outputs.changed}}
           echo ${{contains(needs.detect-changes.outputs.changed,'user-service')}}
 
 

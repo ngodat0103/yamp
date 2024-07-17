@@ -49,9 +49,9 @@ jobs:
       - name: test .env
         run: cat .env
       - name: build
-        run: docker compose build user-service
+        run: docker compose build user-service --quiet
       - name: push
-        run: docker compose push user-service
+        run: docker compose push user-service --quiet
   debug:
     runs-on: ubuntu-latest
     needs: detect-changes

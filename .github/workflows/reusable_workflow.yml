@@ -48,7 +48,7 @@ jobs:
           severity: 'HIGH'
           exit-code: 1
           format: template
-          template: '@contrib/html.tpl'
+          template: '@/usr/local/share/trivy/templates/html.tpl'
           output: ${{inputs.service_name}}-report-${{github.sha}}.html
         env:
           TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://share-db:5432/auth-db
+    username: share
+    password: share
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate.hibernate.format_sql: true
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+server:
+  port: 7001

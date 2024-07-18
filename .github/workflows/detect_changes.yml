@@ -20,6 +20,14 @@ jobs:
           ignore: "**/+(.github)"
           format: "csv"
           foldersOnly: true
+
+  auth-service:
+    needs: detect_changes
+    if: ${{contains(needs.detect_changes.outputs.changed,'auth-service')}}
+    uses: ./.github/workflows/reusable_workflow.yml
+    with:
+      service_name: auth-service
+    secrets: inherit
   user-service:
     needs: detect_changes
     if: ${{contains(needs.detect_changes.outputs.changed,'user-service')}}

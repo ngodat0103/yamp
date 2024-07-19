@@ -45,10 +45,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: snky test
-        run: snyk test
         working-directory: ${{inputs.service_name}}
         env:
           SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
+        run: |
+          chmod +x ./mvnw
+          synk test
 
   build-and-push:
     needs: [test,security_check_code]

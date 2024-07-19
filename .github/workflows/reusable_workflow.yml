@@ -40,7 +40,7 @@ jobs:
       - name: snyk setup
         uses: snyk/actions/setup@master
       - name: java set up
-        uses: actions/setup-java@4.2.1
+        uses: actions/setup-java@v4.2.1
         with:
           distribution: 'temurin'
           java-version: '17'

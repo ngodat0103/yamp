@@ -7,7 +7,53 @@ on:
         required: true
         type: string
 jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3.9.8-eclipse-temurin-17-alpine
+    services:
+      share-db:
+        image: postgres:16.3-bullseye
+        env:
+          POSTGRES_USER: share
+          POSTGRES_PASSWORD: share
+          POSTGRES_DB: ${{inputs.service_name}}-db
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Running test
+        working-directory: ${{inputs.service_name}}
+        run: mvn test
+
+  security_check_code:
+    name: Security check for code using snyk
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: snyk setup
+        uses: snyk/actions/setup@master
+      - name: java set up
+        uses: actions/setup-java@v4.2.1
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: snky test
+        working-directory: ${{inputs.service_name}}
+        env:
+          SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
+        run: |
+          chmod +x ./mvnw
+          snyk test
+
   build-and-push:
+    needs: [test,security_check_code]
     name: Build and push
     runs-on: ubuntu-latest
     steps:
@@ -33,7 +79,7 @@ jobs:
           build-args: service_name=${{inputs.service_name}}
 
   security_check:
-    name: Security check for ${{inputs.service_name}}
+    name: Security check for docker image
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
@@ -54,7 +100,7 @@ jobs:
           TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
           TRIVY_PASSWORD: ${{secrets.REGISTRY_PASSWORD}}
       - name: Upload ${{inputs.service_name}} security report to artifact tab
-        if: always()
+        if: ${{steps.generate-report.conclusion == 'failure'}}
         uses: actions/upload-artifact@v4.3.4
         with:
           name: ${{inputs.service_name}}-report-${{github.sha}}.html

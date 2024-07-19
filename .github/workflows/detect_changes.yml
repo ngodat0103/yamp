@@ -4,6 +4,7 @@ on:
     paths:
       - "user-service/**"
       - '.github/workflows/**'
+      - "auth-service/**"
 jobs:
   detect_changes:
     runs-on: ubuntu-latest

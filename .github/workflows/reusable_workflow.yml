@@ -50,7 +50,7 @@ jobs:
           SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
 
   build-and-push:
-    needs: test
+    needs: [test,security_check_code]
     name: Build and push
     runs-on: ubuntu-latest
     steps:

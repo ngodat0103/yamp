@@ -7,7 +7,31 @@ on:
         required: true
         type: string
 jobs:
+  test:
+    name: Test for ${{inputs.service_name}}
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3.9.8-eclipse-temurin-17-alpine
+    services:
+      share-db:
+        image: postgres:16.3-bullseye
+        env:
+          POSTGRES_USER: share
+          POSTGRES_PASSWORD: share
+          POSTGRES_DB: ${{inputs.service_name}}-db
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Running test
+        run: mvn -f ${{inputs.service_name}}/pom.xml test
+
+
+
+
   build-and-push:
+    needs: test
     name: Build and push
     runs-on: ubuntu-latest
     steps:

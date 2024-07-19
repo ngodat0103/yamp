@@ -2,7 +2,7 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://share-db:5432/auth-db
+    url: jdbc:postgresql://share-db:5432/auth-service-db
     username: share
     password: share
   jpa:

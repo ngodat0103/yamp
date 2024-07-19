@@ -8,7 +8,7 @@ on:
         type: string
 jobs:
   test:
-    name: Test for ${{inputs.service_name}}
+    name: Test
     runs-on: ubuntu-latest
     container:
       image: maven:3.9.8-eclipse-temurin-17-alpine
@@ -25,10 +25,29 @@ jobs:
         with:
           fetch-depth: 1
       - name: Running test
-        run: mvn -f ${{inputs.service_name}}/pom.xml test
+        working-directory: ${{inputs.service_name}}
+        run: mvn test
 
-
-
+  security_check_code:
+    name: Security check for code using snyk
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: snyk setup
+        uses: snyk/actions/setup@master
+      - name: java set up
+        uses: actions/setup-java@4.2.1
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: snky test
+        run: synk test
+        env:
+          SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
 
   build-and-push:
     needs: test
@@ -57,7 +76,7 @@ jobs:
           build-args: service_name=${{inputs.service_name}}
 
   security_check:
-    name: Security check for ${{inputs.service_name}}
+    name: Security check for docker image
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:

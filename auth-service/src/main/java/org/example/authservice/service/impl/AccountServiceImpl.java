@@ -8,6 +8,7 @@ import org.example.authservice.repository.AccountRepository;
 import org.example.authservice.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -18,6 +19,9 @@ public class AccountServiceImpl implements AccountService {
     AccountRepository accountRepository;
     @Autowired
     AccountMapper accountMapper;
+
+    @Autowired
+    PasswordEncoder passwordEncoder ;
     @Override
     public AccountDto register(AccountDto accountDto) {
 
@@ -26,8 +30,8 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,"Username is already exists!");
         }
 
-
         Account account = accountMapper.mapToEntity(accountDto);
+        account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         Account newAccount = accountRepository.save(account);
         return accountMapper.mapToDto(newAccount);
     }

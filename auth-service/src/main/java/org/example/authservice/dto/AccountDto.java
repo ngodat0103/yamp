@@ -24,5 +24,14 @@ public class AccountDto {
     private String password;
     @Email ( message =  "Email is not valid")
     private String email;
+    public AccountDto(String username,String password){
+        this.username = username;
+        this.password = password;
+    }
+    public AccountDto(String username,String password,String email){
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 
 }

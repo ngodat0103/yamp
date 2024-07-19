@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.authservice.dto.AccountDto;
 import org.example.authservice.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -13,7 +14,7 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
     @PostMapping("/register")
-    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
     public AccountDto register(@Valid @RequestBody AccountDto account){
         return accountService.register(account);
     }

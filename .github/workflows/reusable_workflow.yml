@@ -100,7 +100,7 @@ jobs:
           TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
           TRIVY_PASSWORD: ${{secrets.REGISTRY_PASSWORD}}
       - name: Upload ${{inputs.service_name}} security report to artifact tab
-        if: always()
+        if: ${{steps.generate-report.conclusion == 'failure'}}
         uses: actions/upload-artifact@v4.3.4
         with:
           name: ${{inputs.service_name}}-report-${{github.sha}}.html

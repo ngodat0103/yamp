@@ -45,7 +45,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: snky test
-        run: synk test
+        run: snyk test
         env:
           SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
 

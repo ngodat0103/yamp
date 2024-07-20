@@ -11,16 +11,17 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private UUID uuid;
+    private UUID roleUuid;
     @Column(unique = true,nullable = false)
     @NotNull
+    @Setter
     private String roleName;
+    @Setter
     private String RoleDescription;
     public Role(String roleName){
         this.roleName = roleName;

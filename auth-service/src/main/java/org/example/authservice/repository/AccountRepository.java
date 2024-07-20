@@ -12,7 +12,7 @@ public interface AccountRepository extends CrudRepository<Account, UUID> {
     Account save(Account account);
     Account findByUsername(String username);
     Account findByEmail(String email);
-    Account findByUuid(UUID uuid);
+    Account findByAccountUuid(UUID accountUuid);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     void deleteByUsername(String username);

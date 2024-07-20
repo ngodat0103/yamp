@@ -1,35 +1,40 @@
 package org.example.authservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
 @NoArgsConstructor
-@IdClass(AccountRole.class)
-public class AccountRole implements Serializable {
-    @Id
-    private String username;
-    @Id
-    private String roleName;
-//    @JsonIgnore
-//    @ManyToOne
-//    @JoinColumn(name = "username", insertable = false, updatable = false, referencedColumnName = "username")
-//    Account account;
-//
-//    @JsonIgnore
-//    @ManyToOne
-//    @JoinColumn(name = "roleName", insertable = false, updatable = false, referencedColumnName = "roleName")
-//    Role role;
-    public AccountRole(String username, String roleName) {
-        this.username = username;
-        this.roleName = roleName;
+@Getter
+public class AccountRole {
+    @Embeddable
+    @NoArgsConstructor
+    @AllArgsConstructor
+   public static class Id implements Serializable {
+       private UUID accountUuid;
+       private UUID roleUuid;
+   }
+     @EmbeddedId
+     private Id id = new Id();
+    @CreationTimestamp
+    private LocalDateTime addOn ;
+    @ManyToOne
+    @JoinColumn(name = "accountUuid",insertable = false,updatable = false)
+    private Account account;
+    @ManyToOne
+    @JoinColumn(name = "roleUuid",insertable = false,updatable = false)
+    private Role role;
+    public AccountRole(Account account, Role role){
+        this.account = account;
+        this.role = role;
+        this.id.accountUuid = account.getAccountUuid();
+        this.id.roleUuid = role.getRoleUuid();
     }
 }

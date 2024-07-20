@@ -1,5 +1,6 @@
 package org.example.authservice.exception;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.authservice.dto.ErrorDetail;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,12 @@ public class GlobalExceptionHandler  {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
         return new ErrorDetail(new Date(), HttpStatus.BAD_REQUEST, "Malformed JSON request",request.getServletPath());
+    }
+
+    @ExceptionHandler(ServletException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDetail handleServletException(ServletException e, HttpServletRequest request) {
+        return new ErrorDetail(new Date(), HttpStatus.BAD_REQUEST, e.getMessage(),request.getServletPath());
     }
 
 

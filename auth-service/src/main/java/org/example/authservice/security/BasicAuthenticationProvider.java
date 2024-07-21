@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -27,9 +28,9 @@ public class BasicAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
-        Account account = accountRepository.findByUsername(username);
-        if(account != null && passwordEncoder.matches(password, account.getPassword())){
-            List<SimpleGrantedAuthority> authorities = convertToGrantedAuthorities(account.getAccountRole());
+        Optional<Account> account = accountRepository.findByUsername(username);
+        if(account.isPresent() && passwordEncoder.matches(password, account.get().getPassword())){
+            List<SimpleGrantedAuthority> authorities = convertToGrantedAuthorities(account.get().getAccountRole());
             return new UsernamePasswordAuthenticationToken(username, password, authorities);
         }
         throw new BadCredentialsException("username or password incorrect");

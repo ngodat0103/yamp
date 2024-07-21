@@ -1,6 +1,5 @@
 package org.example.authservice.dto.mapper;
 
-import lombok.AllArgsConstructor;
 import org.example.authservice.dto.AccountDto;
 import org.example.authservice.entity.Account;
 import org.mapstruct.Mapper;

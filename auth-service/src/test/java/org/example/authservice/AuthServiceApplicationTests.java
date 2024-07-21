@@ -1,8 +1,6 @@
 package org.example.authservice;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.example.authservice.dto.AccountDto;
-import org.example.authservice.entity.Account;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

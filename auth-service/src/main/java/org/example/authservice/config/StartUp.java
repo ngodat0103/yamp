@@ -21,6 +21,8 @@ public class StartUp {
     AccountRoleRepository accountRoleRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+
+
     @PostConstruct void init(){
        Account admin = accountRepository.save(new Account(Constants.adminUsername,passwordEncoder.encode(Constants.adminPassword)));
        Role roleAdmin =  roleRepository.save(new Role("ROLE_ADMIN"));

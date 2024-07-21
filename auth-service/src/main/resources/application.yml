@@ -8,13 +8,19 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate.hibernate.format_sql: true
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging.level:
+  org:
+    springframework.security: DEBUG
+
 server:
   port: 7001
 
 init:
   admin: admin
   password: 123456789
+

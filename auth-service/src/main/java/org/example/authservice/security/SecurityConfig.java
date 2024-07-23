@@ -74,15 +74,14 @@ public class SecurityConfig {
     @Order(2)
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-       http.formLogin(Customizer.withDefaults());
                 http.authorizeHttpRequests(request->
                 request.requestMatchers(HttpMethod.GET,"/role/**").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.POST,"/role/**").hasAnyRole("ADMIN")
-                        .requestMatchers("/account/**").hasAnyRole("USER","ADMIN")
                         .anyRequest().permitAll());
 
 
-        http.httpBasic(Customizer.withDefaults());
+                http.formLogin(Customizer.withDefaults());
+
         http.oauth2ResourceServer(oauth ->
                 oauth.jwt(jwt ->
                         jwt.decoder(jwtDecoder())));

@@ -1,0 +1,16 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: gateway
+build:
+  artifacts:
+    - image: registry-harbor.ngodat0103.me/kltn/gateway-service
+      docker:
+        dockerfile: Dockerfile
+deploy:
+  kubectl:
+    defaultNamespace: pre-proc
+manifests:
+  rawYaml:
+    - "./k8s/base/deployment.yaml"
+    - "./k8s/base/service.yaml"

@@ -1,0 +1,56 @@
+apiVersion: v1
+metadata:
+  name: share-db-configmap
+kind: ConfigMap
+data:
+  init.sql: |
+    CREATE DATABASE "auth-service-db";
+    CREATE DATABASE "user-service-db";
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: share-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: share-db
+  template:
+    metadata:
+      labels:
+        app: share-db
+    spec:
+      volumes:
+        - name: init-sql
+          configMap:
+            name: share-db-configmap
+      containers:
+        - image:  postgres:16.3-bullseye
+          name: share-db
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: share
+            - name: POSTGRES_PASSWORD
+              value: share
+            - name: POSTGRES_DB
+              value: share_db
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: init-sql
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: share-db
+spec:
+    selector:
+        app: share-db
+    ports:
+      - protocol: TCP
+        port: 5432
+        targetPort: 5432
+    type: ClusterIP

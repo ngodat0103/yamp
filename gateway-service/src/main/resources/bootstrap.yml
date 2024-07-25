@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: gateway
+
+server:
+  port: 8000
+logging:
+  level:
+    org.springframework.security.: DEBUG
+    org.springframework.cloud.gateway: DEBUG

@@ -18,7 +18,10 @@ logging.level:
     springframework.security: DEBUG
 
 server:
-  port: 7001
+  port: 8001
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /auth
 
 init:
   admin: admin

@@ -12,29 +12,5 @@ services:
     volumes:
         - db_data:/var/lib/postgresql/data
     restart: unless-stopped
-#  web-management-db:
-#   image: dbeaver/cloudbeaver:latest
-#   container_name: web-management-db
-#   network_mode: host
-#   ports:
-#      - 8080:8978
-#   volumes:
-#      - dbeaver:/opt/cloudbeaver/workspace
-#   restart: unless-stopped
-
-  keycloak:
-    image: keycloak/keycloak:25.0
-    container_name: keycloak
-    environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-    ports:
-      - 8080:8080
-      - 8443:8443
-      - 9000:9000
-    restart: unless-stopped
-    command: ["start-dev"]
-
 volumes:
     db_data:
-    dbeaver:

@@ -31,7 +31,7 @@ public class BasicAuthenticationProvider implements AuthenticationProvider {
         Optional<Account> account = accountRepository.findByUsername(username);
         if(account.isPresent() && passwordEncoder.matches(password, account.get().getPassword())){
             List<SimpleGrantedAuthority> authorities = convertToGrantedAuthorities(account.get().getAccountRole());
-            return new UsernamePasswordAuthenticationToken(username, password, authorities);
+            return new UsernamePasswordAuthenticationToken(account.get().getAccountUuid().toString(), password, authorities);
         }
         throw new BadCredentialsException("username or password incorrect");
     }

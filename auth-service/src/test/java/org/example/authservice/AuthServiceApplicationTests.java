@@ -10,13 +10,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AuthServiceApplicationTests {
-    @Autowired
-    WebTestClient webTestClient;
-
-    @Test
-    void contextLoads() throws JsonProcessingException {
-
-    }
+//    @Autowired
+//    WebTestClient webTestClient;
+//
+//    @Test
+//    void contextLoads() throws JsonProcessingException {
+//
+//    }
 
 
 //

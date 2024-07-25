@@ -1,18 +1,10 @@
 spring:
   application:
     name: gateway
-  cloud:
-    gateway:
-      mvc:
-        routes:
-          - id: auth-service
-            uri: http://auth-service:8001
-            predicates:
-              - Path=/auth/**
 
 server:
   port: 8000
 logging:
   level:
     org.springframework.security.: DEBUG
-    org.springframework.cloud.gateway.server.mvc: DEBUG
+    org.springframework.cloud.gateway: DEBUG

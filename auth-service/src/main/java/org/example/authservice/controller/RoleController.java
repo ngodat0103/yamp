@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/role")
 public class RoleController {
@@ -18,9 +20,9 @@ public class RoleController {
     }
 
 
-    @GetMapping("/getAccountRoles")
-    public String getAccountRoles(JwtAuthenticationToken jwtAuthenticationToken){
-        return jwtAuthenticationToken.getName() + " has roles: " + jwtAuthenticationToken.getAuthorities();
+    @GetMapping("getAccountRoles")
+    public String getRole(@RequestHeader(value = "x-account-uuid") UUID accountUuid){
+        return "get access ok with " + accountUuid.toString();
     }
 
 }

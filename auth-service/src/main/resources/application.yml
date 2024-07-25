@@ -20,6 +20,8 @@ logging.level:
 server:
   port: 8001
   forward-headers-strategy: framework
+  servlet:
+    context-path: /auth
 
 init:
   admin: admin

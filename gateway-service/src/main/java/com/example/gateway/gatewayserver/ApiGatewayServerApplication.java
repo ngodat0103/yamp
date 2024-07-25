@@ -2,9 +2,7 @@ package com.example.gateway.gatewayserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.gateway.server.mvc.handler.ProxyExchangeHandlerFunction;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.function.HandlerFunction;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -22,13 +20,6 @@ public class ApiGatewayServerApplication {
 
 	SpringApplication.run(ApiGatewayServerApplication.class, args);
 	}
-	@Bean
-	RouterFunction<ServerResponse> routerFunction(){
-		return route().
-				before(addRequestHeader("x-account-uuid","this is account uuid")).
-				GET("/account/**",http("http://auth-service:8001")).
-				POST("/account/**",http("http://auth-service:8001")).
-				build();
-	}
+
 
 }

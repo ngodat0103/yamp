@@ -1,6 +1,6 @@
 name: auth-service
 on:
-  push:
+  pull_request:
     paths:
       - "auth-service/**"
 jobs:

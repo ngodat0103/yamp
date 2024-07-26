@@ -1,0 +1,13 @@
+name: auth-service
+on:
+  push:
+    paths:
+      - "auth-service/**"
+      - '.github/workflows/**'
+jobs:
+  auth-service:
+    name: auth-service
+    uses: ./.github/workflows/reusable_workflow.yml
+    with:
+      service_name: ${{github.job}}
+    secrets: inherit

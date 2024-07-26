@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.server.authorization.settings.Authori
 @SpringBootApplication
 public class AuthServiceApplication {
 
+    //fdsfsdfdsfdaffdfddsad
     public static void main(String[] args) {
         SpringApplication.run(AuthServiceApplication.class, args);
     }

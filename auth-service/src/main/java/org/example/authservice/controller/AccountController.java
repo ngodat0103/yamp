@@ -6,6 +6,7 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.example.authservice.config.Constants;
@@ -29,11 +30,12 @@ import java.util.Date;
 
 @RequestMapping("/account")
 @RestController
+@Tag(name = "Account" ,description = "Account API")
 public class AccountController {
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
 
-    public AccountController() throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public AccountController(AccountService accountService) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        this.accountService = accountService;
     }
 
     @PostMapping("/register")
@@ -41,13 +43,6 @@ public class AccountController {
     public AccountDto register(@Valid @RequestBody AccountDto account){
         return accountService.register(account);
     }
-
-    @GetMapping("/info")
-    public String  login(Authentication token) throws JOSEException {
-        return "Login ok with " + token.getName() ;
-
-    }
-
 
 
 }

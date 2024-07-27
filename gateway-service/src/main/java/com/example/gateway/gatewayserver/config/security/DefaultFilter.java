@@ -12,8 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableWebSecurity(debug = true)
 public class DefaultFilter {
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.cors( cors-> cors.disable());
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(
                 authorizeHttpRequest->

@@ -2,9 +2,34 @@ spring:
   application:
     name: gateway
 
+  cloud:
+    discovery:
+      client:
+        health-indicator:
+          enabled: false
+    kubernetes:
+      discovery:
+        namespaces: pre-proc
+        enabled: true
+        discovery-server-url: http://spring-cloud-kubernetes-discoveryserver
+
+
+  data:
+    redis:
+      url: redis://redis-service:6379
+      client-type: lettuce
+      database: 0
 server:
   port: 8000
 logging:
   level:
     org.springframework.security.: DEBUG
-    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud: DEBUG
+    org.springdoc: DEBUG
+#springdoc:
+#  swagger-ui:
+#    enabled: true
+#    path: /docs
+#    urls:
+#      - name: "auth-service"
+#        url: "http://auth-service:8001/auth/v3/api-docs"

@@ -1,0 +1,16 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: k8s-development
+portForward:
+  - resourceType: deployment
+    resourceName: redis-deployment
+    port: 6379
+    localPort: 6379
+  - resourceType: deployment
+    resourceName: share-db
+    port: 5432
+    localPort: 5432
+deploy:
+    kubectl:
+      defaultNamespace: pre-proc

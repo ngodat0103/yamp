@@ -1,3 +1,4 @@
+
 spring:
   application:
     name: auth-service
@@ -12,7 +13,6 @@ spring:
     properties:
       hibernate.hibernate.format_sql: true
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-
 logging.level:
   org:
     springframework.security: DEBUG
@@ -22,8 +22,11 @@ server:
   forward-headers-strategy: framework
   servlet:
     context-path: /auth
-
 init:
   admin: admin
   password: 123456789
 
+springdoc:
+  swagger-ui:
+    path: /docs
+  show-oauth2-endpoints: true

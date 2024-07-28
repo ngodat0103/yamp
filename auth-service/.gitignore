@@ -33,3 +33,4 @@ build/
 .vscode/
 /src/main/resources/hcpClientId
 /src/main/resources/hcpClientSecret
+/src/main/resources/init_sql_testing_only.sql

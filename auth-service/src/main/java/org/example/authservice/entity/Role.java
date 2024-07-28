@@ -22,7 +22,7 @@ public class Role {
     @Setter
     private String roleName;
     @Setter
-    private String RoleDescription;
+    private String roleDescription;
     public Role(String roleName){
         this.roleName = roleName;
     }

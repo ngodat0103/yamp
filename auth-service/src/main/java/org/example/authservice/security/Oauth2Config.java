@@ -1,11 +1,10 @@
 package org.example.authservice.security;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.example.authservice.vault.HcpVault;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,8 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
@@ -25,9 +22,9 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -36,25 +33,9 @@ import java.util.stream.Collectors;
 
 @Configuration
 public class Oauth2Config {
-//    @Bean
-//    JwtDecoder jwtDecoder(){
-//        return NimbusJwtDecoder.withJwkSetUri("http://localhost:8001/auth/oauth2/jwks").build();
-//    }
-//    @Bean
-//    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-//        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-//        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-//        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
-//        grantedAuthoritiesConverter.setAuthoritiesClaimDelimiter(" ");
-//        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-//        return jwtAuthenticationConverter;
-//    }
-
-
     @Bean
     RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate, PasswordEncoder passwordEncoder){
-        RegisteredClient InitWebClient = RegisteredClient.withId(UUID.randomUUID().toString())
+        RegisteredClient initWebClient = RegisteredClient.withId(UUID.randomUUID().toString())
                 .clientId("webclient")
                 .clientName("Web Client")
                 .clientSecret(passwordEncoder.encode("webclientsecret"))
@@ -78,7 +59,7 @@ public class Oauth2Config {
                                 requireProofKey(false).build())
                 .build();
         JdbcRegisteredClientRepository jdbcRegisteredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
-        jdbcRegisteredClientRepository.save(InitWebClient);
+        jdbcRegisteredClientRepository.save(initWebClient);
         return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
 
@@ -89,8 +70,10 @@ public class Oauth2Config {
     }
 
     @Bean
-    JWKSource<SecurityContext> jwkSource() throws JOSEException {
-        RSAKey rsaKey = new RSAKeyGenerator(2048).generate();
+    JWKSource<SecurityContext> jwkSource() throws IOException, ParseException, com.nimbusds.oauth2.sdk.ParseException {
+        HcpVault hcpVault = new HcpVault();
+        String jwk = hcpVault.getSecret();
+        RSAKey rsaKey = RSAKey.parse(jwk);
         JWKSet jwkSet = new JWKSet(rsaKey);
         return new ImmutableJWKSet<>(jwkSet);
     }

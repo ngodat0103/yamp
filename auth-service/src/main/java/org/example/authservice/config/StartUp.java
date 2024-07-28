@@ -13,21 +13,24 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StartUp {
-    @Autowired
+    final
     AccountRepository accountRepository;
-    @Autowired
-    RoleRepository roleRepository;
-    @Autowired
-    AccountRoleRepository accountRoleRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    final RoleRepository roleRepository;
+    final AccountRoleRepository accountRoleRepository;
+    final PasswordEncoder passwordEncoder;
+
+    public StartUp(AccountRepository accountRepository, RoleRepository roleRepository, AccountRoleRepository accountRoleRepository, PasswordEncoder passwordEncoder) {
+        this.accountRepository = accountRepository;
+        this.roleRepository = roleRepository;
+        this.accountRoleRepository = accountRoleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     @PostConstruct void init(){
        Account admin = accountRepository.save(new Account(Constants.adminUsername,passwordEncoder.encode(Constants.adminPassword)));
        Role roleAdmin =  roleRepository.save(new Role("ROLE_ADMIN"));
-       Role  roleUser =  roleRepository.save(new Role("ROLE_USER"));
-        AccountRole accountRole = new AccountRole(admin,roleAdmin);
-        accountRoleRepository.save(accountRole);
+       AccountRole accountRole = new AccountRole(admin,roleAdmin);
+       accountRoleRepository.save(accountRole);
     }
 }

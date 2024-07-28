@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.yaml.snakeyaml.events.Event;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor

@@ -15,5 +15,7 @@ spec:
       containers:
         - image: registry-harbor.ngodat0103.me/kltn/auth-service
           name: auth
+          securityContext:
+            readOnlyRootFilesystem: true
           ports:
             - containerPort: 7001

@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import org.example.authservice.entity.Role;
 import org.example.authservice.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;

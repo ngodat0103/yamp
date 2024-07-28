@@ -3,7 +3,6 @@ package org.example.authservice.security;
 import org.example.authservice.entity.Account;
 import org.example.authservice.entity.AccountRole;
 import org.example.authservice.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,10 +19,15 @@ import java.util.Set;
 
 @Component
 public class BasicAuthenticationProvider implements AuthenticationProvider {
-    @Autowired
-    private AccountRepository accountRepository;
-    @Autowired
+    private final AccountRepository accountRepository;
+    final
     PasswordEncoder passwordEncoder;
+
+    public BasicAuthenticationProvider(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+        this.accountRepository = accountRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getName();

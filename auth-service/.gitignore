@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+/src/main/resources/hcpClientId
+/src/main/resources/hcpClientSecret

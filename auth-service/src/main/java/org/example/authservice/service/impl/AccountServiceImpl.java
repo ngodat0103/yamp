@@ -19,17 +19,20 @@ import java.util.UUID;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-    @Autowired
-    AccountRepository accountRepository;
-    @Autowired
-    AccountMapper accountMapper;
+    final AccountRepository accountRepository;
+    final AccountMapper accountMapper;
 
-    @Autowired
-    RoleRepository roleRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder ;
-    @Autowired
-    private AccountRoleRepository accountRoleRepository;
+    final RoleRepository roleRepository;
+    final PasswordEncoder passwordEncoder ;
+    private final AccountRoleRepository accountRoleRepository;
+
+    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper, RoleRepository roleRepository, PasswordEncoder passwordEncoder, AccountRoleRepository accountRoleRepository) {
+        this.accountRepository = accountRepository;
+        this.accountMapper = accountMapper;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.accountRoleRepository = accountRoleRepository;
+    }
 
     @Override
     public AccountDto register(AccountDto accountDto) {

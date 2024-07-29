@@ -1,18 +1,22 @@
 spring:
+  cloud:
+    gateway:
+      filter:
+        local-response-cache:
+          enabled: true
+          request:
+            no-cache-strategy: update_cache_entry
+          time-to-live: 30000
+      global-filter:
+        local-response-cache:
+          enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://auth-service:8001/auth/oauth2/jwks"
   application:
     name: gateway
-
-  cloud:
-    discovery:
-      client:
-        health-indicator:
-          enabled: false
-    kubernetes:
-      discovery:
-        namespaces: pre-proc
-        enabled: true
-        discovery-server-url: http://spring-cloud-kubernetes-discoveryserver
-
 
   data:
     redis:
@@ -32,4 +36,11 @@ logging:
 #    path: /docs
 #    urls:
 #      - name: "auth-service"
-#        url: "http://auth-service:8001/auth/v3/api-docs"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway
+  endpoint:
+    gateway:
+      enabled: true

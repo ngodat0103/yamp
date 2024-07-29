@@ -1,5 +1,4 @@
 package org.example.authservice.security;
-
 import org.example.authservice.entity.Account;
 import org.example.authservice.entity.AccountRole;
 import org.example.authservice.repository.AccountRepository;
@@ -11,7 +10,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

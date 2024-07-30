@@ -4,13 +4,14 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.example.authservice.service.impl.RedisOauth2AuthorizationService;
 import org.example.authservice.vault.HcpVault;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -31,8 +32,10 @@ public class Oauth2Config {
 
 
     @Bean
-    OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository){
-        return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
+    RedisOauth2AuthorizationService authorizationService(RedisOperations<String,String> redisOperations,
+                                                         RegisteredClientRepository registeredClientRepository,
+                                                         AutowireCapableBeanFactory autowireCapableBeanFactory){
+        return new RedisOauth2AuthorizationService(redisOperations,registeredClientRepository,autowireCapableBeanFactory);
     }
 
 

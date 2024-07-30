@@ -12,6 +12,10 @@ spring:
     properties:
       hibernate.hibernate.format_sql: true
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    redis:
+      url: redis://redis-service:6379
+      client-type: lettuce
 logging.level:
   org:
     springframework.security: info

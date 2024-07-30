@@ -13,14 +13,14 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/userservice
+    url: jdbc:postgresql://share-db:5432/user-service-db
     username: share
     password: share
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
 
-      ddl-auto:  update
+      ddl-auto:  create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -59,14 +59,19 @@ api:
       description: "Unprocessable entity, input parameters
 caused the processing to fail. See response message for more information"
 
+logging:
+  level:
+    com.example.userservice: DEBUG
+
 springdoc:
-  swagger-ui.path: /openapi/swagger-ui.html
-  api-docs.path: /openapi/v3/api-docs
-  packagesToScan: com.example.userservice
   swagger-ui:
-    enabled: true
-  pathsToMatch: /**
+    path: /docs
+
 server:
-  port: 7001
+  port: 8002
+  servlet:
+    context-path: /api/v1/user
+  forward-headers-strategy: framework
+
 
 

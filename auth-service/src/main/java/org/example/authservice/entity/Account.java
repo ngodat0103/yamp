@@ -25,6 +25,7 @@ public class Account{
     private String password;
     @Getter
     @Setter
+    @Column(nullable = false, unique = true)
     private String email;
     @OneToMany (mappedBy = "account",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<AccountRole> accountRole;

@@ -33,7 +33,10 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role updateRole(Role role) {
-        return null;
+        if (roleRepository.existsByRoleName(role.getRoleName())){
+            return roleRepository.save(role);
+        }
+        throw new ApiException(HttpStatus.NOT_FOUND,"Role not found");
     }
 
     @Override

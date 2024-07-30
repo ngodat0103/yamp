@@ -1,12 +1,10 @@
-services:
-#  user-service:
-#    networks:
-#      - dev-network
-#    build:
-#      context: user-service
-#      dockerfile: ../Dockerfile
-#    image: ${USER_SERVICE_IMAGE}
+---
+version: "3"
 
+networks:
+  loki:
+
+services:
   read:
     image: grafana/loki:3.0.0
     command: "-config.file=/etc/loki/config.yaml -target=read"
@@ -15,7 +13,7 @@ services:
       - 7946
       - 9095
     volumes:
-      - ./logging/loki-config.yaml:/etc/loki/config.yaml
+      - ./loki-config.yaml:/etc/loki/config.yaml
     depends_on:
       - minio
     healthcheck:
@@ -24,7 +22,7 @@ services:
       timeout: 5s
       retries: 5
     networks: &loki-dns
-      dev-network:
+      loki:
         aliases:
           - loki
 
@@ -50,15 +48,15 @@ services:
   alloy:
     image: grafana/alloy-dev:latest
     volumes:
-      - ./logging/alloy-local-config.yaml:/etc/alloy/config.alloy:ro
+      - ./alloy-local-config.yaml:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock
-    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    command:  run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
     ports:
       - 12345:12345
     depends_on:
       - gateway
     networks:
-      - dev-network
+      - loki
 
   minio:
     image: minio/minio
@@ -77,14 +75,14 @@ services:
     ports:
       - 9000
     volumes:
-      - ./logging/.data/minio:/data
+      - ./.data/minio:/data
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
       interval: 15s
       timeout: 20s
       retries: 5
     networks:
-      - dev-network
+      - loki
 
   grafana:
     image: grafana/grafana:latest
@@ -120,7 +118,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - dev-network
+      - loki
 
   backend:
     image: grafana/loki:3.0.0
@@ -133,7 +131,8 @@ services:
     depends_on:
       - gateway
     networks:
-      - dev-network
+      - loki
+
 
   gateway:
     image: nginx:latest
@@ -147,46 +146,46 @@ services:
         cat <<EOF > /etc/nginx/nginx.conf
         user  nginx;
         worker_processes  5;  ## Default: 1
-  
+
         events {
           worker_connections   1000;
         }
-  
+
         http {
           resolver 127.0.0.11;
-  
+
           server {
             listen             3100;
-  
+
             location = / {
               return 200 'OK';
               auth_basic off;
             }
-  
+
             location = /api/prom/push {
               proxy_pass       http://write:3100\$$request_uri;
             }
-  
+
             location = /api/prom/tail {
               proxy_pass       http://read:3100\$$request_uri;
               proxy_set_header Upgrade \$$http_upgrade;
               proxy_set_header Connection "upgrade";
             }
-  
+
             location ~ /api/prom/.* {
               proxy_pass       http://read:3100\$$request_uri;
             }
-  
+
             location = /loki/api/v1/push {
               proxy_pass       http://write:3100\$$request_uri;
             }
-  
+
             location = /loki/api/v1/tail {
               proxy_pass       http://read:3100\$$request_uri;
               proxy_set_header Upgrade \$$http_upgrade;
               proxy_set_header Connection "upgrade";
             }
-  
+
             location ~ /loki/api/.* {
               proxy_pass       http://read:3100\$$request_uri;
             }
@@ -197,12 +196,16 @@ services:
     ports:
       - "3100:3100"
     healthcheck:
-      test: [ "CMD", "service", "nginx", "status" ]
+      test: ["CMD", "service", "nginx", "status"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - dev-network
-networks:
-  dev-network:
-    driver: bridge
+      - loki
+
+
+  flog:
+    image: mingrammer/flog
+    command: -f json -d 200ms -l
+    networks:
+      - loki

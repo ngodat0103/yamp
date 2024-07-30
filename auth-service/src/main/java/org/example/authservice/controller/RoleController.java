@@ -19,6 +19,16 @@ public class RoleController {
     }
 
 
+    @PutMapping("/update")
+    public Role updateRole(@RequestBody @Valid Role role){
+        return roleService.updateRole(role);
+    }
+    @DeleteMapping()
+    public void deleteRole(@RequestParam String roleName){
+        roleService.deleteRole(roleName);
+    }
+
+
     @GetMapping("getAccountRoles")
     public String getRole(@RequestHeader(value = "x-account-uuid") UUID accountUuid){
         return "get access ok with " + accountUuid.toString();

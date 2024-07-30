@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.UUID;
 
 @RestController
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping( "/getMe")
-    public CustomerDto getMe(@RequestHeader(value = "x-account-uuid") UUID xAccountUuid){
+    public CustomerDto getMe(@RequestHeader(value = "X-Account-Uuid") UUID xAccountUuid) throws AccountNotFoundException {
         return customerService.getCustomer(xAccountUuid);
 
     }

@@ -8,5 +8,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {
     @Mapping(target = "accountUuid",ignore = true)
+    @Mapping(target = "account",ignore = true)
     CustomerDto mapToDto(Customer customer);
 }

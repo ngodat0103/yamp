@@ -15,30 +15,38 @@ import java.util.UUID;
 @Tag(name = "Account" ,description = "Account API")
 public class AccountController {
     private final AccountService accountService;
+    private final static String ACCOUNT_UUID_HEADER = "X-Account-Uuid";
 
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
+    }
+
+
+    @GetMapping()
+    public AccountDto getAccount(@RequestHeader (value =ACCOUNT_UUID_HEADER) @Valid UUID accountUuid)
+    {
+        return accountService.getAccount(accountUuid);
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void register(@Valid @RequestBody AccountDto account, HttpServletResponse response){
         Account newAccount =  accountService.register(account);
-        response.addHeader("x-account-uuid",newAccount.getAccountUuid().toString());
+        response.addHeader(ACCOUNT_UUID_HEADER,newAccount.getAccountUuid().toString());
     }
 
-    @PatchMapping("/password")
+    @PostMapping("/password")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void updatePassword(
-            @RequestHeader (value = "x-account-uuid") @Valid UUID accountUuid,
+            @RequestHeader (value = ACCOUNT_UUID_HEADER) @Valid UUID accountUuid,
             @RequestHeader(value = "x-new-password") String newPassword)
     {
         accountService.patchPassword(accountUuid,newPassword);
     }
-    @PatchMapping("/email")
+    @PostMapping("/email")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void updateEmail(
-            @RequestHeader (value = "x-account-uuid") @Valid UUID accountUuid,
+            @RequestHeader (value =ACCOUNT_UUID_HEADER) @Valid UUID accountUuid,
             @RequestHeader(value = "x-new-email") @Valid String newEmail)
     {
         accountService.patchEmail(accountUuid,newEmail);
@@ -46,7 +54,7 @@ public class AccountController {
 
     @PostMapping("/role")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void addRole(@RequestHeader (value = "X-Account-Uuid") @Valid UUID accountUuid,
+    public void addRole(@RequestHeader (value = ACCOUNT_UUID_HEADER) @Valid UUID accountUuid,
                         @RequestHeader(value = "X-Role-Name") String roleName)
     {
         accountService.addRole(accountUuid,roleName);

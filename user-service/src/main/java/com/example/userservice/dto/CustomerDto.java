@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,15 +18,14 @@ import java.util.UUID;
 public class CustomerDto {
     @JsonIgnore
     private UUID accountUuid;
+    AccountDto account;
     @NotNull(message = "First name should not be null")
     private String firstName;
     @NotNull(message = "Last name should not be null")
     private String lastName;
     @Email(message = "Email should be valid")
-    private String email;
     @Null
     private String phoneNumber;
-    private String username;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Null
     private Set<AddressDto> addresses;

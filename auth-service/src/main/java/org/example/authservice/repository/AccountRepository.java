@@ -11,5 +11,6 @@ public interface AccountRepository extends CrudRepository<Account, UUID> {
     @Transactional
     Optional<Account> findByUsername(String username);
     Account findByAccountUuid(UUID accountUuid);
+    boolean existsByEmail(String email);
     boolean existsByUsername(String username);
 }

@@ -18,8 +18,8 @@ import java.util.UUID;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-    private final String ACCOUNT_NOT_FOUND = "Account not found!";
-    private  final String ROLE_NOT_FOUND = "Role not found!";
+    private static final String ACCOUNT_NOT_FOUND = "Account not found!";
+    private static final String ROLE_NOT_FOUND = "Role not found!";
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
 
@@ -36,11 +36,24 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public AccountDto getAccount(UUID accountUuid) {
+        Account account = accountRepository.findByAccountUuid(accountUuid);
+        if(account == null)
+        {
+            throw new ApiException(HttpStatus.NOT_FOUND,ACCOUNT_NOT_FOUND);
+        }
+        return accountMapper.mapToDto(account);
+    }
+
+    @Override
     public Account register(AccountDto accountDto) {
 
         if(accountRepository.existsByUsername(accountDto.getUsername()))
         {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,"Username is already exists!");
+        }
+        if(accountRepository.existsByEmail(accountDto.getEmail())){
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,"Email is already exists!");
         }
             Account account = accountMapper.mapToEntity(accountDto);
             account.setPassword(passwordEncoder.encode(accountDto.getPassword()));

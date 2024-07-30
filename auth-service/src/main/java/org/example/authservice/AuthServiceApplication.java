@@ -1,9 +1,6 @@
 package org.example.authservice;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import jakarta.annotation.PostConstruct;
 import org.example.authservice.entity.Role;
 import org.example.authservice.repository.RoleRepository;
 import org.springframework.boot.SpringApplication;

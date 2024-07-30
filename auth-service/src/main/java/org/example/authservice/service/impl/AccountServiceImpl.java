@@ -18,8 +18,10 @@ import java.util.UUID;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-    final AccountRepository accountRepository;
-    final AccountMapper accountMapper;
+    private final String ACCOUNT_NOT_FOUND = "Account not found!";
+    private  final String ROLE_NOT_FOUND = "Role not found!";
+    private final AccountRepository accountRepository;
+    private final AccountMapper accountMapper;
 
     final RoleRepository roleRepository;
     final PasswordEncoder passwordEncoder ;
@@ -51,7 +53,7 @@ public class AccountServiceImpl implements AccountService {
         Account currentAccount = accountRepository.findByAccountUuid(accountUuid);
         if(currentAccount == null)
         {
-            throw new ApiException(HttpStatus.NOT_FOUND,"Account not found!");
+            throw new ApiException(HttpStatus.NOT_FOUND,ACCOUNT_NOT_FOUND);
         }
         currentAccount.setPassword(passwordEncoder.encode(newPassword));
         accountRepository.save(currentAccount);
@@ -62,7 +64,7 @@ public class AccountServiceImpl implements AccountService {
         Account currentAccount = accountRepository.findByAccountUuid(accountUuid);
         if(currentAccount == null)
         {
-            throw new ApiException(HttpStatus.NOT_FOUND,"Account not found!");
+            throw new ApiException(HttpStatus.NOT_FOUND,ACCOUNT_NOT_FOUND);
         }
         currentAccount.setEmail(newEmail);
         accountRepository.save(currentAccount);
@@ -73,7 +75,7 @@ public class AccountServiceImpl implements AccountService {
         Account currentAccount = accountRepository.findByAccountUuid(accountUuid);
         if(currentAccount == null)
         {
-            throw new ApiException(HttpStatus.NOT_FOUND,"Account not found!");
+            throw new ApiException(HttpStatus.NOT_FOUND,ACCOUNT_NOT_FOUND);
         }
         accountRepository.delete(currentAccount);
     }
@@ -83,12 +85,12 @@ public class AccountServiceImpl implements AccountService {
         Account currentAccount = accountRepository.findByAccountUuid(accountUuid);
         if(currentAccount == null)
         {
-            throw new ApiException(HttpStatus.NOT_FOUND,"Account not found!");
+            throw new ApiException(HttpStatus.NOT_FOUND,ACCOUNT_NOT_FOUND);
         }
         Role role = roleRepository.findByRoleName(roleName);
         if(role == null)
         {
-            throw new ApiException(HttpStatus.NOT_FOUND,"Role not found!");
+            throw new ApiException(HttpStatus.NOT_FOUND,ROLE_NOT_FOUND);
         }
         AccountRole accountRole = new AccountRole(currentAccount,role);
         accountRoleRepository.save(accountRole);

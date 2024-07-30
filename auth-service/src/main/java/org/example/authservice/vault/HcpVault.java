@@ -25,7 +25,7 @@ public class HcpVault {
         assert hcpClientSecretInputStream != null;
         String hcpClientId = new String(hcpClientIdInputStream.readAllBytes());
         String hcpClientSecret = new String(hcpClientSecretInputStream.readAllBytes());
-        hcpClientIdInputStream.close(); ;
+        hcpClientIdInputStream.close();
         hcpClientSecretInputStream.close();
         ClientID clientID = new ClientID(hcpClientId);
         Secret clientSecret = new Secret(hcpClientSecret);

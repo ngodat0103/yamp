@@ -17,10 +17,18 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 @Configuration
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
+
+
     @Bean
     @Order(1)
     SecurityFilterChain oauth2FilterChain(HttpSecurity http) throws Exception {
+
+        // for testing purposes
         http.csrf(AbstractHttpConfigurer::disable);
+        http.cors(AbstractHttpConfigurer::disable);
+
+
+
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
         http.exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
@@ -30,7 +38,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
-                http.authorizeHttpRequests( authorize -> authorize.
+        http.cors(AbstractHttpConfigurer::disable);
+
+        http.authorizeHttpRequests( authorize -> authorize.
                                 anyRequest().permitAll()
                         );
 

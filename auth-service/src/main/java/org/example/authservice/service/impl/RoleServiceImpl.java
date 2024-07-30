@@ -4,14 +4,17 @@ import org.example.authservice.entity.Role;
 import org.example.authservice.exception.ApiException;
 import org.example.authservice.repository.RoleRepository;
 import org.example.authservice.service.RoleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RoleServiceImpl implements RoleService {
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
+
+    public RoleServiceImpl(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
+
     @Override
     public Role getRole(String roleName) {
         if (roleRepository.existsByRoleName(roleName)){
@@ -30,7 +33,10 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role updateRole(Role role) {
-        return null;
+        if (roleRepository.existsByRoleName(role.getRoleName())){
+            return roleRepository.save(role);
+        }
+        throw new ApiException(HttpStatus.NOT_FOUND,"Role not found");
     }
 
     @Override

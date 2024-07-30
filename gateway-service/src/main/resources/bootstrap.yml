@@ -1,10 +1,46 @@
 spring:
+  cloud:
+    gateway:
+      filter:
+        local-response-cache:
+          enabled: true
+          request:
+            no-cache-strategy: update_cache_entry
+          time-to-live: 30000
+      global-filter:
+        local-response-cache:
+          enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://auth-service:8001/auth/oauth2/jwks"
   application:
     name: gateway
 
+  data:
+    redis:
+      url: redis://redis-service:6379
+      client-type: lettuce
+      database: 0
 server:
   port: 8000
 logging:
   level:
     org.springframework.security.: DEBUG
-    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud: DEBUG
+    org.springdoc: DEBUG
+#springdoc:
+#  swagger-ui:
+#    enabled: true
+#    path: /docs
+#    urls:
+#      - name: "auth-service"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway
+  endpoint:
+    gateway:
+      enabled: true

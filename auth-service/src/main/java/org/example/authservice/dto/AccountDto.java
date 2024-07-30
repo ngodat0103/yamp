@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AccountDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private UUID uuid;
+    private UUID accountUuid;
     @NotNull (message = "Username is required")
     private String username;
     @JsonProperty (access = JsonProperty.Access.WRITE_ONLY)

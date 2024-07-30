@@ -10,7 +10,6 @@ import org.example.authservice.repository.AccountRepository;
 import org.example.authservice.repository.AccountRoleRepository;
 import org.example.authservice.repository.RoleRepository;
 import org.example.authservice.service.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,35 +18,82 @@ import java.util.UUID;
 
 @Service
 public class AccountServiceImpl implements AccountService {
-    @Autowired
-    AccountRepository accountRepository;
-    @Autowired
-    AccountMapper accountMapper;
+    private final String ACCOUNT_NOT_FOUND = "Account not found!";
+    private  final String ROLE_NOT_FOUND = "Role not found!";
+    private final AccountRepository accountRepository;
+    private final AccountMapper accountMapper;
 
-    @Autowired
-    RoleRepository roleRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder ;
-    @Autowired
-    private AccountRoleRepository accountRoleRepository;
+    final RoleRepository roleRepository;
+    final PasswordEncoder passwordEncoder ;
+    private final AccountRoleRepository accountRoleRepository;
+
+    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper, RoleRepository roleRepository, PasswordEncoder passwordEncoder, AccountRoleRepository accountRoleRepository) {
+        this.accountRepository = accountRepository;
+        this.accountMapper = accountMapper;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.accountRoleRepository = accountRoleRepository;
+    }
 
     @Override
-    public AccountDto register(AccountDto accountDto) {
+    public Account register(AccountDto accountDto) {
 
         if(accountRepository.existsByUsername(accountDto.getUsername()))
         {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,"Username is already exists!");
         }
-        Account account = accountMapper.mapToEntity(accountDto);
-        account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
-        Account newAccount = accountRepository.save(account);
-        Role role = roleRepository.findByRoleName("ROLE_USER");
-        accountRoleRepository.save(new AccountRole(newAccount,role));
-        return accountMapper.mapToDto(newAccount);
+            Account account = accountMapper.mapToEntity(accountDto);
+            account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
+        return accountRepository.save(account);
+
     }
 
     @Override
-    public AccountDto getAccount(UUID uuid) {
-        return null;
+    public void patchPassword(UUID accountUuid, String newPassword) {
+        Account currentAccount = accountRepository.findByAccountUuid(accountUuid);
+        if(currentAccount == null)
+        {
+            throw new ApiException(HttpStatus.NOT_FOUND,ACCOUNT_NOT_FOUND);
+        }
+        currentAccount.setPassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(currentAccount);
     }
+
+    @Override
+    public void patchEmail(UUID accountUuid, String newEmail) {
+        Account currentAccount = accountRepository.findByAccountUuid(accountUuid);
+        if(currentAccount == null)
+        {
+            throw new ApiException(HttpStatus.NOT_FOUND,ACCOUNT_NOT_FOUND);
+        }
+        currentAccount.setEmail(newEmail);
+        accountRepository.save(currentAccount);
+    }
+
+    @Override
+    public void deleteAccount(UUID accountUuid) {
+        Account currentAccount = accountRepository.findByAccountUuid(accountUuid);
+        if(currentAccount == null)
+        {
+            throw new ApiException(HttpStatus.NOT_FOUND,ACCOUNT_NOT_FOUND);
+        }
+        accountRepository.delete(currentAccount);
+    }
+
+    @Override
+    public void addRole(UUID accountUuid, String roleName) {
+        Account currentAccount = accountRepository.findByAccountUuid(accountUuid);
+        if(currentAccount == null)
+        {
+            throw new ApiException(HttpStatus.NOT_FOUND,ACCOUNT_NOT_FOUND);
+        }
+        Role role = roleRepository.findByRoleName(roleName);
+        if(role == null)
+        {
+            throw new ApiException(HttpStatus.NOT_FOUND,ROLE_NOT_FOUND);
+        }
+        AccountRole accountRole = new AccountRole(currentAccount,role);
+        accountRoleRepository.save(accountRole);
+    }
+
 }

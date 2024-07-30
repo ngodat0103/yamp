@@ -12,5 +12,12 @@ services:
     volumes:
         - db_data:/var/lib/postgresql/data
     restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+    image: redis:7.4-rc2-bookworm
+    container_name: redis
+    ports:
+      - 6379:6379
 volumes:
     db_data:

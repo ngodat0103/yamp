@@ -1,18 +1,33 @@
 package com.example.userservice.controller;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.Jwt;
+import com.example.userservice.dto.CustomerDto;
+import com.example.userservice.dto.RegisterDto;
+import com.example.userservice.service.CustomerService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/v1/user")
-public class UserController {
+import java.util.UUID;
 
-    @GetMapping( "/test")
-    public String testOauth(Authentication token){
-        Jwt jwt_token = (Jwt) token.getPrincipal();
-        int stop = 0 ;
-        return "Oauth works!";
+@RestController
+public class UserController {
+    private  final CustomerService customerService;
+
+    public UserController(CustomerService customerService) {
+        this.customerService = customerService;
+    }
+
+
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void register(@RequestBody @Valid RegisterDto registerDto){
+        customerService.register(registerDto);
+    }
+
+    @GetMapping( "/getMe")
+    public CustomerDto getMe(@RequestHeader(value = "x-account-uuid") UUID xAccountUuid){
+        return customerService.getCustomer(xAccountUuid);
+
     }
 
 

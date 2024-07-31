@@ -30,7 +30,7 @@ public class RoleController {
 
 
     @GetMapping("getAccountRoles")
-    public String getRole(@RequestHeader(value = "x-account-uuid") UUID accountUuid){
+    public String getRole(@RequestHeader(value = "X-Account-Uuid") UUID accountUuid){
         return "get access ok with " + accountUuid.toString();
     }
 

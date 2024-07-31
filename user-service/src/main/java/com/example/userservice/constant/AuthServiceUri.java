@@ -1,7 +1,7 @@
 package com.example.userservice.constant;
 
 public class AuthServiceUri {
-    public static final String AUTH_SVC_BASE = "http://auth-service:8001/api/v1/auth";
+    public static final String AUTH_SVC_BASE = "http://auth-service:8000/api/v1/auth";
     public final static String AUTH_SVC_ACC_URI = AUTH_SVC_BASE+"/account";
     public final static String AUTH_SVC_REG_URI = AUTH_SVC_ACC_URI+"/register";
     public final  static String AUTH_SVC_ROLE_URI = AUTH_SVC_ACC_URI+"/role";

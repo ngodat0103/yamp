@@ -1,4 +1,7 @@
 spring:
+  cloud:
+    inetutils:
+      default-hostname: auth-service
   application:
     name: auth-service
   datasource:
@@ -26,6 +29,9 @@ server:
   servlet:
     context-path: /api/v1/auth
 springdoc:
+  api-docs:
+    path: /api-docs
   swagger-ui:
-    path: /docs
+    path: /ui-docs
+
   show-oauth2-endpoints: true

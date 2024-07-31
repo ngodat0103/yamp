@@ -51,6 +51,7 @@ public class GlobalException {
         printWriter.write(this.objectMapper.writeValueAsString(httpErrorInfo));
     }
     private HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, @Nullable Exception ex, String path){
+        assert ex != null;
         final String message = ex.getMessage();
         return new HttpErrorInfo(httpStatus,message,path);
     }

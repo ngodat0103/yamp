@@ -9,16 +9,12 @@ import com.example.userservice.entity.Customer;
 import com.example.userservice.repository.AddressRepository;
 import com.example.userservice.repository.CustomerRepository;
 import org.slf4j.Logger;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.net.ConnectException;
 import java.util.List;
 import java.util.UUID;
 

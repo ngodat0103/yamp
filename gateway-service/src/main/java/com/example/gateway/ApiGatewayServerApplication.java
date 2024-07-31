@@ -2,15 +2,24 @@ package com.example.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.web.reactive.config.EnableWebFlux;
+
+import static org.springdoc.core.utils.Constants.DEFAULT_API_DOCS_URL;
 
 
 @SpringBootApplication
 @EnableWebFluxSecurity
+@EnableWebFlux
 public class ApiGatewayServerApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(ApiGatewayServerApplication.class, args);
+	ApplicationContext ctx =  SpringApplication.run(ApiGatewayServerApplication.class, args);
+
+
     }
+
+
 
 
 

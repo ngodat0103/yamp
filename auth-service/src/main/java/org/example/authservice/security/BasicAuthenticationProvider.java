@@ -18,7 +18,7 @@ import java.util.Set;
 @Component
 public class BasicAuthenticationProvider implements AuthenticationProvider {
     private final AccountRepository accountRepository;
-    final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public BasicAuthenticationProvider(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;

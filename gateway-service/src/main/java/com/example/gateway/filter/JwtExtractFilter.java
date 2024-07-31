@@ -23,8 +23,10 @@ public class JwtExtractFilter implements GlobalFilter {
         String token = jwtHeader.substring(7);
         return reactiveJwtDecoder.decode(token).flatMap(jwt -> {
            ServerWebExchange reMutate = exchange.mutate().request( r -> r
-                   .headers(h-> h
-                           .add("x-account-uuid", jwt.getClaim("x-account-uuid").toString())
+                   .headers(h-> {
+                       h.add("X-Account-Uuid", jwt.getClaim("X-Account-Uuid").toString());
+                       h.remove("Authorization");
+                   }
                    )
            ).build();
            return chain.filter(reMutate);

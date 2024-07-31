@@ -12,14 +12,9 @@ import java.util.UUID;
 @Setter
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID accountUuid;
-    @Column(unique = true)
-    private String username;
     private String firstName;
     private String lastName;
-    @Column(unique = true)
-    private String email;
     @Column(unique = true)
     private String phoneNumber;
     @OneToMany (mappedBy = "accountUuid")

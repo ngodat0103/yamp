@@ -4,9 +4,10 @@ COPY . .
 RUN mvn clean install -DskipTests
 
 FROM eclipse-temurin:17-jre AS layers
-ARG service_name
+ARG SERVICE_NAME
+ARG SERVICE_PORT
 WORKDIR /
-COPY --from=builder /build/target/${service_name}-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /build/target/${SERVICE_NAME}-0.0.1-SNAPSHOT.jar app.jar
 RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination layers
 
 FROM eclipse-temurin:17-jre-jammy
@@ -18,6 +19,6 @@ COPY --from=layers /layers/application/ ./
 RUN useradd -r -s /usr/sbin/nologin -d /opt/app app && \
     chown -R app:app /opt/app
 USER app
-EXPOSE 7001
-HEALTHCHECK --interval=30s --timeout=3s --retries=1 CMD wget -qO- http://localhost:7001/actuator/health/ | grep UP || exit 1
+EXPOSE ${SERVICE_PORT}
+HEALTHCHECK --interval=30s --timeout=3s --retries=1 CMD wget -qO- http://localhost:${SERVICE_PORT}/actuator/health/ | grep UP || exit 1
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

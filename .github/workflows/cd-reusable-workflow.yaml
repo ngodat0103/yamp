@@ -6,16 +6,18 @@ on:
         description: "name of the service to trigger the CD"
         required: true
         type: string
-      VERSION:
-        description: "version of the service to deploy"
-        required: true
-        type: string
 jobs:
   build-ready-container:
     environment: pre-production
     name: build ready container
     runs-on: ubuntu-latest
     steps:
+      - name: Get next version
+        uses: reecetech/version-increment@2024.4.4
+        id: next-version
+        with:
+          scheme: semver
+          increment: patch
       - name: checkout
         uses: actions/checkout@v4
       - name: set up buildx
@@ -39,7 +41,7 @@ jobs:
           context: ${{inputs.SERVICE_NAME}}
           file: Dockerfile
           push: true
-          tags: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.SERVICE_NAME}}:${{inputs.VERSION}}-dev
+          tags: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.SERVICE_NAME}}:${{steps.next-version.outputs.version}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: SERVICE_NAME=${{inputs.SERVICE_NAME}},SERVICE_PORT=${{steps.read-yaml.outputs.data}}

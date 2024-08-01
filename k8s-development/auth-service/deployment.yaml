@@ -12,10 +12,11 @@ spec:
       labels:
         app: auth-service
     spec:
+      imagePullSecrets:
+        - name: registry-secret
       containers:
-        - image: registry-harbor.ngodat0103.me/kltn/auth-service
-          name: auth
-          securityContext:
-            readOnlyRootFilesystem: true
+        - name: auth-container
+          image: registry-harbor.ngodat0103.me/kltn/auth-service:v1
+          imagePullPolicy: Always
           ports:
-            - containerPort: 7001
+            - containerPort: 8001

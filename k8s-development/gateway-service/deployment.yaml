@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: gateway-container
+          image: registry-harbor.ngodat0103.me/kltn/gateway-service:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000

@@ -12,7 +12,7 @@ on:
         type: string
 jobs:
   build-ready-container:
-    environment: development
+    environment: pre-production
     name: build ready container
     runs-on: ubuntu-latest
     steps:

@@ -11,6 +11,14 @@ import com.example.userservice.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.web.OAuth2ClientDsl;
+import org.springframework.security.config.annotation.web.OAuth2LoginDsl;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,15 +37,31 @@ public class CustomerServiceImpl implements CustomerService {
     private final AddressRepository addressRepository;
     private final RestTemplate restTemplate;
     private final CustomerMapper customerMapper;
-    public CustomerServiceImpl(CustomerRepository customerRepository, AddressRepository addressRepository, CustomerMapper customerMapper) {
+    private final TokenService tokenService ;
+    public  CustomerServiceImpl(CustomerRepository customerRepository,
+                                AddressRepository addressRepository,
+                                CustomerMapper customerMapper, TokenService tokenService) {
+
+
+
         this.customerRepository = customerRepository;
         this.addressRepository = addressRepository;
         this.customerMapper = customerMapper;
+        this.tokenService = tokenService;
         this.restTemplate = new RestTemplate();
     }
 
     @Override
     public void register(RegisterDto registerDto) {
+
+        String jwtToken = tokenService.getAccessToken();
+        logger.debug("JWT Token: {}", jwtToken);
+
+
+
+
+
+
         ResponseEntity<String> authSvcResponse =  this.restTemplate.postForEntity(AUTH_SVC_REG_URI,registerDto, String.class);
         logger.debug("Response from auth-service: {}", authSvcResponse);
         if(authSvcResponse.getStatusCode().is2xxSuccessful()){

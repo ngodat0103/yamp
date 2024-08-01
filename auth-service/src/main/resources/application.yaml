@@ -1,28 +1,12 @@
 spring:
-  cloud:
-    inetutils:
-      default-hostname: auth-service
+  profiles:
+    default: dev
+  config:
+    import:
+      - "optional:local-dev.yaml"
+      - "optional:docker-dev.yaml"
   application:
     name: auth-service
-  datasource:
-    url: jdbc:postgresql://share-db:5432/auth-service-db
-    username: share
-    password: share
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate.hibernate.format_sql: true
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-  data:
-    redis:
-      url: redis://redis-service:6379
-      client-type: lettuce
-logging.level:
-  org:
-    springframework.security: info
-
 server:
   port: 8001
   forward-headers-strategy: framework
@@ -33,5 +17,13 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /ui-docs
-
   show-oauth2-endpoints: true
+  open-api:
+    info:
+      version: 1.0.0
+      title: Auth Service
+      description: Auth Service API
+      contact:
+        name: NgoDat0103
+        url: https://github.com/NGODAT0103
+        email: 21521935@gm.uit.edu.vn

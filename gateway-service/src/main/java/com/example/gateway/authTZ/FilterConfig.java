@@ -1,12 +1,16 @@
 package com.example.gateway.authTZ;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.commons.util.InetUtilsProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -18,9 +22,21 @@ import reactor.core.publisher.Mono;
 import java.net.Inet4Address;
 
 @Configuration
+@ConfigurationProperties(prefix = "network-mask")
+@EnableWebFluxSecurity
 public class FilterConfig {
+    private String prefix;
+    private String instanceIp;
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+    public void setInstanceIp(String instanceIp) {
+        this.instanceIp = instanceIp;
+    }
+
     @Bean
-    SecurityWebFilterChain externalFilter(ServerHttpSecurity http){
+    SecurityWebFilterChain externalFilter(ServerHttpSecurity http, InetUtils inetUtils){
         http.cors(ServerHttpSecurity.CorsSpec::disable);
         http.csrf(ServerHttpSecurity.CsrfSpec::disable);
 
@@ -31,16 +47,22 @@ public class FilterConfig {
                 )
         );
 
-
+        String networkMask = instanceIp+"/"+ prefix;
+        System.out.println("Network mask: "+networkMask);
         http.authorizeExchange(exchange ->exchange
-                .pathMatchers(HttpMethod.POST,"/api/v1/auth/account/register").hasIpAddress("127.0.0.1/24")
-                .pathMatchers(HttpMethod.POST,"/api/v1/auth/account/role").hasIpAddress("127.0.0.1/24")
                 .pathMatchers(HttpMethod.GET,"/api/v1/auth/role/getAccountRoles").hasRole("ADMIN")
-                .pathMatchers("/api/v1/auth/oauth2/**","/api/v1/auth/login").permitAll()
-                .pathMatchers("/api/v1/user/register").permitAll()
+                .pathMatchers(HttpMethod.GET,"/api/v1/auth/api-docs").permitAll()
+                .pathMatchers("/api/v1/auth/oauth2/token","/api/v1/auth/login","api/v1/auth/oauth2/authorize").permitAll()
+
+
+                .pathMatchers("/api/v1/user/register","/api/v1/user/api-docs").permitAll()
                 .pathMatchers("/api/v1/user/getMe").hasRole("CUSTOMER")
-                .pathMatchers("/api/v1/user/**").permitAll()
-                .anyExchange().permitAll()
+
+
+                .pathMatchers("/ui-docs/**").permitAll()
+                .pathMatchers("/api-docs/**").permitAll()
+                .pathMatchers("webjars/**").permitAll()
+                .anyExchange().authenticated()
         );
         return http.build();
     }

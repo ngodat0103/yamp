@@ -1,4 +1,4 @@
-package org.example.authservice.security;
+package org.example.authservice.config;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -17,14 +17,14 @@ import org.springframework.security.oauth2.server.authorization.client.JdbcRegis
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
-import java.io.IOException;
+
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Configuration
-public class Oauth2Config {
+public class AuthTZConfig {
     @Bean
     RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate){
         return new JdbcRegisteredClientRepository(jdbcTemplate);
@@ -38,10 +38,6 @@ public class Oauth2Config {
         return new RedisOauth2AuthorizationService(redisOperations,registeredClientRepository,autowireCapableBeanFactory);
     }
 
-
-    @Bean HcpVault hcpVault() throws IOException, com.nimbusds.oauth2.sdk.ParseException {
-        return new HcpVault();
-    }
 
     @Bean
     JWKSource<SecurityContext> jwkSource(HcpVault hcpVault) throws ParseException {

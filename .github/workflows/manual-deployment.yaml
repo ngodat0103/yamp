@@ -19,6 +19,7 @@ jobs:
   auth-service-deployment:
     if: ${{ inputs.auth-service == true }}
     uses: ./.github/workflows/cd-reusable-workflow.yaml
+    secrets: inherit
     with:
       SERVICE_NAME: auth-service
       VERSION: ${{ github.event.inputs.version }}

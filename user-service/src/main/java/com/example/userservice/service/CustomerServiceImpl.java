@@ -8,19 +8,12 @@ import com.example.userservice.dto.mapper.CustomerMapper;
 import com.example.userservice.entity.Customer;
 import com.example.userservice.repository.AddressRepository;
 import com.example.userservice.repository.CustomerRepository;
+import com.example.userservice.security.Oauth2WebClientConfiguration;
 import org.slf4j.Logger;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.web.OAuth2ClientDsl;
-import org.springframework.security.config.annotation.web.OAuth2LoginDsl;
-import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
@@ -35,48 +28,42 @@ public class CustomerServiceImpl implements CustomerService {
     private final Logger logger = org.slf4j.LoggerFactory.getLogger(CustomerServiceImpl.class);
     private final  CustomerRepository  customerRepository;
     private final AddressRepository addressRepository;
-    private final RestTemplate restTemplate;
     private final CustomerMapper customerMapper;
-    private final TokenService tokenService ;
+    private final WebClient webClient;
     public  CustomerServiceImpl(CustomerRepository customerRepository,
                                 AddressRepository addressRepository,
-                                CustomerMapper customerMapper, TokenService tokenService) {
-
-
-
+                                CustomerMapper customerMapper,
+                                WebClient webClient)
+    {
         this.customerRepository = customerRepository;
         this.addressRepository = addressRepository;
         this.customerMapper = customerMapper;
-        this.tokenService = tokenService;
-        this.restTemplate = new RestTemplate();
+        this.webClient = webClient;
     }
 
     @Override
     public void register(RegisterDto registerDto) {
+      ResponseEntity<Void> responseEntity=  webClient.
+              post().
+              uri(AUTH_SVC_REG_URI).
+              bodyValue(registerDto).
+              retrieve().toBodilessEntity().block();
 
-        String jwtToken = tokenService.getAccessToken();
-        logger.debug("JWT Token: {}", jwtToken);
-
-
-
-
-
-
-        ResponseEntity<String> authSvcResponse =  this.restTemplate.postForEntity(AUTH_SVC_REG_URI,registerDto, String.class);
-        logger.debug("Response from auth-service: {}", authSvcResponse);
-        if(authSvcResponse.getStatusCode().is2xxSuccessful()){
-            String accountUuidHeader = authSvcResponse.getHeaders().getFirst(ACCOUNT_UUID_HEADER);
+        assert responseEntity != null;
+        if(responseEntity.getStatusCode().is2xxSuccessful()){
+            String accountUuidHeader = responseEntity.getHeaders().getFirst(ACCOUNT_UUID_HEADER);
             assert  accountUuidHeader !=null;
             logger.debug("get  Account UUID from auth-service: {}", accountUuidHeader);
             UUID accountUuid = UUID.fromString(accountUuidHeader);
 
-            RequestEntity<Void> rq= RequestEntity.
-                    post(AUTH_SVC_ROLE_URI).
+
+            ResponseEntity<Void> authSvcRoleRp= webClient.post().
+                    uri(AUTH_SVC_ROLE_URI).
                     header(ACCOUNT_UUID_HEADER,accountUuid.toString()).
                     header(ROLE_NAME_HEADER,DEFAULT_ROLE).
-                    build();
+                    retrieve().toBodilessEntity().block();
 
-            ResponseEntity<Void> authSvcRoleRp =  this.restTemplate.exchange(rq,Void.class);
+            assert authSvcRoleRp != null;
             if(authSvcRoleRp.getStatusCode().is2xxSuccessful()){
                 logger.debug("Role added to account: {}", accountUuid);
             }
@@ -86,7 +73,9 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setLastName(registerDto.getLastName());
             Customer cusResponse =  customerRepository.save(customer);
             logger.debug("Customer saved: {}", cusResponse);
+
         }
+
 
 
     }
@@ -96,11 +85,13 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findByAccountUuid(accountUuid);
         if(customer != null){
             CustomerDto customerDto = customerMapper.mapToDto(customer);
-            RequestEntity<Void> rq = RequestEntity.
-                    get(AUTH_SVC_ACC_URI).header(ACCOUNT_UUID_HEADER,accountUuid.toString()).
-                    build();
-
-            ResponseEntity<AccountDto> accountDtoResponse = this.restTemplate.exchange(rq,AccountDto.class);
+            ResponseEntity<AccountDto> accountDtoResponse = webClient.get()
+                    .uri(AUTH_SVC_ACC_URI)
+                    .header(ACCOUNT_UUID_HEADER, accountUuid.toString())
+                    .retrieve()
+                    .toEntity(AccountDto.class)
+                    .block();
+            assert accountDtoResponse != null;
             if (accountDtoResponse.getStatusCode().is2xxSuccessful()){
                 AccountDto accountDto = accountDtoResponse.getBody();
                 assert accountDto != null;

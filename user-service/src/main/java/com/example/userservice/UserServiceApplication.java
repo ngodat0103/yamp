@@ -1,13 +1,11 @@
 package com.example.userservice;
 
-import com.example.userservice.service.TokenService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.OAuthFlow;
 import io.swagger.v3.oas.annotations.security.OAuthFlows;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import org.antlr.v4.runtime.Token;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -46,9 +44,6 @@ public class UserServiceApplication {
 	public static void main(String[] args) {
 	 ApplicationContext ctx =  SpringApplication.run(UserServiceApplication.class, args);
 
-		TokenService tokenService = ctx.getBean(TokenService.class);
-		tokenService.getAccessToken();
-		int stop = 0 ;
 	}
 
 }

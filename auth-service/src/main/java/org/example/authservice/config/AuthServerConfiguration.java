@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Configuration
-public class AuthTZConfig {
+public class AuthServerConfiguration {
     @Bean
     RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate){
         return new JdbcRegisteredClientRepository(jdbcTemplate);
@@ -38,29 +38,4 @@ public class AuthTZConfig {
         return new RedisOauth2AuthorizationService(redisOperations,registeredClientRepository,autowireCapableBeanFactory);
     }
 
-
-    @Bean
-    JWKSource<SecurityContext> jwkSource(HcpVault hcpVault) throws ParseException {
-        String jwk = hcpVault.getSecret();
-        RSAKey rsaKey = RSAKey.parse(jwk);
-        JWKSet jwkSet = new JWKSet(rsaKey);
-        return new ImmutableJWKSet<>(jwkSet);
-    }
-
-    @Bean
-    public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer() {
-        return context -> {
-            if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
-                String uuid = context.getPrincipal().getName();
-                context.getClaims().claims(claims -> {
-                    Set<String> roles = AuthorityUtils.authorityListToSet(context.getPrincipal().getAuthorities())
-                            .stream()
-                            .map(c -> c.replaceFirst("^ROLE_", ""))
-                            .collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
-                    claims.put("roles", roles);
-                    claims.put("X-Account-Uuid", uuid);
-                });
-            }
-        };
-    }
 }

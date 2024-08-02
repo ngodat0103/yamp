@@ -7,8 +7,11 @@ spring:
             provider: auth-service
             client-id: user-service
             client-secret: user-service-secret
-            client-authentication-method: basic
+            client-authentication-method: client_secret_basic
             authorization-grant-type: client_credentials
+            scope:
+              - auth-service.read
+              - auth-service.write
         provider:
           auth-service:
             token-uri: http://gateway-service:8000/api/v1/auth/oauth2/token
@@ -26,7 +29,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-
 springdoc:
   swagger-ui:
     path: /ui-docs
@@ -37,5 +39,7 @@ springdoc:
     oauth2-redirect-url: http://localhost:8000/ui-docs/swagger-ui/oauth2-redirect.html
   api-docs:
     path: /api-docs
-
+logging:
+  level:
+    org.springframework.security: DEBUG
 

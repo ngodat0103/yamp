@@ -5,6 +5,7 @@ spring:
     import:
       - "optional:local-dev.yaml"
       - "optional:docker-dev.yaml"
+      - "optional:prod.yaml"
   application:
     name: auth-service
 server:

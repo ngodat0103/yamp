@@ -17,12 +17,15 @@ public class AuthServiceApplication {
     public static void main(String[] args) throws SQLException {
        ApplicationContext ctx =  SpringApplication.run(AuthServiceApplication.class, args);
 
+
        // testing only
         ClassPathResource classPathResource = new ClassPathResource("init_sql_testing_only.sql");
         if (classPathResource.exists()) {
             DataSource dataSource = ctx.getBean(DataSource.class);
             ScriptUtils.executeSqlScript(dataSource.getConnection(), classPathResource);
         }
+
+
 
     }
 

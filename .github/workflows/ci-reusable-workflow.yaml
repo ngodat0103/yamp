@@ -137,7 +137,7 @@ jobs:
         working-directory: ${{inputs.SERVICE_NAME}}
         env:
           TRIVY_USERNAME: ${{github.repository_owner}}
-          TRIVY_PASSWORD: ${{github.token}}
+          TRIVY_PASSWORD: ${{secrets.DOCKER_GITHUB_TOKEN}}
         run: trivy fs --scanners misconfig --exit-code 1 --severity HIGH,CRITICAL .
 
   build-and-push:
@@ -154,7 +154,7 @@ jobs:
         with:
           registry: ${{secrets.REGISTRY_URL}}
           username: ${{github.repository_owner}}
-          password: ${{DOCKER_GITHUB_TOKEN}}
+          password: ${{secrets.DOCKER_GITHUB_TOKEN}}
       - name: build and push
         uses: docker/build-push-action@v6.4.0
         with:
@@ -188,7 +188,7 @@ jobs:
           output: ${{inputs.SERVICE_NAME}}-report-${{github.sha}}.html
         env:
           TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
-          TRIVY_PASSWORD: ${{DOCKER_GITHUB_TOKEN}}
+          TRIVY_PASSWORD: ${{secrets.DOCKER_GITHUB_TOKEN}}
       - name: Upload ${{inputs.SERVICE_NAME}} security report to artifact tab
         if: ${{steps.generate-report.conclusion == 'failure'}}
         uses: actions/upload-artifact@v4.3.4

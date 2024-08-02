@@ -159,7 +159,7 @@ jobs:
           context: ${{inputs.service_name}}
           file: Dockerfile-for-CI
           push: true
-          tags: ghcr.io/${{github.repository}}/${{inputs.service_name}}:${{github.sha}}
+          tags: ghcr.io/ngodat0103/kltn/${{inputs.service_name}}:${{github.sha}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: service_name=${{inputs.service_name}}

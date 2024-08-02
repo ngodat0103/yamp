@@ -71,8 +71,6 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=NGODAT0103_KLTN_469d6be5-1cc8-4567-ae29-7f3f9dc29ff6 -Dsonar.projectName='KLTN'
 
-
-
   scan_security:
     name: Security check
     runs-on: ubuntu-latest
@@ -166,7 +164,7 @@ jobs:
           tags: ${{secrets.REGISTRY_URL}}/ngodat0103/kltn/${{inputs.SERVICE_NAME}}:${{github.sha}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: service_name=${{inputs.SERVICE_NAME}}
+          build-args: SERVICE_NAME=${{inputs.SERVICE_NAME}},SERVICE_PORT=${{inputs.SERVICE_PORT}}
 
   security_check:
     name: Security check for docker image

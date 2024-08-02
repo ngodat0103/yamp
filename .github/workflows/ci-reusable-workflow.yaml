@@ -154,7 +154,7 @@ jobs:
         with:
           registry: ${{secrets.REGISTRY_URL}}
           username: ${{github.repository_owner}}
-          password: ${{github.token}}
+          password: ${{DOCKER_GITHUB_TOKEN}}
       - name: build and push
         uses: docker/build-push-action@v6.4.0
         with:
@@ -188,7 +188,7 @@ jobs:
           output: ${{inputs.SERVICE_NAME}}-report-${{github.sha}}.html
         env:
           TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
-          TRIVY_PASSWORD: ${{secrets.REGISTRY_PASSWORD}}
+          TRIVY_PASSWORD: ${{DOCKER_GITHUB_TOKEN}}
       - name: Upload ${{inputs.SERVICE_NAME}} security report to artifact tab
         if: ${{steps.generate-report.conclusion == 'failure'}}
         uses: actions/upload-artifact@v4.3.4

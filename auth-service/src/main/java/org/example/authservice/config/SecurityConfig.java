@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 public class SecurityConfig {
 
 
+
+
     @Bean
     @Order(1)
     SecurityFilterChain oauth2FilterChain(HttpSecurity http) throws Exception {

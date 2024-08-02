@@ -5,13 +5,16 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.*;
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class Account{
+public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID accountUuid;
@@ -33,8 +36,6 @@ public class Account{
     public Set<AccountRole> getAccountRole (){
         return Collections.unmodifiableSet(accountRole);
     }
-
-
 
     public Account(String username,String password){
         this.username = username;

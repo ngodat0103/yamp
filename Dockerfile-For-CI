@@ -21,4 +21,5 @@ RUN useradd -r -s /usr/sbin/nologin -d /opt/app app && \
 USER app
 EXPOSE ${SERVICE_PORT}
 HEALTHCHECK --interval=30s --timeout=3s --retries=1 CMD wget -qO- http://localhost:${SERVICE_PORT}/actuator/health/ | grep UP || exit 1
+LABEL org.opencontainers.image.source=https://github.com/ngodat0103/kltn
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

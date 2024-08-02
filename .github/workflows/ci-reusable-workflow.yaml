@@ -106,7 +106,7 @@ jobs:
           path: ~/.cache/trivy
           key: ${{ runner.os }}-trivy
       - name: set up trivy
-        run: | 
+        run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v0.53.0/trivy_0.53.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.53.0_Linux-64bit.deb
       - name: trivy scan

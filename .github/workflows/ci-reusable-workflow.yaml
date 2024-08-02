@@ -165,8 +165,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            - SERVICE_NAME=${{inputs.SERVICE_NAME}}
-            - SERVICE_PORT=${{inputs.SERVICE_PORT}}
+            SERVICE_NAME=${{inputs.SERVICE_NAME}}
+            SERVICE_PORT=${{inputs.SERVICE_PORT}}
 
   security_check:
     name: Security check for docker image

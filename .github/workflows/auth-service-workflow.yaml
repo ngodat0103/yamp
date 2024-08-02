@@ -5,7 +5,7 @@ on:
       - "auth-service/**"
 jobs:
   auth-service:
-    uses: ./.github/workflows/ci-reusable-workflow.yml
+    uses: ./.github/workflows/ci-reusable-workflow.yaml
     with:
       service_name: ${{github.workflow}}
     secrets: inherit

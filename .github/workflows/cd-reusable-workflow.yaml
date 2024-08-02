@@ -39,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v6.4.0
         with:
           context: ${{inputs.SERVICE_NAME}}
-          file: Dockerfile
+          file: Dockerfile-for-CI
           push: true
           tags: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.SERVICE_NAME}}:${{steps.next-version.outputs.version}}
           cache-from: type=gha

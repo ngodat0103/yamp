@@ -12,25 +12,6 @@ eureka:
       defaultZone: http://localhost:9001/eureka/
 
 
-#spring:
-#  cloud:
-#    loadbalancer.ribbon.enabled: false
-#    gateway:
-#      routes:
-#        - id: organization-service
-#          uri: lb://organization-service
-#          predicates:
-#            - Path=/organization/**
-#          filters:
-#            - RewritePath=/organization/(?<path>.*), /$\{path}
-#        - id: licensing-service
-#          uri: lb://licensing-service
-#          predicates:
-#            - Path=/license/**
-#          filters:
-#            - RewritePath=/license/(?<path>.*), /$\{path}
-
-
 
 management:
   endpoints:

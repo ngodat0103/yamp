@@ -28,7 +28,7 @@ public class AccountController {
         return accountService.getAccount(accountUuid);
     }
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void register(@Valid @RequestBody AccountDto account, HttpServletResponse response){
         Account newAccount =  accountService.register(account);

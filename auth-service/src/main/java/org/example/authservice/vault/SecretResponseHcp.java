@@ -34,7 +34,6 @@ public class SecretResponseHcp  {
             private CreatedBy createdBy;
             @JsonProperty("created_by_id")
             private String createdById;
-
         }
         @Getter
         public static class CreatedBy {

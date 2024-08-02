@@ -1,0 +1,66 @@
+name: development-environment
+services:
+  auth-service:
+    build:
+      context: auth-service
+    container_name: auth-service
+    ports:
+      - 8001:8001
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker-dev
+    depends_on:
+      - share-db
+      - redis
+    restart: unless-stopped
+  user-service:
+    build:
+      context: user-service
+    container_name: user-service
+    ports:
+      - 8002:8002
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker-dev
+    depends_on:
+      - share-db
+      - redis
+    restart: unless-stopped
+
+  gateway-service:
+    build:
+      context: gateway-service
+    container_name: gateway-service
+    ports:
+      - 8000:8000
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker-dev
+    depends_on:
+      - user-service
+      - auth-service
+      - share-db
+      - redis
+    restart: unless-stopped
+
+
+
+  share-db:
+    image: postgres:16.3-bullseye
+    container_name: share_db
+    environment:
+      - POSTGRES_USER=share
+      - POSTGRES_PASSWORD=share
+      - POSTGRES_DB=share
+    ports:
+      - 5432:5432
+    volumes:
+        - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    hostname: redis-service
+    restart: unless-stopped
+    image: redis:7.4-rc2-bookworm
+    container_name: redis
+    ports:
+      - 6379:6379
+volumes:
+    db_data:

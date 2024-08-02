@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    default: local-dev
+  config:
+    import:
+      - "optional:docker-dev.yaml"
+      - "optional:local-dev.yaml"
+  application:
+    name: user-service
+server:
+  port: 8002
+  forward-headers-strategy: framework
+  servlet:
+    context-path: /api/v1/user
+

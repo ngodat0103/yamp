@@ -1,3 +1,5 @@
 /.idea/
 /.env
 /auth-service/src/main/resources/rsa.jwk
+/k8s-development/.dockerconfigjson
+/k8s-development/registry-secret.yaml

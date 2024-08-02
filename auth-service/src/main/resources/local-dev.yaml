@@ -1,9 +1,7 @@
 spring:
-  cloud:
-    inetutils:
-      default-hostname: auth-service
-  application:
-    name: auth-service
+  config:
+    activate:
+      on-profile: dev
   datasource:
     url: jdbc:postgresql://share-db:5432/auth-service-db
     username: share
@@ -19,19 +17,9 @@ spring:
     redis:
       url: redis://redis-service:6379
       client-type: lettuce
-logging.level:
-  org:
-    springframework.security: info
-
-server:
-  port: 8001
-  forward-headers-strategy: framework
-  servlet:
-    context-path: /api/v1/auth
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /ui-docs
-
-  show-oauth2-endpoints: true
+logging:
+  level:
+    org.springframework.security: DEBUG
+hcp-vault:
+  token-end-point: https://auth.idp.hashicorp.com/oauth2/token
+  jwk-secret-path: https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/cbe1cf74-4825-4a1b-8c63-c685c98f813c/projects/d0064e9e-e611-4d22-8151-d54a515c513d/apps/authTZ/open

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      imagePullSecrets:
+        - name: registry-secret
+      containers:
+        - name: auth-container
+          image: registry-harbor.ngodat0103.me/kltn/user-service:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8002

@@ -5,6 +5,7 @@ import com.example.userservice.dto.RegisterDto;
 import com.example.userservice.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ import javax.security.auth.login.AccountNotFoundException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping()
 public class UserController {
     private  final CustomerService customerService;
 
@@ -30,8 +31,12 @@ public class UserController {
 
     @SecurityRequirement(name = "oauth2")
     @GetMapping( "/getMe")
-    public CustomerDto getMe(@RequestHeader(value = "X-Account-Uuid",required = false) UUID xAccountUuid) throws AccountNotFoundException {
-        return customerService.getCustomer(xAccountUuid);
+    public CustomerDto getMe(HttpServletRequest httpServletRequest) throws AccountNotFoundException {
+        String xAccountUuid = httpServletRequest.getHeader("X-Account-Uuid");
+        if (xAccountUuid == null) {
+            throw new AccountNotFoundException("Account not found");
+        }
+        return customerService.getCustomer(UUID.fromString(xAccountUuid));
 
     }
 

@@ -1,4 +1,4 @@
-name: reusable_workflow
+name: ci-workflow
 on:
   workflow_call:
     inputs:

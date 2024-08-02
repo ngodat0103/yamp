@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.Setter;
-import org.example.authservice.service.OAuth2AuthorizationModule;
+import org.example.authservice.jackson2.OAuth2AuthorizationModule;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.http.converter.json.SpringHandlerInstantiator;

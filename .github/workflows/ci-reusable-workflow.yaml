@@ -137,10 +137,15 @@ jobs:
         working-directory: ${{inputs.SERVICE_NAME}}
         env:
           TRIVY_USERNAME: ${{github.repository_owner}}
-          TRIVY_PASSWORD: ${{secrets.DOCKER_GITHUB_TOKEN}}
+          TRIVY_PASSWORD: ${{secrets.GITHUB_TOKEN}}
         run: trivy fs --scanners misconfig --exit-code 1 --severity HIGH,CRITICAL .
 
   build-and-push:
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     needs: [ test,scan_security,scan_vulnerability,scan_misconfig]
     name: Build and push
     runs-on: ubuntu-latest
@@ -154,14 +159,22 @@ jobs:
         with:
           registry: ${{secrets.REGISTRY_URL}}
           username: ${{github.repository_owner}}
-          password: ${{secrets.DOCKER_GITHUB_TOKEN}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5.5.1
+        with:
+          images: ${{secrets.REGISTRY_URL}}/ngodat0103/kltn/${{inputs.SERVICE_NAME}}
       - name: build and push
         uses: docker/build-push-action@v6.4.0
         with:
           context: ${{inputs.SERVICE_NAME}}
           file: Dockerfile-For-CI
           push: true
-          tags: ${{secrets.REGISTRY_URL}}/ngodat0103/kltn/${{inputs.SERVICE_NAME}}:${{github.sha}}
+          tags: ${{steps.meta.outputs.tags}}
+          labels: ${{steps.meta.outputs.labels}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -188,7 +201,7 @@ jobs:
           output: ${{inputs.SERVICE_NAME}}-report-${{github.sha}}.html
         env:
           TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
-          TRIVY_PASSWORD: ${{secrets.DOCKER_GITHUB_TOKEN}}
+          TRIVY_PASSWORD: ${{secrets.GITHUB_TOKEN}}
       - name: Upload ${{inputs.SERVICE_NAME}} security report to artifact tab
         if: ${{steps.generate-report.conclusion == 'failure'}}
         uses: actions/upload-artifact@v4.3.4

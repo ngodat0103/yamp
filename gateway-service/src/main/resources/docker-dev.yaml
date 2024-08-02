@@ -1,0 +1,33 @@
+spring:
+  config:
+    activate:
+      on-profile: docker-dev
+  data:
+    redis:
+      url: redis://redis-service:6379
+      client-type: lettuce
+      database: 0
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /ui-docs
+    enabled: true
+    oauth:
+      client-id: webclient
+      client-secret: webclientsecret
+      use-basic-authentication-with-access-code-grant: true
+    oauth2-redirect-url: http://localhost:8000/webjars/swagger-ui/oauth2-redirect.html
+    urls:
+      - name: "auth-service"
+        url: "http://localhost:8000/api/v1/auth/api-docs"
+      - name: "user-service"
+        url: "http://localhost:8000/api/v1/user/api-docs"
+    use-root-path: true
+network-mask:
+  prefix: "16"
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.cloud.gateway: DEBUG

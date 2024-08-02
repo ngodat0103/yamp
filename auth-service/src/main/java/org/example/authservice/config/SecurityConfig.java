@@ -1,4 +1,4 @@
-package org.example.authservice.security;
+package org.example.authservice.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -15,8 +15,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity()
 public class SecurityConfig {
+
+
 
 
     @Bean
@@ -26,7 +28,6 @@ public class SecurityConfig {
         // for testing purposes
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
-
 
 
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);

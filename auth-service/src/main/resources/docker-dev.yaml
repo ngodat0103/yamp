@@ -1,0 +1,20 @@
+spring:
+  config:
+    activate:
+      on-profile: docker-dev
+  datasource:
+    url: jdbc:postgresql://share-db:5432/auth-service-db
+    username: share
+    password: share
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    redis:
+      url: redis://redis-service:6379
+      client-type: lettuce
+hcp-vault:
+  token-end-point: https://auth.idp.hashicorp.com/oauth2/token
+  jwk-secret-path: https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/cbe1cf74-4825-4a1b-8c63-c685c98f813c/projects/d0064e9e-e611-4d22-8151-d54a515c513d/apps/authTZ/open

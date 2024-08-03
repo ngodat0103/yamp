@@ -1,16 +1,16 @@
 FROM maven:3.9.8-eclipse-temurin-17-alpine AS builder
 WORKDIR build
 COPY . .
-RUN mvn clean install -DskipTests
+RUN mvn -q clean install -DskipTests
 
 FROM eclipse-temurin:17-jre AS layers
 ARG SERVICE_NAME
-ARG SERVICE_PORT
 WORKDIR /
 COPY --from=builder /build/target/${SERVICE_NAME}-0.0.1-SNAPSHOT.jar app.jar
 RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination layers
 
 FROM eclipse-temurin:17-jre-jammy
+ARG SERVICE_PORT
 WORKDIR /opt/app
 COPY --from=layers /layers/dependencies/ ./
 COPY --from=layers /layers/spring-boot-loader/ ./
@@ -21,4 +21,5 @@ RUN useradd -r -s /usr/sbin/nologin -d /opt/app app && \
 USER app
 EXPOSE ${SERVICE_PORT}
 HEALTHCHECK --interval=30s --timeout=3s --retries=1 CMD wget -qO- http://localhost:${SERVICE_PORT}/actuator/health/ | grep UP || exit 1
+LABEL org.opencontainers.image.source=https://github.com/ngodat0103/kltn
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

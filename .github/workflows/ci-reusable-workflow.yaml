@@ -2,8 +2,12 @@ name: ci-workflow
 on:
   workflow_call:
     inputs:
-      service_name:
+      SERVICE_NAME:
         description: "name of the service to trigger the CI"
+        required: true
+        type: string
+      SERVICE_PORT:
+        description: "port of the service to trigger the CI"
         required: true
         type: string
 jobs:
@@ -18,7 +22,7 @@ jobs:
         env:
           POSTGRES_USER: share
           POSTGRES_PASSWORD: share
-          POSTGRES_DB: ${{inputs.service_name}}-db
+          POSTGRES_DB: ${{inputs.SERVICE_NAME}}-db
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,7 +35,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Running test
-        working-directory: ${{inputs.service_name}}
+        working-directory: ${{inputs.SERVICE_NAME}}
         run: mvn test
 
 
@@ -61,13 +65,11 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
       - name: Build and analyze
-        working-directory: ${{inputs.service_name}}
+        working-directory: ${{inputs.SERVICE_NAME}}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=NGODAT0103_KLTN_469d6be5-1cc8-4567-ae29-7f3f9dc29ff6 -Dsonar.projectName='KLTN'
-
-
 
   scan_security:
     name: Security check
@@ -86,7 +88,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: snky test
-        working-directory: ${{inputs.service_name}}
+        working-directory: ${{inputs.SERVICE_NAME}}
         env:
           SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
         run: |
@@ -110,10 +112,10 @@ jobs:
           wget https://github.com/aquasecurity/trivy/releases/download/v0.53.0/trivy_0.53.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.53.0_Linux-64bit.deb
       - name: trivy scan
-        working-directory: ${{inputs.service_name}}
+        working-directory: ${{inputs.SERVICE_NAME}}
         env:
-          TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
-          TRIVY_PASSWORD: ${{secrets.REGISTRY_PASSWORD}}
+          TRIVY_USERNAME: ${{github.repository_owner}}
+          TRIVY_PASSWORD: ${{github.token}}
         run: trivy fs --exit-code 1 --severity HIGH,CRITICAL .
   scan_misconfig:
     name: check misconfiguration
@@ -132,64 +134,78 @@ jobs:
           wget https://github.com/aquasecurity/trivy/releases/download/v0.53.0/trivy_0.53.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.53.0_Linux-64bit.deb
       - name: trivy scan
-        working-directory: ${{inputs.service_name}}
+        working-directory: ${{inputs.SERVICE_NAME}}
         env:
-          TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
-          TRIVY_PASSWORD: ${{secrets.REGISTRY_PASSWORD}}
+          TRIVY_USERNAME: ${{github.repository_owner}}
+          TRIVY_PASSWORD: ${{secrets.GITHUB_TOKEN}}
         run: trivy fs --scanners misconfig --exit-code 1 --severity HIGH,CRITICAL .
 
-  build-and-push:
-    needs: [ test,scan_security,scan_vulnerability,scan_misconfig]
-    name: Build and push
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v4
-      - name: set up buildx
-        uses: docker/setup-buildx-action@v3.4.0
-      - name: docker login credential
-        uses: docker/login-action@v3.2.0
-        with:
-          registry: ${{secrets.REGISTRY_URL}}
-          username: ${{secrets.REGISTRY_USERNAME}}
-          password: ${{secrets.REGISTRY_PASSWORD}}
-      - name: build and push
-        uses: docker/build-push-action@v6.4.0
-        with:
-          context: ${{inputs.service_name}}
-          file: Dockerfile
-          push: true
-          tags: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.service_name}}:${{github.sha}}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: service_name=${{inputs.service_name}}
-
-  security_check:
-    name: Security check for docker image
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Scan security
-        id: generate-report
-        uses: aquasecurity/trivy-action@0.24.0
-        with:
-          image-ref: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.service_name}}:${{github.sha}}
-          severity: HIGH,CRITICAL
-          vuln-type: os,library
-          exit-code: 1
-          format: template
-          template: '@/contrib/html.tpl'
-          output: ${{inputs.service_name}}-report-${{github.sha}}.html
-        env:
-          TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
-          TRIVY_PASSWORD: ${{secrets.REGISTRY_PASSWORD}}
-      - name: Upload ${{inputs.service_name}} security report to artifact tab
-        if: ${{steps.generate-report.conclusion == 'failure'}}
-        uses: actions/upload-artifact@v4.3.4
-        with:
-          name: ${{inputs.service_name}}-report-${{github.sha}}.html
-          if-no-files-found: warn
-          path: ${{inputs.service_name}}-report-${{github.sha}}.html
+#  build-and-push:
+#    permissions:
+#      contents: read
+#      packages: write
+#    needs: [ test,scan_security,scan_vulnerability,scan_misconfig]
+#    name: Build and push
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: checkout
+#        uses: actions/checkout@v4
+#      - name: set up buildx
+#        uses: docker/setup-buildx-action@v3.4.0
+#      - name: docker login credential
+#        uses: docker/login-action@v3.2.0
+#        with:
+#          logout: false
+#          registry: ghcr.io
+#          username: ${{github.repository_owner}}
+#          password: ${{secrets.GITHUB_TOKEN}}
+#
+#
+#      - name: Extract metadata (tags, labels) for Docker
+#        id: meta
+#        uses: docker/metadata-action@v5.5.1
+#        with:
+#          images: ghcr.io/ngodat0103/kltn/${{inputs.SERVICE_NAME}}
+#      - name: build and push
+#        uses: docker/build-push-action@v6.3.0
+#        with:
+#          context: ${{inputs.SERVICE_NAME}}
+#          file: Dockerfile-For-CI
+#          push: true
+#          tags: ${{steps.meta.outputs.tags}}
+#          labels: ${{steps.meta.outputs.labels}}
+##          cache-from: type=gha
+##          cache-to: type=gha,mode=max
+#          build-args: |
+#            SERVICE_NAME=${{inputs.SERVICE_NAME}}
+#            SERVICE_PORT=${{inputs.SERVICE_PORT}}
+#
+#  security_check:
+#    name: Security check for docker image
+#    needs: build-and-push
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#      - name: Scan security
+#        id: generate-report
+#        uses: aquasecurity/trivy-action@0.24.0
+#        with:
+#          image-ref: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.SERVICE_NAME}}:${{github.sha}}
+#          severity: HIGH,CRITICAL
+#          vuln-type: os,library
+#          exit-code: 1
+#          format: template
+#          template: '@/contrib/html.tpl'
+#          output: ${{inputs.SERVICE_NAME}}-report-${{github.sha}}.html
+#        env:
+#          TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
+#          TRIVY_PASSWORD: ${{secrets.GITHUB_TOKEN}}
+#      - name: Upload ${{inputs.SERVICE_NAME}} security report to artifact tab
+#        if: ${{steps.generate-report.conclusion == 'failure'}}
+#        uses: actions/upload-artifact@v4.3.4
+#        with:
+#          name: ${{inputs.SERVICE_NAME}}-report-${{github.sha}}.html
+#          if-no-files-found: warn
+#          path: ${{inputs.SERVICE_NAME}}-report-${{github.sha}}.html
 

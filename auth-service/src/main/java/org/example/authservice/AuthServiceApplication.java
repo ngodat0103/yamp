@@ -18,7 +18,7 @@ public class AuthServiceApplication {
        ApplicationContext ctx =  SpringApplication.run(AuthServiceApplication.class, args);
 
 
-       // testing only
+       // testing onlydsdasdfdfdsfdsfdfsfdsfdsadfsdffdsffdsffdsffdsffdsffdsfdsdfdsffdsffdsffdsf
         ClassPathResource classPathResource = new ClassPathResource("init_sql_testing_only.sql");
         if (classPathResource.exists()) {
             DataSource dataSource = ctx.getBean(DataSource.class);

@@ -156,7 +156,7 @@ jobs:
         uses: docker/login-action@v3.2.0
         with:
           logout: false
-          registry: ${{secrets.REGISTRY_URL}}
+          registry: ghcr.io
           username: ${{github.repository_owner}}
           password: ${{secrets.GITHUB_TOKEN}}
 
@@ -165,7 +165,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5.5.1
         with:
-          images: ${{secrets.REGISTRY_URL}}/ngodat0103/kltn/${{inputs.SERVICE_NAME}}
+          images: ghcr.io/ngodat0103/kltn/${{inputs.SERVICE_NAME}}
       - name: build and push
         uses: docker/build-push-action@v6.3.0
         with:

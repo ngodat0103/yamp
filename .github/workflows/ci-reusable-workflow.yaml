@@ -10,12 +10,6 @@ on:
         description: "port of the service to trigger the CI"
         required: true
         type: string
-
-permissions:
-  contents: read
-  packages: write
-  attestations: write
-  id-token: write
 jobs:
   test:
     name: Test
@@ -147,6 +141,9 @@ jobs:
         run: trivy fs --scanners misconfig --exit-code 1 --severity HIGH,CRITICAL .
 
   build-and-push:
+    permissions:
+      contents: read
+      packages: write
     needs: [ test,scan_security,scan_vulnerability,scan_misconfig]
     name: Build and push
     runs-on: ubuntu-latest

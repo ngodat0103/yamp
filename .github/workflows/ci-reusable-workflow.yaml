@@ -155,6 +155,7 @@ jobs:
       - name: docker login credential
         uses: docker/login-action@v3.2.0
         with:
+          logout: false
           registry: ${{secrets.REGISTRY_URL}}
           username: ${{github.repository_owner}}
           password: ${{secrets.GITHUB_TOKEN}}

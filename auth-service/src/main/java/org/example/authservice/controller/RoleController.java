@@ -1,4 +1,5 @@
 package org.example.authservice.controller;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import org.example.authservice.entity.Role;
 import org.example.authservice.service.RoleService;
@@ -6,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 @RestController
 @RequestMapping("/role")
+@Hidden
 public class RoleController {
     private final RoleService roleService;
 

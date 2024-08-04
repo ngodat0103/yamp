@@ -1,4 +1,6 @@
 package org.example.authservice.controller;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -12,7 +14,7 @@ import java.util.UUID;
 
 @RequestMapping("/account")
 @RestController
-@Tag(name = "Account" ,description = "Account API")
+@Hidden
 public class AccountController {
     private final AccountService accountService;
     private final static String ACCOUNT_UUID_HEADER = "X-Account-Uuid";

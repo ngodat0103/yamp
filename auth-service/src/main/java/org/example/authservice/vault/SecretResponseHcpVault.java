@@ -3,7 +3,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import java.util.List;
 @Getter
-public class SecretResponseHcp  {
+public class SecretResponseHcpVault {
     @JsonProperty("secrets")
     private List<Secret> secrets;
 

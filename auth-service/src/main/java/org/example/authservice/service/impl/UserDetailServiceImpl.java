@@ -21,7 +21,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         List<SimpleGrantedAuthority> authorities= account.getAccountRole().stream()
                 .map(accountRole -> new SimpleGrantedAuthority(accountRole.getRole().getRoleName()))
                 .toList();
-        return User.withUsername(username)
+        return User.withUsername(account.getAccountUuid().toString())
                 .password(account.getPassword())
                 .authorities(authorities)
                 .build();

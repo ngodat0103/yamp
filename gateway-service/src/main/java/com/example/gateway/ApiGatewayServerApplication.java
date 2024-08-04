@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
+import java.io.IOException;
 
 
 @SpringBootApplication

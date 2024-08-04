@@ -50,10 +50,10 @@ public class AccountServiceImpl implements AccountService {
 
         if(accountRepository.existsByUsername(accountDto.getUsername()))
         {
-            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,"Username is already exists!");
+            throw new ApiException(HttpStatus.CONFLICT,"Username is already exists!");
         }
         if(accountRepository.existsByEmail(accountDto.getEmail())){
-            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY,"Email is already exists!");
+            throw new ApiException(HttpStatus.CONFLICT,"Email is already exists!");
         }
             Account account = accountMapper.mapToEntity(accountDto);
             account.setPassword(passwordEncoder.encode(accountDto.getPassword()));

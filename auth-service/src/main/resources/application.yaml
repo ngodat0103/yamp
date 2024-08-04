@@ -18,7 +18,6 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /ui-docs
-  show-oauth2-endpoints: true
   open-api:
     info:
       version: 1.0.0

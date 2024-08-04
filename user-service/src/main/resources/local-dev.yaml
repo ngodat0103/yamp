@@ -1,45 +1,39 @@
 spring:
+  config:
+    activate:
+      on-profile: local-dev
   security:
     oauth2:
       client:
         registration:
           user-service:
-            provider: auth-service
+            provider: internal-auth-service
             client-id: user-service
-            client-secret: user-service-secret
+            client-secret: "{cipher}e4ae50670b988f7503de551f5a61741d422a4a827ad67941979660faba6308030450098cba2e9155c63f7799932a5559"
             client-authentication-method: client_secret_basic
             authorization-grant-type: client_credentials
             scope:
               - auth-service.read
               - auth-service.write
         provider:
-          auth-service:
+          external-auth-service:
+            token-uri: http://localhost:8000/api/v1/auth/oauth2/token
+            authorization-uri: http://localhost:8000/api/v1/auth/oauth2/authorize
+          internal-auth-service:
             token-uri: http://gateway-service:8000/api/v1/auth/oauth2/token
             authorization-uri: http://gateway-service:8000/api/v1/auth/oauth2/authorize
   datasource:
     url: jdbc:postgresql://share-db:5432/user-service-db
-    username: share
-    password: share
+    username: "{cipher}8d5408ba942dc178a167f8b27a52f866184a2c084d21b713f6904932d2963285"
+    password: "{cipher}8d5408ba942dc178a167f8b27a52f866184a2c084d21b713f6904932d2963285"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-
       ddl-auto:  create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-springdoc:
-  swagger-ui:
-    path: /ui-docs
-    oauth:
-      client-id: webclient
-      client-secret: webclientsecret
-      use-basic-authentication-with-access-code-grant: true
-    oauth2-redirect-url: http://localhost:8000/ui-docs/swagger-ui/oauth2-redirect.html
-  api-docs:
-    path: /api-docs
 logging:
   level:
     org.springframework.security: DEBUG
-

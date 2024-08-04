@@ -19,8 +19,8 @@ springdoc:
     path: /ui-docs
     enabled: true
     oauth:
-      client-id: webclient
-      client-secret: webclientsecret
+      client-id: swagger-client
+      client-secret: "{cipher}dcbe3d737b10508e19c95bf72cfe2d22b734104965350a20d6297ebed9953bdfabd761772530e5bb6c2fbc7e30d64551"
       use-basic-authentication-with-access-code-grant: true
     oauth2-redirect-url: http://localhost:8000/webjars/swagger-ui/oauth2-redirect.html
     urls:
@@ -29,6 +29,3 @@ springdoc:
       - name: "user-service"
         url: "http://localhost:8000/api/v1/user/api-docs"
     use-root-path: true
-network-mask:
-  instance-ip: "127.0.0.1"
-  prefix: "24"

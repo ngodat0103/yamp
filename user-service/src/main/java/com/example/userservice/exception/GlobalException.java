@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.reactive.function.client.WebClientException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.io.IOException;
@@ -41,8 +43,8 @@ public class GlobalException {
     }
 
 
-    @ExceptionHandler(RestClientResponseException.class)
-    public void handleRestClientException(RestClientResponseException e, HttpServletResponse rp,HttpServletRequest rq) throws IOException {
+    @ExceptionHandler(WebClientException.class)
+    public void handleRestClientException(WebClientResponseException e, HttpServletResponse rp, HttpServletRequest rq) throws IOException {
         rp.setStatus(e.getStatusCode().value());
         rp.setContentType("application/json");
         HttpErrorInfo httpErrorInfo = this.objectMapper.readValue(e.getResponseBodyAsString(), HttpErrorInfo.class);

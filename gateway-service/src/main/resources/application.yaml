@@ -1,10 +1,9 @@
 spring:
   profiles:
-    default: local-dev
+    active: local-dev
   config:
     import:
       - "optional:local-dev.yaml"
-      - "optional:docker-dev.yaml"
   application:
     name: gateway
   cloud:

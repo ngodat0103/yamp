@@ -12,10 +12,12 @@ import com.example.userservice.security.Oauth2WebClientConfiguration;
 import org.slf4j.Logger;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,16 +49,15 @@ public class CustomerServiceImpl implements CustomerService {
               post().
               uri(AUTH_SVC_REG_URI).
               bodyValue(registerDto).
-              retrieve().toBodilessEntity().block();
-
+              retrieve().
+              toBodilessEntity().
+              block();
         assert responseEntity != null;
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             String accountUuidHeader = responseEntity.getHeaders().getFirst(ACCOUNT_UUID_HEADER);
             assert  accountUuidHeader !=null;
             logger.debug("get  Account UUID from auth-service: {}", accountUuidHeader);
             UUID accountUuid = UUID.fromString(accountUuidHeader);
-
-
             ResponseEntity<Void> authSvcRoleRp= webClient.post().
                     uri(AUTH_SVC_ROLE_URI).
                     header(ACCOUNT_UUID_HEADER,accountUuid.toString()).
@@ -73,7 +74,6 @@ public class CustomerServiceImpl implements CustomerService {
             customer.setLastName(registerDto.getLastName());
             Customer cusResponse =  customerRepository.save(customer);
             logger.debug("Customer saved: {}", cusResponse);
-
         }
 
 

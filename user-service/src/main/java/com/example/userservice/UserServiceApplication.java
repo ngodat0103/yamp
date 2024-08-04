@@ -12,28 +12,26 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 
 @SpringBootApplication
 @Configuration
-@SecurityScheme(
-		type = SecuritySchemeType.OAUTH2,
-		in = SecuritySchemeIn.HEADER,
-		scheme = "bearer",
-		description = "OAuth2 Bearer Token",
-		name = "oauth2",
-		flows = @OAuthFlows(
-				authorizationCode = @OAuthFlow(
-						authorizationUrl = "http://localhost:8000/api/v1/auth/oauth2/authorize",
-						tokenUrl = "http://localhost:8000/api/v1/auth/oauth2/token",
-						refreshUrl = "http://localhost:8000/api/v1/auth/oauth2/refresh"
-				)
-		)
-)
-
-
-@OpenAPIDefinition()
-
-
+//@SecurityScheme(
+//		type = SecuritySchemeType.OAUTH2,
+//		in = SecuritySchemeIn.HEADER,
+//		scheme = "bearer",
+//		description = "OAuth2 Bearer Token",
+//		name = "oauth2",
+//		flows = @OAuthFlows(
+//				authorizationCode = @OAuthFlow(
+//						authorizationUrl = "http://localhost:8000/api/v1/auth/oauth2/authorize",
+//						tokenUrl = "http://localhost:8000/api/v1/auth/oauth2/token",
+//						refreshUrl = "http://localhost:8000/api/v1/auth/oauth2/refresh"
+//				)
+//		)
+//)
+//
+//@OpenAPIDefinition()
 public class UserServiceApplication {
 
 
@@ -43,6 +41,7 @@ public class UserServiceApplication {
 	}
 	public static void main(String[] args) {
 	 ApplicationContext ctx =  SpringApplication.run(UserServiceApplication.class, args);
+
 
 	}
 

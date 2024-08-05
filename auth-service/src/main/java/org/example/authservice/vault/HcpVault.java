@@ -1,6 +1,5 @@
 package org.example.authservice.vault;
 
-import org.example.authservice.config.HcpVaultConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package org.example.authservice.config;
+package org.example.authservice.cache;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;

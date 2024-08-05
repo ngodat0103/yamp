@@ -8,4 +8,5 @@ public class AuthServiceUri {
     public final static  String DEFAULT_ROLE = "ROLE_CUSTOMER";
     public final static String ACCOUNT_UUID_HEADER = "X-Account-Uuid";
     public final static String ROLE_NAME_HEADER = "X-Role-Name";
+    public final static String CORRELATION_ID_HEADER =  "X-Correlation-ID";
 }

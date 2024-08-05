@@ -1,23 +1,14 @@
-package org.example.authservice.config;
+package org.example.authservice.vault;
 
-import com.nimbusds.oauth2.sdk.ParseException;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.authservice.vault.HcpVault;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.*;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.io.IOException;
-import java.util.Map;
 
 @Getter
 @ConfigurationProperties(prefix = "hcp-vault")

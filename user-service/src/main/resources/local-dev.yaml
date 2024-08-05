@@ -37,3 +37,4 @@ spring:
 logging:
   level:
     org.springframework.security: DEBUG
+    com.example.userservice.security: DEBUG

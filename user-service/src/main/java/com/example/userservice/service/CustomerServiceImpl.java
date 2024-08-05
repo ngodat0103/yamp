@@ -1,5 +1,4 @@
 package com.example.userservice.service;
-
 import com.example.userservice.dto.AccountDto;
 import com.example.userservice.dto.AddressDto;
 import com.example.userservice.dto.CustomerDto;
@@ -8,20 +7,15 @@ import com.example.userservice.dto.mapper.CustomerMapper;
 import com.example.userservice.entity.Customer;
 import com.example.userservice.repository.AddressRepository;
 import com.example.userservice.repository.CustomerRepository;
-import com.example.userservice.security.Oauth2WebClientConfiguration;
 import org.slf4j.Logger;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-
 import javax.security.auth.login.AccountNotFoundException;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.UUID;
-
 import static com.example.userservice.constant.AuthServiceUri.*;
+
 
 @Repository
 public class CustomerServiceImpl implements CustomerService {
@@ -44,11 +38,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void register(RegisterDto registerDto) {
-      ResponseEntity<Void> responseEntity=  webClient.
+    public void register(RegisterDto registerDto,String correlationId) {
+        ResponseEntity<Void> responseEntity=  webClient.
               post().
               uri(AUTH_SVC_REG_URI).
               bodyValue(registerDto).
+              header(CORRELATION_ID_HEADER,correlationId).
               retrieve().
               toBodilessEntity().
               block();
@@ -60,8 +55,11 @@ public class CustomerServiceImpl implements CustomerService {
             UUID accountUuid = UUID.fromString(accountUuidHeader);
             ResponseEntity<Void> authSvcRoleRp= webClient.post().
                     uri(AUTH_SVC_ROLE_URI).
-                    header(ACCOUNT_UUID_HEADER,accountUuid.toString()).
-                    header(ROLE_NAME_HEADER,DEFAULT_ROLE).
+                    headers( h-> {
+                        h.add(ACCOUNT_UUID_HEADER,accountUuid.toString());
+                        h.add(CORRELATION_ID_HEADER,correlationId);
+                        h.add(ROLE_NAME_HEADER,DEFAULT_ROLE);
+                    }).
                     retrieve().toBodilessEntity().block();
 
             assert authSvcRoleRp != null;
@@ -81,13 +79,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDto getCustomer(UUID accountUuid) throws AccountNotFoundException {
+    public CustomerDto getCustomer(UUID accountUuid,String correlationId) throws AccountNotFoundException {
         Customer customer = customerRepository.findByAccountUuid(accountUuid);
         if(customer != null){
             CustomerDto customerDto = customerMapper.mapToDto(customer);
             ResponseEntity<AccountDto> accountDtoResponse = webClient.get()
                     .uri(AUTH_SVC_ACC_URI)
-                    .header(ACCOUNT_UUID_HEADER, accountUuid.toString())
+                    .headers(h -> {
+                        h.add(ACCOUNT_UUID_HEADER, accountUuid.toString());
+                        h.add(CORRELATION_ID_HEADER, correlationId);
+                    })
                     .retrieve()
                     .toEntity(AccountDto.class)
                     .block();

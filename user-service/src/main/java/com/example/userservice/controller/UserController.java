@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.UUID;
 
+import static com.example.userservice.constant.AuthServiceUri.ACCOUNT_UUID_HEADER;
+import static com.example.userservice.constant.AuthServiceUri.CORRELATION_ID_HEADER;
+
 @RestController
 @RequestMapping()
 public class UserController {
@@ -25,18 +28,20 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@RequestBody @Valid RegisterDto registerDto){
-        customerService.register(registerDto);
+    public void register(@RequestBody @Valid RegisterDto registerDto, HttpServletRequest request) {
+        String correlationId = request.getHeader(CORRELATION_ID_HEADER);
+        customerService.register(registerDto,correlationId);
     }
 
     @SecurityRequirement(name = "oauth2")
     @GetMapping( "/getMe")
     public CustomerDto getMe(HttpServletRequest httpServletRequest) throws AccountNotFoundException {
-        String xAccountUuid = httpServletRequest.getHeader("X-Account-Uuid");
+        String xAccountUuid = httpServletRequest.getHeader(ACCOUNT_UUID_HEADER);
+        String xCorrelationId = httpServletRequest.getHeader(CORRELATION_ID_HEADER);
         if (xAccountUuid == null) {
             throw new AccountNotFoundException("Account not found");
         }
-        return customerService.getCustomer(UUID.fromString(xAccountUuid));
+        return customerService.getCustomer(UUID.fromString(xAccountUuid),xCorrelationId);
 
     }
 

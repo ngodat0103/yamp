@@ -36,6 +36,7 @@ spring:
 logging:
   level:
     org.springframework.security: DEBUG
+    com.example.authservice.security: DEBUG
     org:
       springframework:
         security:
@@ -47,4 +48,3 @@ init-swagger-client:
   swagger-secret: "{cipher}dcbe3d737b10508e19c95bf72cfe2d22b734104965350a20d6297ebed9953bdfabd761772530e5bb6c2fbc7e30d64551"
   redirect-uri: http://localhost:8000/webjars/swagger-ui/oauth2-redirect.html
   logout-uri: http://localhost:8000/api/v1/auth/logout
-

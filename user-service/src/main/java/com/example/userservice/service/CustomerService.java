@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CustomerService {
-    void register(RegisterDto registerDto);
-    CustomerDto getCustomer(UUID accountUuid) throws AccountNotFoundException;
+    void register(RegisterDto registerDto,String correlationId);
+    CustomerDto getCustomer(UUID accountUuid,String correlationId) throws AccountNotFoundException;
     CustomerDto updateCustomer(UUID accountUuid, CustomerDto customerDto);
     void deleteCustomer(UUID accountUuid);
     List<CustomerDto> getCustomers();

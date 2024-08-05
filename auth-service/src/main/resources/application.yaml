@@ -13,6 +13,10 @@ server:
   forward-headers-strategy: framework
   servlet:
     context-path: /api/v1/auth
+    session:
+      cookie:
+        name: SESSION
+        domain: localhost
 springdoc:
   api-docs:
     path: /api-docs

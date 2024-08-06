@@ -40,22 +40,17 @@ public class AuthConfiguration {
 
         JdbcRegisteredClientRepository jdbcRegisteredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
         RegisteredClient swaggerClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("swagger-client")
-                .clientSecret(passwordEncoder.encode(swaggerSecret))
+                .clientId("gateway-service")
+                .clientSecret(passwordEncoder.encode("gateway-service-secret"))
                 .clientSecretExpiresAt(null)
                 .tokenSettings(TokenSettings.builder().
-                        accessTokenTimeToLive(Duration.ofMinutes(5)).
-                        refreshTokenTimeToLive(Duration.ofDays(7)).
+                        accessTokenTimeToLive(Duration.ofMinutes(15)).
                         build()
                 ).
-                clientName("Swagger client")
+                clientName("Gateway service")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantTypes(a -> {
-                            a.add(AuthorizationGrantType.AUTHORIZATION_CODE);
-                            a.add(AuthorizationGrantType.REFRESH_TOKEN);
-                        })
-                .redirectUri(redirectUri)
-                .postLogoutRedirectUri(logoutUri)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .scope("SCOPE_auth-service.verify")
                 .build();
 
         jdbcRegisteredClientRepository.save(swaggerClient);

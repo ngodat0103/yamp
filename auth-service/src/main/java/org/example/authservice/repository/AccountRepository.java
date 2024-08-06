@@ -9,7 +9,7 @@ import java.util.UUID;
 @Repository
 public interface AccountRepository extends CrudRepository<Account, UUID> {
     @Transactional
-    Optional<Account> findByUsername(String username);
+    Account findByUsername(String username);
     Account findByAccountUuid(UUID accountUuid);
     Optional<Account> findByUsernameOrEmail(String username, String email);
     boolean existsByEmail(String email);

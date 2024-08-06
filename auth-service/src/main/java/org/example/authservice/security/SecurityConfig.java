@@ -1,5 +1,7 @@
 package org.example.authservice.security;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -20,19 +22,22 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.CookieRequestCache;
 
 @Configuration
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
 
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Bean
     SecurityFilterChain oauth2FilterChain(HttpSecurity http) throws Exception {
 
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
-        http.exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
+//        http.exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
       OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer =  http.getConfigurer(OAuth2AuthorizationServerConfigurer.class);
       oAuth2AuthorizationServerConfigurer.tokenRevocationEndpoint( e ->
               e.revocationResponseHandler( (request, response, authentication) -> {
@@ -46,31 +51,18 @@ public class SecurityConfig {
               }
               )
       );
+
+
+
         http.headers( h-> h.addHeaderWriter(new TraceHeaderWriter()));
         http.rememberMe(AbstractHttpConfigurer::disable);
         return http.build();
     }
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
-                                                          OAuth2AuthorizationService oAuth2AuthorizationService
-                                                          ) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
         http.headers( h-> h.addHeaderWriter(new TraceHeaderWriter()));
-
-
-
-
-
-        // add logout handler to remove token from database when user logs out
-        http.logout(logout -> logout.addLogoutHandler(new Oauth2LogoutHandler(oAuth2AuthorizationService)));
-
-        http.authorizeHttpRequests( authorize -> authorize.
-                                anyRequest().permitAll()
-                        );
-        
-
-        http.formLogin(Customizer.withDefaults());
        return http.build();
     }
 

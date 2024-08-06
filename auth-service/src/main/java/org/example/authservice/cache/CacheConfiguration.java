@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.cache.SpringCacheBasedUserC
 @Configuration
 public class CacheConfiguration {
     @Bean
-    RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory){
+    RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory ){
         return RedisCacheManager.builder(redisConnectionFactory).build();
     }
 

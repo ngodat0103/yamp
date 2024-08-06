@@ -26,7 +26,7 @@ server:
   reactive:
     session:
       cookie:
-        name: SESSION
+        name: JSESSIONID
         domain: localhost
 management:
   endpoints:

@@ -15,7 +15,7 @@ server:
     context-path: /api/v1/auth
     session:
       cookie:
-        name: SESSION
+        name: JSESSIONID
         domain: localhost
 springdoc:
   api-docs:

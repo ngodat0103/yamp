@@ -34,27 +34,9 @@ public class AuthConfiguration {
     private String logoutUri;
 
     @Bean
-    RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate,
-                                                          PasswordEncoder passwordEncoder
-    ){
+    RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate){
 
-        JdbcRegisteredClientRepository jdbcRegisteredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
-        RegisteredClient swaggerClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientId("gateway-service")
-                .clientSecret(passwordEncoder.encode("gateway-service-secret"))
-                .clientSecretExpiresAt(null)
-                .tokenSettings(TokenSettings.builder().
-                        accessTokenTimeToLive(Duration.ofMinutes(15)).
-                        build()
-                ).
-                clientName("Gateway service")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .scope("SCOPE_auth-service.verify")
-                .build();
-
-        jdbcRegisteredClientRepository.save(swaggerClient);
-        return jdbcRegisteredClientRepository;
+        return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
 
 

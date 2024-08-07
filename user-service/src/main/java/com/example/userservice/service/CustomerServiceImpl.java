@@ -49,14 +49,14 @@ public class CustomerServiceImpl implements CustomerService {
               block();
         assert responseEntity != null;
         if(responseEntity.getStatusCode().is2xxSuccessful()){
-            String accountUuidHeader = responseEntity.getHeaders().getFirst(ACCOUNT_UUID_HEADER);
+            String accountUuidHeader = responseEntity.getHeaders().getFirst(X_ACCOUNT_UUID_HEADER);
             assert  accountUuidHeader !=null;
             logger.debug("get  Account UUID from auth-service: {}", accountUuidHeader);
             UUID accountUuid = UUID.fromString(accountUuidHeader);
             ResponseEntity<Void> authSvcRoleRp= webClient.post().
                     uri(AUTH_SVC_ROLE_URI).
                     headers( h-> {
-                        h.add(ACCOUNT_UUID_HEADER,accountUuid.toString());
+                        h.add(X_ACCOUNT_UUID_HEADER,accountUuid.toString());
                         h.add(CORRELATION_ID_HEADER,correlationId);
                         h.add(ROLE_NAME_HEADER,DEFAULT_ROLE);
                     }).
@@ -86,7 +86,7 @@ public class CustomerServiceImpl implements CustomerService {
             ResponseEntity<AccountDto> accountDtoResponse = webClient.get()
                     .uri(AUTH_SVC_ACC_URI)
                     .headers(h -> {
-                        h.add(ACCOUNT_UUID_HEADER, accountUuid.toString());
+                        h.add(X_ACCOUNT_UUID_HEADER, accountUuid.toString());
                         h.add(CORRELATION_ID_HEADER, correlationId);
                     })
                     .retrieve()

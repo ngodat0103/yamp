@@ -5,15 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.session.ReactiveSessionRegistry;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
@@ -23,8 +20,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint;
-import org.springframework.security.web.server.savedrequest.WebSessionServerRequestCache;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -35,9 +32,13 @@ public class SecurityConfiguration {
 
 
     @Bean
-    SecurityWebFilterChain internalFilter(ServerHttpSecurity http){
+    SecurityWebFilterChain rule(ServerHttpSecurity http
+                                ){
         http.cors(ServerHttpSecurity.CorsSpec::disable);
         http.csrf(ServerHttpSecurity.CsrfSpec::disable);
+
+
+        http.httpBasic(Customizer.withDefaults());
         http.oauth2ResourceServer(oauth2 -> {
                     oauth2.jwt(jwt -> jwt
                             .jwtDecoder(jwtDecoder())
@@ -72,6 +73,9 @@ public class SecurityConfiguration {
         );
 
         http.formLogin(Customizer.withDefaults());
+        WebSessionServerSecurityContextRepository  webSessionServerSecurityContextRepository = new WebSessionServerSecurityContextRepository();
+        webSessionServerSecurityContextRepository.setCacheSecurityContext(false);
+        http.securityContextRepository(webSessionServerSecurityContextRepository);
         return http.build();
     }
 

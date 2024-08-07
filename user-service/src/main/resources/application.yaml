@@ -11,7 +11,13 @@ server:
   port: 8002
   forward-headers-strategy: framework
   servlet:
+    encoding:
+      enabled: false
     context-path: /api/v1/user
+    session:
+      cookie:
+        name: JSESSIONID
+        domain: local
 
 springdoc:
   api-docs:

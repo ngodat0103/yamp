@@ -16,16 +16,6 @@ public class ApiGatewayServerApplication {
 	public static void main(String[] args) {
 	ApplicationContext ctx =  SpringApplication.run(ApiGatewayServerApplication.class, args);
 
-
-		TextEncryptor textEncryptor = ctx.getBean(TextEncryptor.class);
-
-		String encrypted = textEncryptor.encrypt("gateway-service-secret");
-
-
-
-
-
-int stop = 0 ;
     }
 
 }

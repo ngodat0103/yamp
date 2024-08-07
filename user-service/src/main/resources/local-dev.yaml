@@ -20,8 +20,7 @@ spring:
             token-uri: http://localhost:8000/api/v1/auth/oauth2/token
             authorization-uri: http://localhost:8000/api/v1/auth/oauth2/authorize
           internal-auth-service:
-            token-uri: http://gateway-service:8000/api/v1/auth/oauth2/token
-            authorization-uri: http://gateway-service:8000/api/v1/auth/oauth2/authorize
+            token-uri: http://auth-service:8001/api/v1/auth/oauth2/token
   datasource:
     url: jdbc:postgresql://share-db:5432/user-service-db
     username: "{cipher}8d5408ba942dc178a167f8b27a52f866184a2c084d21b713f6904932d2963285"
@@ -34,6 +33,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+  data:
+    redis:
+      client-name: user-service
+      url: redis://redis-service:6379
+      client-type: lettuce
+      database: 0
 logging:
   level:
     org.springframework.security: DEBUG

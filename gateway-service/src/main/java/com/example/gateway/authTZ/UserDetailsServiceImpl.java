@@ -1,7 +1,8 @@
 package com.example.gateway.authTZ;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,11 +14,11 @@ import java.net.URI;
 import java.util.List;
 
 @Component
-public class UsernameServiceImpl implements ReactiveUserDetailsService {
+public class UserDetailsServiceImpl implements ReactiveUserDetailsService {
 
     final WebClient webClient ;
     private final ReactiveJwtDecoder reactiveJwtDecoder;
-    public UsernameServiceImpl(WebClient webClient, ReactiveJwtDecoder reactiveJwtDecoder) {
+    public UserDetailsServiceImpl(WebClient webClient, ReactiveJwtDecoder reactiveJwtDecoder) {
         this.webClient = webClient;
         this.reactiveJwtDecoder = reactiveJwtDecoder;
     }
@@ -31,18 +32,22 @@ public class UsernameServiceImpl implements ReactiveUserDetailsService {
                 .uri(uri)
                 .retrieve()
                 .toBodilessEntity()
-                .onErrorResume(WebClientResponseException.class,e -> {
-                    throw new UsernameNotFoundException("User not found");
-                })
+                .doOnError(WebClientResponseException.class,e -> {
+                    if(e.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                        throw new UsernameNotFoundException("User not found");
+                    else if(e.getStatusCode().is5xxServerError())
+                        throw new InternalAuthenticationServiceException("Internal server error");
+        })
                 .mapNotNull(responseEntity -> responseEntity.getHeaders().getFirst("X-User-Info"))
                 .flatMap(reactiveJwtDecoder::decode)
                 .map(jwt -> {
                     String password = jwt.getClaimAsString("password");
                     List<String> roles = jwt.getClaimAsStringList("roles");
+                    String accountUuid = jwt.getClaimAsString("accountUuid");
                     List<SimpleGrantedAuthority> authorityList = roles.stream()
                             .map(SimpleGrantedAuthority::new)
                             .toList();
-                    return User.withUsername(username)
+                    return User.withUsername(accountUuid)
                             .password(password)
                             .authorities(authorityList)
                             .build();

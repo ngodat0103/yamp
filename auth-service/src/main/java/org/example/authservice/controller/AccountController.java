@@ -49,8 +49,6 @@ public class AccountController {
 
     }
 
-
-    @PreAuthorize("hasAuthority('auth-service.read')")
     @GetMapping("/userinfo")
     public void getUserInfo(@RequestParam String username, HttpServletResponse response){
         Account account = accountRepository.findByUsername(username);
@@ -66,6 +64,7 @@ public class AccountController {
                     c.put("username",account.getUsername());
                     c.put("roles",roles);
                     c.put("password",account.getPassword());
+                    c.put("accountUuid",account.getAccountUuid().toString());
                 })
                 .issuedAt(Instant.now())
                 .issuedAt(Instant.now().plus(Duration.ofMinutes(1)))

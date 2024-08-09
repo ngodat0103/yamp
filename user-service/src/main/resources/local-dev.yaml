@@ -28,7 +28,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto:  create
+      ddl-auto:  update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -43,3 +43,4 @@ logging:
   level:
     org.springframework.security: DEBUG
     com.example.userservice.security: DEBUG
+    com.example.userservice.exception: ERROR

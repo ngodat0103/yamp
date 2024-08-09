@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    default: dev-local
+  config:
+    import:
+      - 'optional:classpath:/dev-local.yaml'
+  application:
+    name: product-svc
+server:
+  port: 8003
+  servlet:
+    context-path: /product-svc/core

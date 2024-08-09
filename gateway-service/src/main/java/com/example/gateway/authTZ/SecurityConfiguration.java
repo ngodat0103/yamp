@@ -1,5 +1,4 @@
 package com.example.gateway.authTZ;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -9,7 +8,6 @@ import org.springframework.security.authentication.UserDetailsRepositoryReactive
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.session.ReactiveSessionRegistry;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -21,9 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
-import org.springframework.session.data.redis.ReactiveRedisSessionRepository;
 import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -65,7 +61,7 @@ public class SecurityConfiguration {
 
                 .pathMatchers(HttpMethod.POST,"/api/v1/auth/logout").permitAll()
                 .pathMatchers("/api/v1/user/register","/api/v1/user/api-docs").permitAll()
-                .pathMatchers("/api/v1/user/getMe").hasRole("CUSTOMER")
+                .pathMatchers("/api/v1/user/get-me").hasRole("CUSTOMER")
                 .pathMatchers("/ui-docs/**").permitAll()
                 .pathMatchers("/api-docs/**").permitAll()
                 .pathMatchers("webjars/**").permitAll()

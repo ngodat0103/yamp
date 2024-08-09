@@ -6,10 +6,12 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class UserDetailsServiceImpl implements ReactiveUserDetailsService {
         this.webClient = webClient;
         this.reactiveJwtDecoder = reactiveJwtDecoder;
     }
+
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
@@ -38,6 +41,9 @@ public class UserDetailsServiceImpl implements ReactiveUserDetailsService {
                     else if(e.getStatusCode().is5xxServerError())
                         throw new InternalAuthenticationServiceException("Internal server error");
         })
+                .doOnError(WebClientRequestException.class, e -> {
+                    throw new InternalAuthenticationServiceException("Internal server error");
+                })
                 .mapNotNull(responseEntity -> responseEntity.getHeaders().getFirst("X-User-Info"))
                 .flatMap(reactiveJwtDecoder::decode)
                 .map(jwt -> {
@@ -52,6 +58,7 @@ public class UserDetailsServiceImpl implements ReactiveUserDetailsService {
                             .authorities(authorityList)
                             .build();
                 });
+
 
     }
 }

@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @SecurityRequirement(name = "http-basic")
-    @GetMapping( "/getMe")
+    @GetMapping( "/get-me")
     public CustomerDto getMe(HttpServletRequest request) throws AccountNotFoundException {
         Principal principal = request.getUserPrincipal();
         if(principal == null){

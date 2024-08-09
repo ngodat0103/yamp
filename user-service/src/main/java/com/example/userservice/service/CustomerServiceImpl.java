@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 import java.util.UUID;
@@ -59,8 +61,10 @@ public class CustomerServiceImpl implements CustomerService {
                         h.add(X_ACCOUNT_UUID_HEADER,accountUuid.toString());
                         h.add(CORRELATION_ID_HEADER,correlationId);
                         h.add(ROLE_NAME_HEADER,DEFAULT_ROLE);
-                    }).
-                    retrieve().toBodilessEntity().block();
+                    })
+                    .retrieve()
+                    .toBodilessEntity()
+                    .block();
 
             assert authSvcRoleRp != null;
             if(authSvcRoleRp.getStatusCode().is2xxSuccessful()){

@@ -8,5 +8,3 @@ spring:
     name: product-svc
 server:
   port: 8003
-  servlet:
-    context-path: /product-svc/core

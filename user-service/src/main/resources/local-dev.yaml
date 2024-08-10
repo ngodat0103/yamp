@@ -7,7 +7,7 @@ spring:
       client:
         registration:
           user-service:
-            provider: internal-auth-service
+            provider: internal-auth-svc
             client-id: user-service
             client-secret: "{cipher}e4ae50670b988f7503de551f5a61741d422a4a827ad67941979660faba6308030450098cba2e9155c63f7799932a5559"
             client-authentication-method: client_secret_basic
@@ -16,27 +16,27 @@ spring:
               - auth-service.read
               - auth-service.write
         provider:
-          external-auth-service:
+          external-auth-svc:
             token-uri: http://localhost:8000/api/v1/auth/oauth2/token
             authorization-uri: http://localhost:8000/api/v1/auth/oauth2/authorize
-          internal-auth-service:
-            token-uri: http://auth-service:8001/api/v1/auth/oauth2/token
+          internal-auth-svc:
+            token-uri: http://auth-svc:8001/api/v1/auth/oauth2/token
   datasource:
-    url: jdbc:postgresql://share-db:5432/user-service-db
-    username: "{cipher}8d5408ba942dc178a167f8b27a52f866184a2c084d21b713f6904932d2963285"
-    password: "{cipher}8d5408ba942dc178a167f8b27a52f866184a2c084d21b713f6904932d2963285"
+    url: jdbc:postgresql://share-db:5432/user-svc-db
+    username: 'user-svc-user'
+    password: '{cipher}0579337b871cd41ba98c4875971fa8eca89a6a6902e15b6cf75f711c299912285e825d81331fa61ec4317b6306c3b29d'
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto:  update
+      ddl-auto:  create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   data:
     redis:
-      client-name: user-service
-      url: redis://redis-service:6379
+      client-name: user-svc
+      url: redis://redis-svc:6379
       client-type: lettuce
       database: 0
 logging:
@@ -44,3 +44,22 @@ logging:
     org.springframework.security: DEBUG
     com.example.userservice.security: DEBUG
     com.example.userservice.exception: ERROR
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -82,7 +83,8 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/v1/auth/account/userinfo").hasAuthority("auth-service.read")
-                .anyRequest().authenticated()
+                .requestMatchers( HttpMethod.GET,"/api/v1/auth/actuator/prometheus").permitAll()
+                .anyRequest().permitAll()
         );
        return http.build();
     }

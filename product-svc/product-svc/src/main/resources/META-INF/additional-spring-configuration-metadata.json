@@ -29,5 +29,10 @@
       "name": "springdoc.open-api.info.contact.email",
       "type": "java.lang.String",
       "description": "Description for springdoc.open-api.info.contact.email."
+    },
+    {
+      "name": "spring.metric.tags.application",
+      "type": "java.lang.String",
+      "description": "Description for spring.metric.tags.application."
     }
   ] }

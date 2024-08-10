@@ -27,8 +27,8 @@ springdoc:
   open-api:
     info:
       version: 1.0.0
-      title: Auth Service
-      description: Auth Service API
+      title: User Service
+      description: User Service API
       contact:
         name: NgoDat0103
         url: https://github.com/NGODAT0103

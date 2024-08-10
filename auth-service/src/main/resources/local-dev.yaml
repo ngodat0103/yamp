@@ -3,9 +3,9 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:postgresql://share-db:5432/auth-service-db
-    username: "{cipher}8d5408ba942dc178a167f8b27a52f866184a2c084d21b713f6904932d2963285"
-    password: "{cipher}8d5408ba942dc178a167f8b27a52f866184a2c084d21b713f6904932d2963285"
+    url: jdbc:postgresql://share-db:5432/auth-svc-db
+    username: 'auth-svc-user'
+    password: '{cipher}e4b0a2a815e34f4e3ad39d30b1fbdffd994ce5695fb5976b370b9965d8d117f548b1303da957eb20c4865c3c3c0276b0'
   jpa:
     show-sql: true
     hibernate:
@@ -15,7 +15,7 @@ spring:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
   data:
     redis:
-      url: redis://redis-service:6379
+      url: redis://redis-svc:6379
       client-name: auth-service
   security:
     oauth2:
@@ -37,11 +37,6 @@ logging:
   level:
     org.springframework.security: DEBUG
     com.example.authservice.security: DEBUG
-    org:
-      springframework:
-        security:
-          web:
-            access: debug
 hcp-vault:
   jwk-secret-path: https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/cbe1cf74-4825-4a1b-8c63-c685c98f813c/projects/d0064e9e-e611-4d22-8151-d54a515c513d/apps/authTZ/open
 init-swagger-client:
@@ -49,5 +44,22 @@ init-swagger-client:
   redirect-uri: http://localhost:8000/webjars/swagger-ui/oauth2-redirect.html
   logout-uri: http://localhost:8000/api/v1/auth/logout
 
-springdoc:
-  show-oauth2-endpoints: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always

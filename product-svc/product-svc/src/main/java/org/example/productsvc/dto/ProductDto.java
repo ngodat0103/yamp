@@ -13,8 +13,8 @@ public class ProductDto {
     private String longDescription;
 
 
-    ProductCategoryDto productCategory;
-    ProductBrandDto productBrand;
+    CategoryDto productCategory;
+    BrantDto productBrand;
 
     Set<ProductVariationDto> productVariationSet;
     Set<ProductImageDto> productImageSet;

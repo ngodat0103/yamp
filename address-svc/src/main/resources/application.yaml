@@ -1,0 +1,10 @@
+spring:
+  profiles:
+    default: dev-local
+  config:
+    import:
+      - "optional:dev-local.yaml"
+  application:
+    name: address-svc
+server:
+  port: 8003

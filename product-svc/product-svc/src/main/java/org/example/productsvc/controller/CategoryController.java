@@ -1,6 +1,7 @@
 package org.example.productsvc.controller;
 
-import org.example.productsvc.dto.ProductCategoryDto;
+import jakarta.validation.Valid;
+import org.example.productsvc.dto.CategoryDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,14 +11,15 @@ import java.util.Set;
 @RequestMapping("/category")
 public class CategoryController {
     @GetMapping(produces = "application/json")
-    public Set<ProductCategoryDto> getProductsByCategory(){
-        return Set.of(new ProductCategoryDto());
+    public Set<CategoryDto> getProductsByCategory(){
+        return Set.of(new CategoryDto());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createCategory(@RequestBody ProductCategoryDto productCategoryDto){
-        return;
+    public CategoryDto createCategory(@RequestBody @Valid CategoryDto categoryDto){
+        return categoryDto;
+
     }
     @PutMapping("/{categoryUuid}")
     @ResponseStatus(HttpStatus.ACCEPTED)

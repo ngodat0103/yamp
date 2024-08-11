@@ -1,4 +1,4 @@
-package com.example.userservice.entity;
+package com.example.userservice.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class Address {
     @Id
     @GeneratedValue (strategy = GenerationType.UUID)
     private UUID uuid;
-    private UUID accountUuid;
+    private UUID customerUuid;
     private String name;
     private String cityName;
     private String phoneNumber;
@@ -23,6 +23,6 @@ public class Address {
     private String addressType;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "accountUuid",insertable = false, updatable = false)
+    @JoinColumn(name = "customerUuid",insertable = false, updatable = false)
    private Customer customer;
 }

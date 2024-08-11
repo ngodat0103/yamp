@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: dev-local
+  data:
+    mongodb:
+      host: mongo-db
+      database: address-svc
+springdoc:
+  api-docs:
+    path: /api/v1/user/address/api-docs
+  swagger-ui:
+    path: /api/v1/user/address/ui-docs
+    enabled: true

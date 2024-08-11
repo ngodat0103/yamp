@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class ProductBrandDto {
+public class BrantDto {
     private UUID brandUuid;
     private String name;
     private String logo;

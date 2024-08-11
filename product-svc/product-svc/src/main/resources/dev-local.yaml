@@ -5,7 +5,7 @@ spring:
   datasource:
     username: 'product-svc-user'
     password: '{cipher}0e6bc549acc028308f75f8117a7a9847cfcefb038c115580bc9b52e64dc7776f8e32fbd5ec7ba00c2973cf65a744eb33'
-    url: 'jdbc:postgresql://localhost:5432/product-svc-db'
+    url: 'jdbc:postgresql://share-db:5432/product-svc-db'
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true

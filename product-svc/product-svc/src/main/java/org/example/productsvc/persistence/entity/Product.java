@@ -1,4 +1,4 @@
-package org.example.productsvc.persistence;
+package org.example.productsvc.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Product {
+public class Product  extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID productUuid;
@@ -26,11 +26,11 @@ public class Product {
     private UUID brandUuid;
     @OneToOne (fetch = FetchType.EAGER)
     @JoinColumn(name = "categoryUuid", insertable = false, updatable = false)
-    private ProductCategory productCategory;
+    private Category category;
 
     @OneToOne (fetch = FetchType.EAGER)
     @JoinColumn(name = "brandUuid", insertable = false, updatable = false )
-    private ProductBrand productBrand;
+    private Brand brand;
 
 
     @OneToMany(mappedBy = "product",fetch = FetchType.EAGER)

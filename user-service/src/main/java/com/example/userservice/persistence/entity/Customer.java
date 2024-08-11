@@ -1,4 +1,4 @@
-package com.example.userservice.entity;
+package com.example.userservice.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,11 +12,14 @@ import java.util.UUID;
 @Setter
 public class Customer {
     @Id
+    private UUID customerUuid;
+    @Column(unique = true)
     private UUID accountUuid;
     private String firstName;
     private String lastName;
     @Column(unique = true)
     private String phoneNumber;
-    @OneToMany (mappedBy = "accountUuid")
+    @OneToMany (mappedBy = "customer")
     private Set<Address> addresses;
+
 }

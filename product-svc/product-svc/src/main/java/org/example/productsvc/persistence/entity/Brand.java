@@ -1,4 +1,4 @@
-package org.example.productsvc.persistence;
+package org.example.productsvc.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-public class ProductBrand {
+public class Brand extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID brandUuid;

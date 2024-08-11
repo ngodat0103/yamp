@@ -4,14 +4,13 @@ import com.example.userservice.dto.AddressDto;
 import com.example.userservice.dto.CustomerDto;
 import com.example.userservice.dto.RegisterDto;
 import com.example.userservice.dto.mapper.CustomerMapper;
-import com.example.userservice.entity.Customer;
-import com.example.userservice.repository.AddressRepository;
-import com.example.userservice.repository.CustomerRepository;
+import com.example.userservice.persistence.entity.Customer;
+import com.example.userservice.persistence.repository.AddressRepository;
+import com.example.userservice.persistence.repository.CustomerRepository;
 import org.slf4j.Logger;
 import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
@@ -71,7 +70,7 @@ public class CustomerServiceImpl implements CustomerService {
                 logger.debug("Role added to account: {}", accountUuid);
             }
             Customer customer = new Customer();
-            customer.setAccountUuid(accountUuid);
+            customer.setCustomerUuid(accountUuid);
             customer.setFirstName(registerDto.getFirstName());
             customer.setLastName(registerDto.getLastName());
             Customer cusResponse =  customerRepository.save(customer);

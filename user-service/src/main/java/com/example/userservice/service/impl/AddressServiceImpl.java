@@ -48,8 +48,14 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressResponseDto getAddresses(UUID customerUuid) {
-        Set<Address> addresses = addressRepository.findByCustomerUuid(customerUuid)
+        customerRepository.findCustomerByCustomerUuid(customerUuid)
                 .orElseThrow(customerNotFoundExceptionSupplier(customerUuid));
+
+        Set<Address> addresses = addressRepository.findAddressByCustomerUuid(customerUuid);
+        if(addresses.isEmpty()){
+            logger.debug("No address found for customer UUID: {}", customerUuid);
+
+        }
         Set<AddressDto> addressDtos = addressMapper.mapToDtos(addresses);
         return AddressResponseDto.builder()
                 .customerUuid(customerUuid)

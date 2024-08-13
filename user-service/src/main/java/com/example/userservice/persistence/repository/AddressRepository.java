@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, UUID> {
-    Optional<Set<Address>> findByCustomerUuid(UUID customerUuid);
+    Set<Address> findAddressByCustomerUuid(UUID customerUuid);
     Optional<Address> findAddressByCustomerUuidAndName(UUID customerUuid, String name);
     void deleteByUuid(UUID addressUuid);
 }

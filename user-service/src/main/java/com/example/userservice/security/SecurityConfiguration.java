@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -17,7 +16,6 @@ public class SecurityConfiguration {
         http.cors(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable);
         http.oauth2Login(AbstractHttpConfigurer::disable);
-        http.oauth2Client(AbstractHttpConfigurer::disable);
         http.logout(AbstractHttpConfigurer::disable);
         http.formLogin(AbstractHttpConfigurer::disable);
         http.httpBasic(AbstractHttpConfigurer::disable);
@@ -25,9 +23,7 @@ public class SecurityConfiguration {
         http.requestCache(AbstractHttpConfigurer::disable);
         http.anonymous(AbstractHttpConfigurer::disable);
         http.sessionManagement(AbstractHttpConfigurer::disable);
-
-
-
+        http.rememberMe(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests((authorizeRequests) -> authorizeRequests.anyRequest().permitAll());
         http.headers(header -> header.addHeaderWriter(new TraceHeaderWriter()));
         return http.build();

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.OAuth2AuthorizationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -76,14 +77,22 @@ public class GlobalException {
     public @ResponseBody HttpErrorInfo handleInvalidInputException(Exception ex, HttpServletRequest request){
         return createHttpErrorInfo(HttpStatus.UNPROCESSABLE_ENTITY,ex,request.getRequestURI());
     }
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class, MissingRequestValueException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody Map<String,String> handleBadRequest(MethodArgumentNotValidException ex){
+    public @ResponseBody Map<String,String> handleBadRequest(Exception ex){
 
-        List<FieldError> fieldErrors = ex.getFieldErrors();
-        Map<String,String> errorMap = new HashMap<>();
-        fieldErrors.forEach(f-> errorMap.put(f.getField(),f.getDefaultMessage()));
-        return errorMap;
+       if(ex instanceof MethodArgumentNotValidException methodArgumentNotValidException){
+           List<FieldError> fieldErrors = methodArgumentNotValidException.getFieldErrors();
+           Map<String,String> errorMap = new HashMap<>();
+           fieldErrors.forEach(f-> errorMap.put(f.getField(),f.getDefaultMessage()));
+           return errorMap;
+       }
+         else if(ex instanceof MissingRequestValueException missingRequestValueException){
+                Map<String,String> errorMap = new HashMap<>();
+                errorMap.put("message",missingRequestValueException.getMessage());
+              return errorMap;
+         }
+         return null;
     }
 
     @ExceptionHandler(NotFoundException.class)

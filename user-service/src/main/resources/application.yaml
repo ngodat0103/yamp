@@ -4,7 +4,7 @@ spring:
   config:
     import:
       - "optional:local-dev.yaml"
-      - "optional:test.yaml"
+      - "optional:docker-dev.yaml"
   application:
     name: user-service
 server:
@@ -14,10 +14,6 @@ server:
     encoding:
       enabled: false
     context-path: /api/v1/user
-    session:
-      cookie:
-        name: JSESSIONID
-        domain: local
 
 springdoc:
   api-docs:

@@ -86,9 +86,16 @@ public class GlobalException {
         return errorMap;
     }
 
-    @ExceptionHandler(AccountNotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public @ResponseBody HttpErrorInfo handleAccountNotFoundException(AccountNotFoundException ex, HttpServletRequest request){
+    public @ResponseBody HttpErrorInfo handleAccountNotFoundException(NotFoundException ex, HttpServletRequest request){
         return createHttpErrorInfo(HttpStatus.NOT_FOUND,ex,request.getRequestURI());
+    }
+
+
+    @ExceptionHandler(AddressNameConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public HttpErrorInfo handleAddressNameConflictException(AddressNameConflictException ex, HttpServletRequest request){
+        return createHttpErrorInfo(HttpStatus.CONFLICT,ex,request.getRequestURI());
     }
 }

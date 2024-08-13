@@ -13,13 +13,25 @@ public class Address {
     @Id
     @GeneratedValue (strategy = GenerationType.UUID)
     private UUID uuid;
+    @Column(nullable = false)
     private UUID customerUuid;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String cityName;
+    @Column(nullable = false)
     private String phoneNumber;
+    @Column(nullable = false)
     private String province;
-    private String district;
+
+    @Column (nullable = false)
+    private String street;
+    @Column(nullable = false)
     private String ward;
+    @Column(nullable = false)
+    private String district;
+
+    @Column(nullable = false)
     private String addressType;
 
     @ManyToOne(fetch = FetchType.EAGER)

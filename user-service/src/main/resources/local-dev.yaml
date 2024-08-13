@@ -33,12 +33,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-  data:
-    redis:
-      client-name: user-svc
-      url: redis://redis-svc:6379
-      client-type: lettuce
-      database: 0
 logging:
   level:
     org.springframework.security: DEBUG

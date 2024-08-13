@@ -1,5 +1,6 @@
-package com.example.userservice.dto;
+package com.example.userservice.dto.customer;
 
+import com.example.userservice.dto.address.AddressDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;

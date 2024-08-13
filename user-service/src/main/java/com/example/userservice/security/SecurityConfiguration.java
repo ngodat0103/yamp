@@ -6,19 +6,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.session.DisableEncodeUrlFilter;
-import org.springframework.session.data.redis.RedisSessionRepository;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-import org.springframework.session.web.http.SessionRepositoryFilter;
 
 @Configuration
 @EnableWebSecurity(debug = true)
-@EnableRedisHttpSession
 public class SecurityConfiguration {
     @Bean
-    SecurityFilterChain securityFilterChain (HttpSecurity http, RedisSessionRepository redisSessionRepository
-                                             ) throws Exception {
+    SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
 
         // disable all security features for internal communication microservices
         http.cors(AbstractHttpConfigurer::disable);
@@ -27,18 +20,11 @@ public class SecurityConfiguration {
         http.oauth2Client(AbstractHttpConfigurer::disable);
         http.logout(AbstractHttpConfigurer::disable);
         http.formLogin(AbstractHttpConfigurer::disable);
-
-
-
-
-        // These settings for distributed session management
-        http.sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.NEVER));
-        HttpSessionSecurityContextRepository httpSessionSecurityContextRepository = new HttpSessionSecurityContextRepository();
-        httpSessionSecurityContextRepository.setAllowSessionCreation(false);
-        http.securityContext(securitycontext ->
-                securitycontext.securityContextRepository(httpSessionSecurityContextRepository)
-                );
-        http.addFilterBefore(new SessionRepositoryFilter<>(redisSessionRepository), DisableEncodeUrlFilter.class);
+        http.httpBasic(AbstractHttpConfigurer::disable);
+        http.securityContext(AbstractHttpConfigurer::disable);
+        http.requestCache(AbstractHttpConfigurer::disable);
+        http.anonymous(AbstractHttpConfigurer::disable);
+        http.sessionManagement(AbstractHttpConfigurer::disable);
 
 
 

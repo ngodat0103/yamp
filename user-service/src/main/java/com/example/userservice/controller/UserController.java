@@ -1,7 +1,7 @@
 package com.example.userservice.controller;
 
-import com.example.userservice.dto.CustomerDto;
-import com.example.userservice.dto.RegisterDto;
+import com.example.userservice.dto.customer.CustomerDto;
+import com.example.userservice.dto.customer.RegisterDto;
 import com.example.userservice.service.CustomerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,6 @@ import javax.security.auth.login.AccountNotFoundException;
 import java.security.Principal;
 import java.util.UUID;
 
-import static com.example.userservice.constant.AuthServiceUri.X_ACCOUNT_UUID_HEADER;
 import static com.example.userservice.constant.AuthServiceUri.CORRELATION_ID_HEADER;
 
 @RestController

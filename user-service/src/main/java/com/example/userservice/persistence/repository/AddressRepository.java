@@ -4,10 +4,13 @@ import com.example.userservice.persistence.entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, UUID> {
-    Set<Address> findByCustomerUuid(UUID customerUuid);
+    Optional<Set<Address>> findByCustomerUuid(UUID customerUuid);
+    Optional<Address> findAddressByCustomerUuidAndName(UUID customerUuid, String name);
+    void deleteByUuid(UUID addressUuid);
 }

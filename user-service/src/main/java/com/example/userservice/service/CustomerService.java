@@ -8,7 +8,6 @@ import javax.security.auth.login.AccountNotFoundException;
 import java.util.UUID;
 
 public interface CustomerService {
-    @Transactional
     void register(CustomerRegisterDto customerRegisterDto, String correlationId);
     CustomerDto getCustomer(UUID accountUuid,String correlationId) throws AccountNotFoundException;
 

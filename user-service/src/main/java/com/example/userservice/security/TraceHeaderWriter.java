@@ -13,8 +13,9 @@ public class TraceHeaderWriter implements HeaderWriter {
         String correlationId = request.getHeader("X-Correlation-ID");
         if(correlationId == null){
             logger.warn("X-Correlation-ID is missing in the request");
+            return;
         }
         response.addHeader( "X-Correlation-ID", correlationId);
-        logger.debug("auth-service received request with correlation-id: {}", correlationId);
+        logger.debug("Service received request with correlation-id: {}", correlationId);
     }
 }

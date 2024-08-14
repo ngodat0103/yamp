@@ -1,6 +1,7 @@
 package org.example.authservice.service.impl;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import jakarta.transaction.Transactional;
 import org.example.authservice.dto.AccountDto;
 import org.example.authservice.dto.mapper.AccountMapper;
 import org.example.authservice.persistence.entity.Account;
@@ -51,7 +52,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDto getAccount(UUID accountUuid) {
-        Account account = accountRepository.findByAccountUuid(accountUuid)
+        Account account = accountRepository.findById(accountUuid)
                 .orElseThrow(accountNotFoundSupplier(accountUuid.toString()));
         return accountMapper.mapToDto(account);
     }
@@ -82,10 +83,11 @@ public class AccountServiceImpl implements AccountService {
         return jwt.getTokenValue();
     }
 
+    @Transactional
     @Override
     public AccountDto register(AccountDto accountDto) {
 
-        if(accountRepository.existsByAccountUuid(accountDto.getAccountUuid()))
+        if(accountRepository.existsById(accountDto.getAccountUuid()))
         {
             throw new ApiException(HttpStatus.CONFLICT,"AccountUuid is already exists!");
         }
@@ -97,7 +99,6 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(HttpStatus.CONFLICT,"Email is already exists!");
         }
             Account account = accountMapper.mapToEntity(accountDto);
-            account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
             Account savedAccount = accountRepository.save(account);
             return accountMapper.mapToDto(savedAccount);
     }
@@ -105,7 +106,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void addRole(UUID accountUuid, String roleName) {
-        Account currentAccount = accountRepository.findByAccountUuid(accountUuid)
+        Account currentAccount = accountRepository.findById(accountUuid)
                 .orElseThrow(accountNotFoundSupplier(accountUuid));
         Role role = roleRepository.findByRoleName(roleName);
         if(role == null)

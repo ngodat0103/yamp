@@ -38,6 +38,7 @@ logging:
     org.springframework.security: DEBUG
     com.example.userservice.security: DEBUG
     com.example.userservice.exception: ERROR
+    com.example.userservice.service: DEBUG
 management:
   endpoints:
     web:

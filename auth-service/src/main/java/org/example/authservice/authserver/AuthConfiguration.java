@@ -1,7 +1,7 @@
 package org.example.authservice.authserver;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.authservice.repository.AccountRepository;
+import org.example.authservice.persistence.repository.AccountRepository;
 import org.example.authservice.service.impl.UserDetailServiceImpl;
 import org.example.authservice.service.impl.RedisOauth2AuthorizationService;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -14,15 +14,8 @@ import org.springframework.security.authentication.CachingUserDetailsService;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
-
-import java.time.Duration;
-import java.util.UUID;
 
 @Configuration
 @Setter

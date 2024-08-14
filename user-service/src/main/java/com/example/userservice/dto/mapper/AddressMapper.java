@@ -12,8 +12,6 @@ import java.util.Set;
 public interface AddressMapper {
     Set<AddressDto> mapToDtos(Set<Address> addresses);
 
-    @Mapping(target = "customerUuid",ignore = true)
-    @Mapping(target = "uuid",ignore = true)
     @Mapping(target = "customer",ignore = true)
     Address mapToEntity(AddressDto addressDto);
 }

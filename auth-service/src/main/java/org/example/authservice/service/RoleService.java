@@ -1,6 +1,6 @@
 package org.example.authservice.service;
 
-import org.example.authservice.entity.Role;
+import org.example.authservice.persistence.entity.Role;
 
 public interface RoleService {
     public Role getRole(String roleName);

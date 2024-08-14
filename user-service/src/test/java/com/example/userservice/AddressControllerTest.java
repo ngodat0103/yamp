@@ -1,14 +1,10 @@
 package com.example.userservice;
-
-
-import com.example.userservice.controller.AddressController;
 import com.example.userservice.dto.address.AddressDto;
 import com.example.userservice.dto.address.AddressResponseDto;
 import com.example.userservice.exception.AddressNotFoundException;
 import com.example.userservice.exception.CustomerNotFoundException;
 import com.example.userservice.service.AddressService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
 import java.util.Set;
 import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,8 +23,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.ArgumentMatchers.eq;
-
-
 @WebMvcTest(value = AddressController.class)
 @ActiveProfiles("local-dev")
 @AutoConfigureMockMvc(addFilters = false)

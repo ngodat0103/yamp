@@ -35,10 +35,8 @@ public class AddressServiceImpl implements AddressService {
         addressRepository.findAddressByCustomerUuidAndName(customerUuid,addressDto.getName())
                 .ifPresent(address -> {
                     logger.debug("Address name conflict for customer UUID: {} and address name: {}", customerUuid, addressDto.getName());
-                    throw new AddressNameConflictException(addressDto.getName());
+                    throw new AddressNameConflictException(address.getName());
                 });
-
-
         Address address = addressMapper.mapToEntity(addressDto);
         address.setCustomerUuid(customerUuid);
         customer.setLastModifiedDate(LocalDateTime.now());
@@ -75,6 +73,10 @@ public class AddressServiceImpl implements AddressService {
         addressRepository.findAddressByCustomerUuidAndName(customerUuid, addressDto.getName())
                 .orElseThrow(addressNotFoundExceptionSupplier(addressUuid));
         Address  address = addressMapper.mapToEntity(addressDto);
+
+
+
+
         address.setCustomerUuid(customerUuid);
         address.setUuid(addressUuid);
         addressRepository.save(address);

@@ -1,7 +1,7 @@
 package com.example.userservice.service.impl;
 import com.example.userservice.dto.customer.AccountDto;
 import com.example.userservice.dto.customer.CustomerDto;
-import com.example.userservice.dto.customer.RegisterDto;
+import com.example.userservice.dto.customer.CustomerRegisterDto;
 import com.example.userservice.dto.mapper.AddressMapper;
 import com.example.userservice.dto.mapper.CustomerMapper;
 import com.example.userservice.exception.AddressNotFoundException;
@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.UUID;
@@ -34,47 +35,32 @@ public class CustomerServiceImpl implements CustomerService {
     private final WebClient webClient;
 
     @Override
-    public void register(RegisterDto registerDto,String correlationId) {
-        ResponseEntity<Void> responseEntity=  webClient.
-              post().
-              uri(AUTH_SVC_REG_URI).
-              bodyValue(registerDto).
-              header(CORRELATION_ID_HEADER,correlationId).
-              retrieve().
-              toBodilessEntity().
-              block();
-        assert responseEntity != null;
-        if(responseEntity.getStatusCode().is2xxSuccessful()){
-            String accountUuidHeader = responseEntity.getHeaders().getFirst(X_ACCOUNT_UUID_HEADER);
-            assert  accountUuidHeader !=null;
-            logger.debug("get  Account UUID from auth-service: {}", accountUuidHeader);
-            UUID accountUuid = UUID.fromString(accountUuidHeader);
-            ResponseEntity<Void> authSvcRoleRp= webClient.post().
-                    uri(AUTH_SVC_ROLE_URI).
-                    headers( h-> {
-                        h.add(X_ACCOUNT_UUID_HEADER,accountUuid.toString());
-                        h.add(CORRELATION_ID_HEADER,correlationId);
-                        h.add(ROLE_NAME_HEADER,DEFAULT_ROLE);
-                    })
-                    .retrieve()
-                    .toBodilessEntity()
-                    .block();
+    public void register(CustomerRegisterDto customerRegisterDto, String correlationId) {
+        Customer customer = customerMapper.mapToEntity(customerRegisterDto);
+        customer = customerRepository.save(customer);
+        AccountDto accountDtoRequest = customerMapper.mapToAccountDto(customer);
+        logger.debug("Customer saved but not commit: {}", customer);
+        AccountDto accountDtoResponse = webClient
+                .post()
+                .uri(AUTH_SVC_REG_URI)
+                .bodyValue(accountDtoRequest)
+                .retrieve()
+                .bodyToMono(AccountDto.class)
+                .block();
 
-            assert authSvcRoleRp != null;
-            if(authSvcRoleRp.getStatusCode().is2xxSuccessful()){
-                logger.debug("Role added to account: {}", accountUuid);
-            }
-            Customer customer = new Customer();
-            customer.setCustomerUuid(accountUuid);
-            customer.setFirstName(registerDto.getFirstName());
-            customer.setLastName(registerDto.getLastName());
-            Customer cusResponse =  customerRepository.save(customer);
-            logger.debug("Customer saved: {}", cusResponse);
+        if(accountDtoRequest.equals(accountDtoResponse)) {
+            logger.debug("Account created successfully: {}", accountDtoResponse);
+        }
+        else {
+            logger.error( "Failed to create account: {}", accountDtoRequest);
+            logger.error("roll back customer creation: {}", customer);
+            throw new RuntimeException("Failed to create account");
         }
 
-
-
     }
+
+
+
 
     @Override
     public CustomerDto getCustomer(UUID accountUuid,String correlationId) throws AccountNotFoundException {

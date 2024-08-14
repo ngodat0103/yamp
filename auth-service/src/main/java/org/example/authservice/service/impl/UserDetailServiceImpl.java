@@ -1,7 +1,7 @@
 package org.example.authservice.service.impl;
 
-import org.example.authservice.entity.Account;
-import org.example.authservice.repository.AccountRepository;
+import org.example.authservice.persistence.entity.Account;
+import org.example.authservice.persistence.repository.AccountRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

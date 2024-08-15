@@ -1,4 +1,5 @@
 package com.example.userservice;
+import com.example.userservice.controller.AddressController;
 import com.example.userservice.dto.address.AddressDto;
 import com.example.userservice.dto.address.AddressResponseDto;
 import com.example.userservice.exception.AddressNotFoundException;

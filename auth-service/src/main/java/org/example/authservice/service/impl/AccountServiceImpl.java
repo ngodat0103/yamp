@@ -15,14 +15,11 @@ import org.example.authservice.service.AccountService;
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Service;
-import java.time.Duration;
-import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -34,7 +31,6 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     final RoleRepository roleRepository;
     final PasswordEncoder passwordEncoder ;
-    private final JwtEncoder jwtEncoder;
     private final AccountRoleRepository accountRoleRepository;
     public AccountServiceImpl(AccountRepository accountRepository,
                               AccountMapper accountMapper,
@@ -46,42 +42,9 @@ public class AccountServiceImpl implements AccountService {
         this.accountMapper = accountMapper;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtEncoder = new NimbusJwtEncoder(jwkSource);
         this.accountRoleRepository = accountRoleRepository;
     }
 
-    @Override
-    public AccountDto getAccount(UUID accountUuid) {
-        Account account = accountRepository.findById(accountUuid)
-                .orElseThrow(accountNotFoundSupplier(accountUuid.toString()));
-        return accountMapper.mapToDto(account);
-    }
-
-    @Override
-    public String getUserDetails(String username) {
-        Account account = accountRepository
-                .findByUsernameOrEmail(username,username)
-                .orElseThrow(accountNotFoundSupplier(username));
-        Set<String> roles = account.getAccountRole().stream()
-                .map(accountRole -> accountRole.getRole().getRoleName())
-                .collect(Collectors.toSet());
-        JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
-                .issuer("auth-service")
-                .subject("user-details")
-                .claims(c -> {
-                    c.put("username",account.getUsername());
-                    c.put("roles",roles);
-                    c.put("password",account.getPassword());
-                    c.put("accountUuid",account.getAccountUuid().toString());
-                })
-                .issuedAt(Instant.now())
-                .issuedAt(Instant.now().plus(Duration.ofMinutes(1)))
-                .build();
-
-        JwtEncoderParameters jwtEncoderParameters = JwtEncoderParameters.from(jwtClaimsSet);
-        Jwt jwt = jwtEncoder.encode(jwtEncoderParameters);
-        return jwt.getTokenValue();
-    }
 
     @Transactional
     @Override
@@ -99,6 +62,11 @@ public class AccountServiceImpl implements AccountService {
             throw new ApiException(HttpStatus.CONFLICT,"Email is already exists!");
         }
             Account account = accountMapper.mapToEntity(accountDto);
+            Set<AccountRole> accountRoles = new HashSet<>();
+            Role roleCustomer = roleRepository.findByRoleName("ROLE_CUSTOMER");
+            AccountRole accountRole = new AccountRole(account,roleCustomer);
+            accountRoles.add(accountRole);
+            account.setAccountRole(accountRoles);
             Account savedAccount = accountRepository.save(account);
             return accountMapper.mapToDto(savedAccount);
     }

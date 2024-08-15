@@ -1,4 +1,4 @@
-package com.example.userservice;
+package com.example.userservice.controller;
 
 import com.example.userservice.dto.customer.CustomerDto;
 import com.example.userservice.dto.customer.CustomerRegisterDto;
@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -34,19 +36,13 @@ public class UserController {
 
     @SecurityRequirement(name = "http-basic")
     @GetMapping( "/get-me")
-    public CustomerDto getMe(HttpServletRequest request) throws AccountNotFoundException {
-        Principal principal = request.getUserPrincipal();
-        if(principal == null){
+    public CustomerDto getMe(JwtAuthenticationToken authenticationToken, HttpServletRequest request) throws AccountNotFoundException {
+        if(authenticationToken == null){
             throw new AccountNotFoundException("Account not found");
         }
-        String accountUuid = principal.getName();
+        Jwt jwt = authenticationToken.getToken();
         String xCorrelationId = request.getHeader(CORRELATION_ID_HEADER);
-
-
-        if (accountUuid == null) {
-            throw new AccountNotFoundException("Account not found");
-        }
-        return customerService.getCustomer(UUID.fromString(accountUuid),xCorrelationId);
+        return customerService.getCustomer(jwt,xCorrelationId);
 
     }
 

@@ -42,49 +42,23 @@ public class SecurityConfig {
 
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
-      OAuth2AuthorizationServerConfigurer oAuth2AuthorizationServerConfigurer =  http.getConfigurer(OAuth2AuthorizationServerConfigurer.class);
-      oAuth2AuthorizationServerConfigurer.tokenRevocationEndpoint( e ->
-              e.revocationResponseHandler( (request, response, authentication) -> {
-                          SecurityContext securityContext = SecurityContextHolder.getContext();
-                          if(securityContext != null){
-                              SecurityContextHolder.clearContext();
-                          }
-                  request.getSession().invalidate();
-                  response.setStatus(200);
-                  response.getWriter().write("Token revoked");
-              }
-              )
-      );
-
-
-
         http.headers( h-> h.addHeaderWriter(new TraceHeaderWriter()));
-        http.rememberMe(AbstractHttpConfigurer::disable);
+        http.exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
         return http.build();
     }
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
-        http.formLogin(AbstractHttpConfigurer::disable);
         http.logout(AbstractHttpConfigurer::disable);
-
-
         http.headers( h-> h.addHeaderWriter(new TraceHeaderWriter()));
+        http.formLogin(Customizer.withDefaults());
 
-
-       http.oauth2ResourceServer(resource ->
-               resource.jwt(jwt -> jwt.
-                       jwkSetUri("http://localhost:8001/api/v1/auth/oauth2/jwsk")
-                       .decoder(jwtDecoder())
-                               .jwtAuthenticationConverter(jwtAuthenticationConverter()
-               )
-               ));
 
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/v1/auth/account/userinfo").hasAuthority("auth-service.read")
                 .requestMatchers( HttpMethod.GET,"/api/v1/auth/actuator/prometheus").permitAll()
-                .anyRequest().permitAll()
+                .requestMatchers(HttpMethod.POST,"/api/v1/auth/account/register").permitAll()
+                .anyRequest().authenticated()
         );
        return http.build();
     }

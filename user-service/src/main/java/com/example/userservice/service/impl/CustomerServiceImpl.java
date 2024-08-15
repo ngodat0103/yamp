@@ -1,5 +1,6 @@
 package com.example.userservice.service.impl;
 import com.example.userservice.dto.customer.AccountDto;
+import com.example.userservice.dto.customer.AccountRegisterDto;
 import com.example.userservice.dto.customer.CustomerDto;
 import com.example.userservice.dto.customer.CustomerRegisterDto;
 import com.example.userservice.dto.mapper.AddressMapper;
@@ -13,10 +14,8 @@ import com.example.userservice.service.CustomerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
@@ -34,9 +33,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-
-
-
     private final Logger logger = getLogger(CustomerServiceImpl.class);
     private final  CustomerRepository  customerRepository;
     private final AddressRepository addressRepository;
@@ -53,21 +49,21 @@ public class CustomerServiceImpl implements CustomerService {
     public void register(CustomerRegisterDto customerRegisterDto, String correlationId) {
         Customer customer = customerMapper.mapToEntity(customerRegisterDto);
         customer = customerRepository.save(customer);
-        AccountDto accountDtoRequest = customerMapper.mapToAccountDto(customerRegisterDto);
-        accountDtoRequest.setPassword(passwordEncoder.encode(accountDtoRequest.getPassword()));
-        accountDtoRequest.setAccountUuid(customer.getCustomerUuid());
+        AccountRegisterDto accountRegisterDtoRequest = customerMapper.maptoAccountRegisterDto(customerRegisterDto);
+        accountRegisterDtoRequest.setPassword(passwordEncoder.encode(accountRegisterDtoRequest.getPassword()));
+        accountRegisterDtoRequest.setAccountUuid(customer.getCustomerUuid());
         logger.debug("New customerUuid {} saved but not commit, wait for auth-svc response", customer.getCustomerUuid());
         webClient.post()
                 .uri(AUTH_SVC_REG_URI)
-                .bodyValue(accountDtoRequest)
+                .bodyValue(accountRegisterDtoRequest)
                 .retrieve()
-                .bodyToMono(AccountDto.class)
+                .bodyToMono(AccountRegisterDto.class)
                 .doOnError(getOnError(customer.getCustomerUuid()))
                 .doOnSuccess(
-                        accountDtoResponse -> {
-                            accountDtoRequest.setPassword(null);
-                            if(accountDtoResponse.equals(accountDtoRequest)){
-                                logger.debug("Account created successfully: {}", accountDtoResponse.getAccountUuid());
+                        accountRegisterDtoResponse -> {
+                            accountRegisterDtoRequest.setPassword(null);
+                            if(accountRegisterDtoResponse.equals(accountRegisterDtoRequest)){
+                                logger.debug("Account created successfully: {}", accountRegisterDtoResponse.getAccountUuid());
                             }
                             else {
                                 throw new RuntimeException("Inconsistent account data");
@@ -81,30 +77,16 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public CustomerDto getCustomer(UUID accountUuid,String correlationId) throws AccountNotFoundException {
-        Customer customer = customerRepository.findCustomerByCustomerUuid(accountUuid)
-                .orElseThrow(accountNotFoundExceptionSupplier(accountUuid));
+    public CustomerDto getCustomer(Jwt jwt, String correlationId) {
+        UUID customerUuid = UUID.fromString(jwt.getClaimAsString("X-Account-Uuid"));
+        Customer customer = customerRepository.findById(customerUuid)
+                .orElseThrow(accountNotFoundExceptionSupplier(customerUuid));
         CustomerDto customerDto = customerMapper.mapToDto(customer);
-        ResponseEntity<AccountDto> accountDtoResponse = webClient.get()
-                .uri(AUTH_SVC_ACC_URI)
-                .headers(h -> {
-                    h.add(X_ACCOUNT_UUID_HEADER, accountUuid.toString());
-                    h.add(CORRELATION_ID_HEADER, correlationId);
-                })
-                .retrieve()
-                .toEntity(AccountDto.class)
-                .block();
-        assert accountDtoResponse != null;
-        if (accountDtoResponse.getStatusCode().is2xxSuccessful()) {
-            AccountDto accountDto = accountDtoResponse.getBody();
-            assert accountDto != null;
-            customerDto.setAccount(accountDto);
-            logger.debug("CustomerDto: {}", customerDto);
-            return customerDto;
-        } else {
-            logger.error("Failed to get account from auth-service: {}", accountUuid);
-        }
-        return null;
+        String username = jwt.getClaimAsString("username");
+        String email = jwt.getClaimAsString("email");
+        AccountDto accountDto = new AccountDto(username,email);
+        customerDto.setAccount(accountDto);
+        return customerDto;
     }
 
 

@@ -4,23 +4,10 @@ spring:
       on-profile: local-dev
   security:
     oauth2:
-      client:
-        registration:
-          user-service:
-            provider: internal-auth-svc
-            client-id: user-service
-            client-secret: "{cipher}e4ae50670b988f7503de551f5a61741d422a4a827ad67941979660faba6308030450098cba2e9155c63f7799932a5559"
-            client-authentication-method: client_secret_basic
-            authorization-grant-type: client_credentials
-            scope:
-              - auth-service.read
-              - auth-service.write
-        provider:
-          external-auth-svc:
-            token-uri: http://localhost:8000/api/v1/auth/oauth2/token
-            authorization-uri: http://localhost:8000/api/v1/auth/oauth2/authorize
-          internal-auth-svc:
-            token-uri: http://auth-svc:8001/api/v1/auth/oauth2/token
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://auth-svc:8001/api/v1/auth/oauth2/jwks
+
   datasource:
     url: jdbc:postgresql://share-db:5432/user-svc-db
     username: 'user-svc-user'
@@ -28,7 +15,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto:  create
+      ddl-auto:  update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect

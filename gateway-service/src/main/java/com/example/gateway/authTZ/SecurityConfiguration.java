@@ -1,76 +1,69 @@
 package com.example.gateway.authTZ;
+import com.example.gateway.filter.AddJwtHeaderFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
-import org.springframework.security.oauth2.server.resource.authentication.DelegatingJwtGrantedAuthoritiesConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
-import reactor.core.publisher.Mono;
-import java.util.ArrayList;
-import java.util.Collection;
 
 @Configuration
 public class SecurityConfiguration {
 
 
     @Bean
-    SecurityWebFilterChain rule(ServerHttpSecurity http
-                                ){
+    SecurityWebFilterChain httpSecurity(ServerHttpSecurity http, ReactiveOAuth2AuthorizedClientService reactiveOAuth2AuthorizedClientService){
         http.cors(ServerHttpSecurity.CorsSpec::disable);
         http.csrf(ServerHttpSecurity.CsrfSpec::disable);
 
 
-        http.httpBasic(Customizer.withDefaults());
-        http.oauth2ResourceServer(oauth2 -> {
-                    oauth2.jwt(jwt -> jwt
-                            .jwtDecoder(jwtDecoder())
-                            .jwtAuthenticationConverter(CustomJwtExtract())
-                    );
-
-                }
-        );
-
 
         http.authorizeExchange(exchange ->exchange
-                .pathMatchers(HttpMethod.GET,"/api/v1/auth/api-docs").permitAll()
-                .pathMatchers("/api/v1/auth/oauth2/token",
-                        "/api/v1/auth/login",
-                        "/api/v1/auth/oauth2/authorize"
-                ).permitAll()
+//                .pathMatchers(HttpMethod.GET,"/api/v1/auth/api-docs").permitAll()
+//                .pathMatchers("/api/v1/auth/oauth2/token",
+//                        "/api/v1/auth/login",
+//                        "/api/v1/auth/oauth2/authorize"
+//                ).permitAll()
+//
+//                .pathMatchers(HttpMethod.POST, "/api/v1/auth/account/**").hasAuthority("SCOPE_auth-service.write")
+//                .pathMatchers(HttpMethod.GET, "/api/v1/auth/account").hasAuthority("SCOPE_auth-service.read")
+//
+//
+//
+//
+//
+//                .pathMatchers(HttpMethod.POST,"/api/v1/auth/logout").permitAll()
+//                .pathMatchers("/api/v1/user/register","/api/v1/user/api-docs").permitAll()
+//                .pathMatchers("/api/v1/user/get-me").hasRole("CUSTOMER")
+//                .pathMatchers("/ui-docs/**").permitAll()
+//                .pathMatchers("/api-docs/**").permitAll()
+//                .pathMatchers("webjars/**").permitAll()
+//                .pathMatchers(HttpMethod.GET,"/actuator/**").hasRole("ADMIN")
 
-                .pathMatchers(HttpMethod.POST, "/api/v1/auth/account/**").hasAuthority("SCOPE_auth-service.write")
-                .pathMatchers(HttpMethod.GET, "/api/v1/auth/account").hasAuthority("SCOPE_auth-service.read")
+                        .pathMatchers("/favicon.ico").permitAll()
+                        .pathMatchers("/api/v1/auth/oauth2/authorize").permitAll()
+                        .pathMatchers("/api/v1/auth/login").permitAll()
+                        .pathMatchers("/api/v1/auth/oauth2/token").permitAll()
+                        .pathMatchers("/login/oauth2/code/gateway-service").permitAll()
+                        .pathMatchers("/api/v1/user/get-me").authenticated()
+                        .pathMatchers("/ui-docs/").permitAll()
+                        .pathMatchers("/actuator/**").authenticated()
+                        .anyExchange().permitAll()
 
-
-
-
-
-                .pathMatchers(HttpMethod.POST,"/api/v1/auth/logout").permitAll()
-                .pathMatchers("/api/v1/user/register","/api/v1/user/api-docs").permitAll()
-                .pathMatchers("/api/v1/user/get-me").hasRole("CUSTOMER")
-                .pathMatchers("/ui-docs/**").permitAll()
-                .pathMatchers("/api-docs/**").permitAll()
-                .pathMatchers("webjars/**").permitAll()
-                .pathMatchers(HttpMethod.GET,"/actuator/**").hasRole("ADMIN")
         );
 
-        http.formLogin(Customizer.withDefaults());
-        WebSessionServerSecurityContextRepository  webSessionServerSecurityContextRepository = new WebSessionServerSecurityContextRepository();
+       http.oauth2Client(Customizer.withDefaults());
+        http.oauth2Login(Customizer.withDefaults());
+
+        http.addFilterAfter(new AddJwtHeaderFilter(reactiveOAuth2AuthorizedClientService), SecurityWebFiltersOrder.AUTHORIZATION);
+        WebSessionServerSecurityContextRepository webSessionServerSecurityContextRepository = new WebSessionServerSecurityContextRepository();
         webSessionServerSecurityContextRepository.setCacheSecurityContext(false);
+
+
         http.securityContextRepository(webSessionServerSecurityContextRepository);
         return http.build();
     }
@@ -78,44 +71,12 @@ public class SecurityConfiguration {
 
 
 
-    @Bean
-    UserDetailsRepositoryReactiveAuthenticationManager authenticationManager(ReactiveUserDetailsService userDetailsService){
-       UserDetailsRepositoryReactiveAuthenticationManager authenticationManager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-       authenticationManager.setPasswordEncoder(new BCryptPasswordEncoder());
-         return authenticationManager;
-    }
 
 
-    @Bean
-    ReactiveJwtDecoder jwtDecoder(){
-        return NimbusReactiveJwtDecoder
-                .withJwkSetUri("http://auth-service:8001/api/v1/auth/oauth2/jwks")
-                .build();
-    }
-
-    Converter<Jwt, Mono<AbstractAuthenticationToken>> CustomJwtExtract(){
-        final Collection<Converter<Jwt, Collection<GrantedAuthority>>> listConverter = getConverters();
-
-        DelegatingJwtGrantedAuthoritiesConverter delegatingJwtGrantedAuthoritiesConverter = new DelegatingJwtGrantedAuthoritiesConverter(listConverter);
-
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(delegatingJwtGrantedAuthoritiesConverter);
 
 
-        return new ReactiveJwtAuthenticationConverterAdapter(jwtAuthenticationConverter);
 
-    }
 
-    private static Collection<Converter<Jwt, Collection<GrantedAuthority>>> getConverters() {
-        Collection<Converter<Jwt,Collection<GrantedAuthority>>> listConverter = new ArrayList<>();
-        JwtGrantedAuthoritiesConverter jwtExtractScopeConverter = new JwtGrantedAuthoritiesConverter();
-        JwtGrantedAuthoritiesConverter jwtExtractRoleConverter = new JwtGrantedAuthoritiesConverter();
-        jwtExtractRoleConverter.setAuthoritiesClaimName("roles");
-        jwtExtractRoleConverter.setAuthorityPrefix("ROLE_");
-        listConverter.add(jwtExtractScopeConverter); // for extract scope
-        listConverter.add(jwtExtractRoleConverter); // for extract role
-        return listConverter;
-    }
 
 
 

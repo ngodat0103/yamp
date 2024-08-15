@@ -13,10 +13,6 @@ server:
   forward-headers-strategy: framework
   servlet:
     context-path: /api/v1/auth
-    session:
-      cookie:
-        name: JSESSIONID
-        domain: localhost
 springdoc:
   api-docs:
     path: /api-docs
@@ -31,3 +27,4 @@ springdoc:
         name: NgoDat0103
         url: https://github.com/NGODAT0103
         email: 21521935@gm.uit.edu.vn
+  show-oauth2-endpoints: true

@@ -1,6 +1,6 @@
 package com.example.userservice.dto.mapper;
 
-import com.example.userservice.dto.customer.AccountDto;
+import com.example.userservice.dto.customer.AccountRegisterDto;
 import com.example.userservice.dto.customer.CustomerDto;
 import com.example.userservice.dto.customer.CustomerRegisterDto;
 import com.example.userservice.persistence.entity.Customer;
@@ -15,5 +15,5 @@ public interface CustomerMapper {
 
     Customer mapToEntity(CustomerRegisterDto customerRegisterDto);
     @Mapping(target = "accountUuid",ignore = true)
-    AccountDto mapToAccountDto(CustomerRegisterDto customerRegisterDto);
+    AccountRegisterDto maptoAccountRegisterDto(CustomerRegisterDto customerRegisterDto);
 }

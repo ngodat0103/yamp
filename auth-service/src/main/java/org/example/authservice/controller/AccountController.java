@@ -29,19 +29,7 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @GetMapping("/user-details")
-    public void getUserInfo(@RequestParam String username, HttpServletResponse response){
-        String jwtToken = accountService.getUserDetails(username);
-        response.addHeader("X-Jwt-Token", jwtToken);
-    }
 
-
-
-    @GetMapping()
-    public AccountDto getAccount(@RequestHeader (value =ACCOUNT_UUID_HEADER) @Valid UUID accountUuid)
-    {
-        return accountService.getAccount(accountUuid);
-    }
 
     @PostMapping(value = "/register")
     @ResponseStatus(HttpStatus.CREATED)

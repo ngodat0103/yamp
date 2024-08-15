@@ -1,7 +1,6 @@
-package com.example.userservice;
+package com.example.userservice.controller;
 import com.example.userservice.dto.address.AddressDto;
 import com.example.userservice.dto.address.AddressResponseDto;
-import com.example.userservice.persistence.entity.Customer;
 import com.example.userservice.service.AddressService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

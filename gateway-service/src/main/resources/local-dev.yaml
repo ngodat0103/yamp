@@ -10,16 +10,18 @@ spring:
       client:
         provider:
           auth-service:
-            authorization-uri: http://auth-service:8001/api/v1/auth/oauth2/authorize
-            token-uri: http://auth-service:8001/api/v1/auth/oauth2/token
+            authorization-uri: http://localhost:8000/api/v1/auth/oauth2/authorize
+            token-uri: http://localhost:8000/api/v1/auth/oauth2/token
+            jwk-set-uri: http://auth-svc:8001/api/v1/auth/oauth2/jwks
         registration:
           gateway-service:
+            redirect-uri: "http://localhost:8000/login/oauth2/code/gateway-service"
             provider: auth-service
-            authorization-grant-type: client_credentials
+            authorization-grant-type: authorization_code
             client-authentication-method: client_secret_basic
             client-id: gateway-service
             client-secret: "{cipher}806472b06e24fc5a178e34594f1c6406cc662fb95c63596dece4d03e10bd8ee6ba014c5d22f5b13ce206544f3cbb2e20"
-            scope: auth-service.read
+            scope: user.read,openid,profile,message.read,message.write
 
 
   config:
@@ -27,9 +29,9 @@ spring:
       on-profile: local-dev
   data:
     redis:
-      url: redis://redis-service:6379
+      url: redis://redis-svc:6379
       client-type: lettuce
-      database: 0
+      database: 1
       client-name: gateway-service
 logging:
   level:

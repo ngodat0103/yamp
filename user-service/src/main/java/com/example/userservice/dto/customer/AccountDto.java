@@ -1,13 +1,11 @@
 package com.example.userservice.dto.customer;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import java.util.UUID;
-
-@Data
+@Getter
+@AllArgsConstructor
 public class AccountDto {
-    private UUID accountUuid;
     private String username;
     private String email;
-    private String password;
 }

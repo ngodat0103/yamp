@@ -5,7 +5,7 @@ on:
       - "auth-service/**"
 jobs:
   auth-service:
-    uses: ./.github/workflows/ci-reusable-workflow.yaml
+    uses: ./.github/workflows/template/ci-commit-workflow.yaml
     permissions:
       contents: read
       packages: write

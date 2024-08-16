@@ -33,6 +33,8 @@ spring:
       client-type: lettuce
       database: 1
       client-name: gateway-service
+  datasource:
+    url:
 logging:
   level:
     com.example.gateway.filter: DEBUG

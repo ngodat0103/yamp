@@ -1,4 +1,4 @@
-package com.example.gateway.filter;
+package com.example.gateway.security.filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -19,8 +19,6 @@ public class ResponsePostFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         HttpHeaders requestHeader = exchange.getRequest().getHeaders();
         HttpHeaders ResponseHeader = exchange.getResponse().getHeaders();
-
-
         InetSocketAddress remoteAddress = exchange.getRequest().getRemoteAddress();
         String correlationId = requestHeader.getFirst("X-Correlation-ID");
         String xResponseTime = requestHeader.getFirst("X-Response-Time");

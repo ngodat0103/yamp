@@ -45,7 +45,6 @@ public class RedisOauth2AuthorizationService implements OAuth2AuthorizationServi
 
     private static final String ID_TO_CORRELATIONS = "id_to_correlations:";
 
-    private static final String UID_TO_AUTHORIZATIONS = "uid_to_authorizations:";
 
     private static final String CID_TO_AUTHORIZATIONS = "cid_to_authorizations:";
 

@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 @WebMvcTest(value = AddressController.class)
 @ActiveProfiles("local-dev")
 @AutoConfigureMockMvc(addFilters = false)
-public class AddressControllerTest {
+class AddressControllerTest {
     private final static String CUSTOMER_UUID_HEADER = "X-Customer-Uuid";
     @MockBean
     private AddressService addressService;
@@ -52,7 +52,7 @@ public class AddressControllerTest {
     }
 
     @Test
-    public void getAddressWhenCustomerUuidNotFound() throws Exception {
+    void getAddressWhenCustomerUuidNotFound() throws Exception {
         UUID customerUuid = UUID.randomUUID();
         when(addressService.getAddresses(eq(customerUuid))).thenThrow(new CustomerNotFoundException(customerUuid));
         mockMvc.perform(get("/address")
@@ -64,7 +64,7 @@ public class AddressControllerTest {
     }
 
     @Test
-    public void getAddressWhenCustomerUuidIsNull() throws Exception {
+    void getAddressWhenCustomerUuidIsNull() throws Exception {
         mockMvc.perform(get("/address")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -91,7 +91,7 @@ public class AddressControllerTest {
 
 
     @Test
-    public void getAddressTest() throws Exception {
+    void getAddressTest() throws Exception {
         UUID customerUuid = UUID.randomUUID();
         AddressDto addressDto = AddressDto.builder()
                 .name("Ten gi do")

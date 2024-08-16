@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = AccountController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("application-test")
-public class AccountControllerTest {
+class AccountControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -49,7 +49,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void testRegisterAccountWhenNotFound() throws Exception {
+    void testRegisterAccountWhenNotFound() throws Exception {
         when(accountService.register(any(AccountDto.class))).thenReturn(accountDto);
         mockMvc.perform(post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -61,7 +61,7 @@ public class AccountControllerTest {
                 .andExpect(jsonPath("$.accountUuid").value(accountDto.getAccountUuid().toString()));
     }
     @Test
-    public void testRegisterAccountWhenAccountUuidFound() throws Exception {
+    void testRegisterAccountWhenAccountUuidFound() throws Exception {
         doThrow(new ApiException(HttpStatus.CONFLICT,"AccountUuid is already exists!"))
                 .when(accountService)
                 .register(any(AccountDto.class));
@@ -73,7 +73,7 @@ public class AccountControllerTest {
                 .andExpect(jsonPath("$.message").value("AccountUuid is already exists!"));
     }
     @Test
-    public void testRegisterAccountWhenUsernameFound() throws Exception {
+    void testRegisterAccountWhenUsernameFound() throws Exception {
         doThrow(new ApiException(HttpStatus.CONFLICT,"Username is already exists!"))
                 .when(accountService)
                 .register(any(AccountDto.class));
@@ -86,7 +86,7 @@ public class AccountControllerTest {
                 .andExpect(jsonPath("$.message").value("Username is already exists!"));
     }
     @Test
-    public void testRegisterAccountWhenEmailFound() throws Exception {
+    void testRegisterAccountWhenEmailFound() throws Exception {
         doThrow(new ApiException(HttpStatus.CONFLICT,"Email is already exists!"))
                 .when(accountService)
                 .register(any(AccountDto.class));
@@ -99,7 +99,7 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void testRegisterAccountWhenMissingField() throws Exception {
+    void testRegisterAccountWhenMissingField() throws Exception {
         accountDto.setAccountUuid(null);
         mockMvc.perform(post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)

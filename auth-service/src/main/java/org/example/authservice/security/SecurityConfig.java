@@ -35,7 +35,6 @@ import org.springframework.security.web.savedrequest.CookieRequestCache;
 public class SecurityConfig {
 
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Bean
     SecurityFilterChain oauth2FilterChain(HttpSecurity http) throws Exception {

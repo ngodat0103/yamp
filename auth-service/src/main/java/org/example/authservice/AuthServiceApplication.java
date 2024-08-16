@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -16,17 +17,11 @@ public class AuthServiceApplication {
 
     public static void main(String[] args) throws SQLException {
        ApplicationContext ctx =  SpringApplication.run(AuthServiceApplication.class, args);
-
-
-       // testing onlydsdasdfdfdsfdsfdfsfdsfdsadfsdffdsffdsffdsffdsffdsffdsfdsdfdsffdsffdsffdsf
-        ClassPathResource classPathResource = new ClassPathResource("init_sql_testing_only.sql");
-        if (classPathResource.exists()) {
-            DataSource dataSource = ctx.getBean(DataSource.class);
-            ScriptUtils.executeSqlScript(dataSource.getConnection(), classPathResource);
-        }
-
-
-
+//        ClassPathResource classPathResource = new ClassPathResource("init_sql_testing_only.sql");
+//        if (classPathResource.exists()) {
+//            DataSource dataSource = ctx.getBean(DataSource.class);
+//            ScriptUtils.executeSqlScript(dataSource.getConnection(), classPathResource);
+//        }
     }
 
 }

@@ -1,0 +1,11 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  application:
+    name: test
+  datasource:
+    url: jdbc:postgresql://share-db:5432/user-svc-db-test
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver

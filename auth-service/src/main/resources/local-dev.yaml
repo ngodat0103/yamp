@@ -3,23 +3,62 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:postgresql://share-db:5432/auth-service-db
-    username: share
-    password: share
+    url: jdbc:postgresql://share-db:5432/auth-svc-db
+    username: 'auth-svc-user'
+    password: '{cipher}e4b0a2a815e34f4e3ad39d30b1fbdffd994ce5695fb5976b370b9965d8d117f548b1303da957eb20c4865c3c3c0276b0'
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate.hibernate.format_sql: true
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
   data:
     redis:
-      url: redis://redis-service:6379
-      client-type: lettuce
+      url: redis://redis-svc:6379
+      client-name: auth-service
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: http://localhost:8000/api/v1/auth
+      client:
+        provider:
+          hcp-vault-provider:
+            token-uri: https://auth.idp.hashicorp.com/oauth2/token
+        registration:
+          hcp-vault-client:
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: "client_credentials"
+            provider: hcp-vault-provider
+            client-id: "{cipher}5127dc6c6f3048cb9915341aabe36094e96d4a70785eacfe444fc5476e0d9c67f7a6b91237fc47ef600c5a5ba6e3441d1e5d0d96d23238ef78c88d8071da8bdd"
+            client-secret: "{cipher}261d1370f6c91ca84e624ab0d1e991fcddc9b973603393b46600b344211f40eb687e87192b0cdb5db32d7bad9dae85274c88a5a5e3c5738fe94d777f524a9e30f22c5aaa4861cf179202f96bd53d3ea63a679830e966e249b26d0a92e4b85ed3"
+
 logging:
   level:
-    org.springframework.security: DEBUG
+    com.example.authservice.security: DEBUG
 hcp-vault:
-  token-end-point: https://auth.idp.hashicorp.com/oauth2/token
   jwk-secret-path: https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/cbe1cf74-4825-4a1b-8c63-c685c98f813c/projects/d0064e9e-e611-4d22-8151-d54a515c513d/apps/authTZ/open
+init-swagger-client:
+  swagger-secret: "{cipher}dcbe3d737b10508e19c95bf72cfe2d22b734104965350a20d6297ebed9953bdfabd761772530e5bb6c2fbc7e30d64551"
+  redirect-uri: http://localhost:8000/webjars/swagger-ui/oauth2-redirect.html
+  logout-uri: http://localhost:8000/api/v1/auth/logout
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always

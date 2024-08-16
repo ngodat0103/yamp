@@ -1,7 +1,7 @@
 package org.example.authservice.service.impl;
 
-import org.example.authservice.entity.Account;
-import org.example.authservice.repository.AccountRepository;
+import org.example.authservice.persistence.entity.Account;
+import org.example.authservice.persistence.repository.AccountRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +21,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         List<SimpleGrantedAuthority> authorities= account.getAccountRole().stream()
                 .map(accountRole -> new SimpleGrantedAuthority(accountRole.getRole().getRoleName()))
                 .toList();
-        return User.withUsername(username)
+        return User.withUsername(account.getAccountUuid().toString())
                 .password(account.getPassword())
                 .authorities(authorities)
                 .build();

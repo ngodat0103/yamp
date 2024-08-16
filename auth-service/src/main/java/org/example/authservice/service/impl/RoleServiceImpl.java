@@ -1,8 +1,8 @@
 package org.example.authservice.service.impl;
 
-import org.example.authservice.entity.Role;
+import org.example.authservice.persistence.entity.Role;
 import org.example.authservice.exception.ApiException;
-import org.example.authservice.repository.RoleRepository;
+import org.example.authservice.persistence.repository.RoleRepository;
 import org.example.authservice.service.RoleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

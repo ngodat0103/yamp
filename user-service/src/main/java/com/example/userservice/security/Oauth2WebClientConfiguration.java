@@ -1,17 +1,20 @@
 package com.example.userservice.security;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import static com.example.userservice.constant.AuthServiceUri.AUTH_SVC_BASE;
+
+
+// This class is used to configure the WebClient to use OAuth2 for authentication and authorization.
 
 @Component
 public class Oauth2WebClientConfiguration {
 
+  //todo: Will implement using redis cache for further optimization
     @Bean
-    WebClient webClient(OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager) {
-        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2Client = new ServletOAuth2AuthorizedClientExchangeFilterFunction(oAuth2AuthorizedClientManager);
-        oauth2Client.setDefaultClientRegistrationId("user-service");
-        return WebClient.builder().apply(oauth2Client.oauth2Configuration()).build();
+    WebClient webClient() {
+      return WebClient.builder()
+              .baseUrl(AUTH_SVC_BASE)
+              .build();
     }
 }

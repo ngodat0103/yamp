@@ -1,8 +1,11 @@
 spring:
+  config:
+    activate:
+      on-profile: docker-dev
   datasource:
     url: jdbc:postgresql://share-db:5432/user-service-db
-    username: share
-    password: share
+    username: "{cipher}8d5408ba942dc178a167f8b27a52f866184a2c084d21b713f6904932d2963285"
+    password: "{cipher}8d5408ba942dc178a167f8b27a52f866184a2c084d21b713f6904932d2963285"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -13,15 +16,5 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 
-springdoc:
-  swagger-ui:
-    path: /ui-docs
-    oauth:
-      client-id: webclient
-      client-secret: webclientsecret
-      use-basic-authentication-with-access-code-grant: true
-    oauth2-redirect-url: http://localhost:8000/ui-docs/swagger-ui/oauth2-redirect.html
-  api-docs:
-    path: /api-docs
 
 

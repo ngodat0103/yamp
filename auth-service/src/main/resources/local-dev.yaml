@@ -35,7 +35,6 @@ spring:
 
 logging:
   level:
-    org.springframework.security: DEBUG
     com.example.authservice.security: DEBUG
 hcp-vault:
   jwk-secret-path: https://api.cloud.hashicorp.com/secrets/2023-06-13/organizations/cbe1cf74-4825-4a1b-8c63-c685c98f813c/projects/d0064e9e-e611-4d22-8151-d54a515c513d/apps/authTZ/open

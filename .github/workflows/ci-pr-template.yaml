@@ -12,7 +12,7 @@ on:
         type: string
 jobs:
   integration-test:
-    name: Set up
+    name: running integration test
     runs-on: ubuntu-latest
     container:
       image: maven:3.9.8-eclipse-temurin-17-alpine
@@ -67,7 +67,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5.5.1
         with:
-          images: ghcr.io/ngodat0103/kltn/${{inputs.SERVICE_NAME}}
+          images: ghcr.io/ngodat0103/yamp/${{inputs.SERVICE_NAME}}
       - name: build and push
         uses: docker/build-push-action@v6.3.0
         with:
@@ -93,7 +93,7 @@ jobs:
         id: generate-report
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: ${{secrets.REGISTRY_URL}}/kltn/${{inputs.SERVICE_NAME}}:${{github.sha}}
+          image-ref: ${{secrets.REGISTRY_URL}}/yamp/${{inputs.SERVICE_NAME}}:${{meta.outputs.tags}}
           severity: HIGH,CRITICAL
           vuln-type: os,library
           exit-code: 1

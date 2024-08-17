@@ -95,7 +95,7 @@ jobs:
         id: generate-report
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: ${{secrets.REGISTRY_URL}}/yamp/${{inputs.SERVICE_NAME}}:${{needs.build-and-push.outputs.tags}}
+          image-ref: ghcr.io/yamp/${{inputs.SERVICE_NAME}}:${{needs.build-and-push.outputs.tags}}
           severity: HIGH,CRITICAL
           vuln-type: os,library
           exit-code: 1
@@ -103,7 +103,7 @@ jobs:
           template: '@/contrib/html.tpl'
           output: ${{inputs.SERVICE_NAME}}-report-${{github.sha}}.html
         env:
-          TRIVY_USERNAME: ${{secrets.REGISTRY_USERNAME}}
+          TRIVY_USERNAME: ${{github.repository_owner}}
           TRIVY_PASSWORD: ${{secrets.GITHUB_TOKEN}}
       - name: Upload ${{inputs.SERVICE_NAME}} security report to artifact tab
         if: ${{steps.generate-report.conclusion == 'failure'}}

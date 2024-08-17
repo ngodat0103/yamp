@@ -14,6 +14,8 @@ spec:
     spec:
       containers:
         - image: registry-harbor.ngodat0103.me/kltn/gateway-service
+          securityContext:
+            readOnlyRootFilesystem: true
           name: gateway
           ports:
             - containerPort: 8080

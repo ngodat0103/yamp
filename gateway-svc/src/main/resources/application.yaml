@@ -4,6 +4,7 @@ spring:
   config:
     import:
       - "optional:local-dev.yaml"
+      - "optional:test.yaml"
   application:
     name: gateway
   cloud:

@@ -1,4 +1,4 @@
-package com.example.userservice;
+package com.example.userservice.unit_test;
 import com.example.userservice.controller.AddressController;
 import com.example.userservice.dto.address.AddressDto;
 import com.example.userservice.dto.address.AddressResponseDto;

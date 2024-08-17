@@ -5,6 +5,7 @@ spring:
     import:
       - "optional:local-dev.yaml"
       - "optional:docker-dev.yaml"
+      - "optional:test.yaml"
   application:
     name: user-service
 server:

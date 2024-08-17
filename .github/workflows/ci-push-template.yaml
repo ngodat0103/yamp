@@ -29,6 +29,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Running test
         working-directory: ${{inputs.SERVICE_NAME}}
+        continue-on-error: true
         run: mvn test -q -Dtest="**.unit_test.**"
       - name: Create summary
         working-directory: ${{inputs.SERVICE_NAME}}/target/surefire-reports

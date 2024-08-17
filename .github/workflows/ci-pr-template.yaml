@@ -41,8 +41,10 @@ jobs:
         run: mvn test -q -Dtest="**.integration_test.**"
 
 
-
   build-and-push:
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
     permissions:
       contents: read
       packages: write
@@ -93,7 +95,7 @@ jobs:
         id: generate-report
         uses: aquasecurity/trivy-action@0.24.0
         with:
-          image-ref: ${{secrets.REGISTRY_URL}}/yamp/${{inputs.SERVICE_NAME}}:${{meta.outputs.tags}}
+          image-ref: ${{secrets.REGISTRY_URL}}/yamp/${{inputs.SERVICE_NAME}}:${{needs.build-and-push.outputs.tags}}
           severity: HIGH,CRITICAL
           vuln-type: os,library
           exit-code: 1

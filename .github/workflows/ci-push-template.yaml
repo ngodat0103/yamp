@@ -29,10 +29,10 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Running test
         working-directory: ${{inputs.SERVICE_NAME}}
-        run: mvn test -Dtest="**.unit_test.**"
+        run: mvn test -q -Dtest="**.unit_test.**"
       - name: Create summary
+        working-directory: ${{inputs.SERVICE_NAME}}/target/surefire-reports
         run: |
-         cd target/surefire-reports
          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
          echo "All unit tests have been executed." >> $GITHUB_STEP_SUMMARY
          echo "- **Service Name**: ${{ inputs.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY

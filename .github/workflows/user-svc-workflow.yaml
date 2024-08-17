@@ -11,7 +11,7 @@ jobs:
     if: github.event_name == 'push'
     uses: ./.github/workflows/ci-push-template.yaml
     with:
-      SERVICE_NAME: gateway-svc
+      SERVICE_NAME: user-svc
       SERVICE_PORT: 8001
     secrets: inherit
   pr:

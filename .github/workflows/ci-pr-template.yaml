@@ -36,7 +36,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Running integration test
         working-directory: ${{inputs.SERVICE_NAME}}
-        run: mvn test -q -Dtest="**.integration_test.**"
+        run: mvn test -q -Dtest="**.integration_test.**" -DENCRYPT_KEY=${{github.secrets.ENCRYPT_KEY}}
 
 
 

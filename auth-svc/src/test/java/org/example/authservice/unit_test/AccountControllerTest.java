@@ -69,7 +69,7 @@ class AccountControllerTest {
         mockMvc.perform(post("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(accountDto)))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value("CONFLICT"))
                 .andExpect(jsonPath("$.message").value("AccountUuid is already exists!"));
     }

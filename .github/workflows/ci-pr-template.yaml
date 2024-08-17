@@ -11,8 +11,8 @@ on:
         required: true
         type: string
 jobs:
-  test:
-    name: Set up integrated test
+  integration-test:
+    name: Set up
     runs-on: ubuntu-latest
     container:
       image: maven:3.9.8-eclipse-temurin-17-alpine
@@ -20,9 +20,9 @@ jobs:
       share-db:
         image: postgres:16.3-bullseye
         env:
-          POSTGRES_USER: share
-          POSTGRES_PASSWORD: share
-          POSTGRES_DB: ${{inputs.SERVICE_NAME}}-db
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,9 +34,9 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Running test
+      - name: Running integration test
         working-directory: ${{inputs.SERVICE_NAME}}
-        run: mvn test
+        run: mvn test -q -Dtest="**.integration_test.**"
 
 
 
@@ -44,7 +44,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    needs: [ test]
+    needs: [integration-test]
     name: Build and push
     runs-on: ubuntu-latest
     steps:

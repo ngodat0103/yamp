@@ -1,18 +1,18 @@
 on:
   push:
     paths:
-      - "auth-svc/**"
+      - "gateway-svc/**"
   pull_request:
     paths:
-      - "auth-svc/**"
+      - "gateway-svc/**"
 jobs:
   push:
     name: auth-svc-push
     if: github.event_name == 'push'
     uses: ./.github/workflows/ci-push-template.yaml
     with:
-      SERVICE_NAME: auth-svc
-      SERVICE_PORT: 8000
+      SERVICE_NAME: gateway-svc
+      SERVICE_PORT: 8001
     secrets: inherit
 
   pr:
@@ -20,6 +20,6 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/ci-pr-template.yaml
     with:
-      SERVICE_NAME: auth-svc
-      SERVICE_PORT: 8000
+      SERVICE_NAME: gateway-svc
+      SERVICE_PORT: 8001
     secrets: inherit

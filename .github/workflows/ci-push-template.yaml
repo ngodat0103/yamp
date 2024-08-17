@@ -11,7 +11,7 @@ on:
         required: true
         type: string
 jobs:
-  test:
+  unit-test:
     name: Run Unit test
     runs-on: ubuntu-latest
     container:
@@ -43,7 +43,6 @@ jobs:
   scan_quality_code:
     name: Scan quality
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - uses: actions/checkout@v4
         with:
@@ -70,12 +69,11 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=NGODAT0103_KLTN_469d6be5-1cc8-4567-ae29-7f3f9dc29ff6 -Dsonar.projectName='KLTN'
+        run: mvn -DskipTests -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=NGODAT0103_KLTN_469d6be5-1cc8-4567-ae29-7f3f9dc29ff6 -Dsonar.projectName='KLTN'
 
   scan_security:
     name: Security check using
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -99,7 +97,6 @@ jobs:
   scan_vulnerability:
     name: check vulnerability using trivy
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -121,7 +118,6 @@ jobs:
   scan_misconfig:
     name: check misconfiguration
     runs-on: ubuntu-latest
-    needs: test
     steps:
       - name: Checkout
         uses: actions/checkout@v4

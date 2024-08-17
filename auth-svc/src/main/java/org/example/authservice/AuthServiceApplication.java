@@ -8,7 +8,7 @@ public class AuthServiceApplication {
 
     public static void main(String[] args) {
 
-        // fsdfdsfsffdsffdsffdsffdsffdsf
+        // fsdfdsfsffdsffdsffdsffdsffdsfdfdfd
         SpringApplication.run(AuthServiceApplication.class, args);
 
     }

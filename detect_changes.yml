@@ -25,21 +25,21 @@
 #  auth-service:
 #    needs: detect_changes
 #    if: ${{contains(needs.detect_changes.outputs.changed,'auth-service')}}
-#    uses: ./.github/workflows/ci-reusable-workflow.yaml
+#    uses: ./.github/workflows/ci-push-template.yaml
 #    with:
 #      service_name: auth-service
 #    secrets: inherit
 #  user-service:
 #    needs: detect_changes
 #    if: ${{contains(needs.detect_changes.outputs.changed,'user-service')}}
-#    uses: ./.github/workflows/ci-reusable-workflow.yaml
+#    uses: ./.github/workflows/ci-push-template.yaml
 #    with:
 #      service_name: user-service
 #    secrets: inherit
 #  config-service:
 #    needs: detect_changes
 #    if: ${{contains(needs.detect_changes.outputs.changed,'config-service')}}
-#    uses: ./.github/workflows/ci-reusable-workflow.yaml
+#    uses: ./.github/workflows/ci-push-template.yaml
 #    with:
 #      service_name: config-service
 #    secrets: inherit

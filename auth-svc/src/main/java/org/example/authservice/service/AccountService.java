@@ -1,9 +1,7 @@
 package org.example.authservice.service;
 
 
-import jakarta.transaction.Transactional;
 import org.example.authservice.dto.AccountDto;
-import org.example.authservice.persistence.entity.Account;
 
 import java.util.UUID;
 

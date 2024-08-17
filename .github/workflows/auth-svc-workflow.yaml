@@ -1,0 +1,26 @@
+name: auth-service
+on:
+  push:
+    paths:
+      - "auth-svc/**"
+  pull_request:
+    paths:
+      - "auth-svc/**"
+jobs:
+  auth-svc-push:
+    name: auth-svc-push
+    if: github.event_name == 'push'
+    uses: ./template/ci-push-template.yaml
+    with:
+      SERVICE_NAME: auth-svc
+      SERVICE_PORT: 8000
+    secrets: inherit
+
+  auth-svc-pr:
+    name: auth-svc-pr
+    if: github.event_name == 'pull_request'
+    uses: ./template/ci-pr-template.yaml
+    with:
+      SERVICE_NAME: auth-svc
+      SERVICE_PORT: 8000
+    secrets: inherit

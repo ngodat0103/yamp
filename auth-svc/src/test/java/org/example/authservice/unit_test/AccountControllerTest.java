@@ -45,8 +45,7 @@ class AccountControllerTest {
             .build();
 
     @BeforeEach
-    void setUp(JdbcTemplate jdbcTemplate) {
-        ;
+    void setUp() {
       objectMapper = JsonMapper.builder().disable(MapperFeature.USE_ANNOTATIONS).build();
     }
 

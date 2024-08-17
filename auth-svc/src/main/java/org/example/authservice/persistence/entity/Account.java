@@ -23,8 +23,7 @@ public class Account {
     @Column (nullable=false)
     private String password;
     @Convert(converter = RoleConverter.class)
-    private Set<String> roles;
-
+    private Set<String> roles = new HashSet<>();
     public Account(UUID accountUuid ,String email,String username, String password){
         this.username = username;
         this.password = password;

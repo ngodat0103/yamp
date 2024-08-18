@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: local-dev
   datasource:
     url: jdbc:postgresql://share-db:5432/auth-svc-db
     username: 'auth-svc-user'

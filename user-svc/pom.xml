@@ -8,10 +8,10 @@
         <version>3.3.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
-    <artifactId>user-svc</artifactId>
+    <groupId>com.github.ngodat0103.yamp</groupId>
+    <artifactId>usersvc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>user-service</name>
+    <name>usersvc</name>
     <description>User-service</description>
     <url/>
     <licenses>

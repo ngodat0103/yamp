@@ -22,4 +22,11 @@ USER app
 EXPOSE ${SERVICE_PORT}
 HEALTHCHECK --interval=30s --timeout=3s --retries=1 CMD wget -qO- http://localhost:${SERVICE_PORT}/actuator/health/ | grep UP || exit 1
 LABEL org.opencontainers.image.source=https://github.com/ngodat0103/yamp
+LABEL  org.opencontainers.image.created=2024-08-17T08:21:45.973Z
+LABEL  org.opencontainers.image.description="YAMP - Yet Another Microservice Project"
+LABEL  org.opencontainers.image.revision=b10d1612f94e720574470c5a6e00adfc59f05785
+LABEL  org.opencontainers.image.source=https://github.com/NGODAT0103/YAMP
+LABEL  org.opencontainers.image.title=YAMP
+LABEL  org.opencontainers.image.url=https://github.com/NGODAT0103/YAMP
+LABEL  org.opencontainers.image.version=pr-26
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

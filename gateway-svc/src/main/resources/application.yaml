@@ -23,8 +23,26 @@ spring:
           uri: http://user-svc:8002
           predicates:
             - Path=/api/v1/user/**
-#          filters:
-#            - CircuitBreaker=user-service-breaker
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.requestedTokens: 1
+#            - name: Retry
+#              args:
+#                method: GET
+#                backoff:
+#                  firstBackoff: 100ms
+#                  maxBackoff: 1000ms
+#                  factor: 2
+#            - name: CircuitBreaker
+#              args:
+#                name: user-service-breaker
+#                fallbackUri: forward:/fallback
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 1s
 server:
   port: 8000
 management:

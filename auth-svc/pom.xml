@@ -8,10 +8,10 @@
         <version>3.3.2</version> <!-- Update to a version that includes the required spring-web version -->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>org.example</groupId>
-    <artifactId>auth-svc</artifactId>
+    <groupId>com.github.ngodat0103.yamp</groupId>
+    <artifactId>authsvc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>auth-service</name>
+    <name>authsvc</name>
     <description>auth-service</description>
     <url/>
     <licenses>

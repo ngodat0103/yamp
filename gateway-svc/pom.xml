@@ -8,7 +8,7 @@
 		<version>3.3.2-SNAPSHOT</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example.gateway</groupId>
+	<groupId>com.github.ngodat0103.yamp</groupId>
 	<artifactId>gateway-svc</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>API Gateway Server</name>

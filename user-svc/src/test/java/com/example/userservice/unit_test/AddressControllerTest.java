@@ -1,10 +1,10 @@
 package com.example.userservice.unit_test;
-import com.example.userservice.controller.AddressController;
-import com.example.userservice.dto.address.AddressDto;
-import com.example.userservice.dto.address.AddressResponseDto;
-import com.example.userservice.exception.AddressNotFoundException;
-import com.example.userservice.exception.CustomerNotFoundException;
-import com.example.userservice.service.AddressService;
+import com.example.yamp.usersvc.controller.AddressController;
+import com.example.yamp.usersvc.dto.address.AddressDto;
+import com.example.yamp.usersvc.dto.address.AddressResponseDto;
+import com.example.yamp.usersvc.exception.AddressNotFoundException;
+import com.example.yamp.usersvc.exception.CustomerNotFoundException;
+import com.example.yamp.usersvc.service.AddressService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

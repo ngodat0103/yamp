@@ -20,12 +20,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-#logging:
-#  level:
-#    org.springframework.security: DEBUG
-#    com.example.userservice.security: DEBUG
-#    com.example.userservice.exception: ERROR
-#    com.example.userservice.service: DEBUG
+
 management:
   endpoints:
     web:
@@ -45,3 +40,11 @@ management:
   endpoint:
     health:
       show-details: always
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.example.userservice.security: DEBUG
+    com.example.userservice.exception: ERROR
+    com.example.userservice.service: DEBUG
+  pattern:
+    level:  "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

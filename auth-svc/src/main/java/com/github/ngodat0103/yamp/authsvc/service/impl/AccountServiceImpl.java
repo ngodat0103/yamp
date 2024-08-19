@@ -8,6 +8,7 @@ import com.github.ngodat0103.yamp.authsvc.service.AccountService;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,9 +19,9 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 @Service
+@Slf4j
 public class AccountServiceImpl implements AccountService {
 
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AccountServiceImpl.class);
 
     private static final String ROLE_NOT_FOUND = "Role not found!";
     private final AccountRepository accountRepository;
@@ -42,20 +43,25 @@ public class AccountServiceImpl implements AccountService {
 
         if(accountRepository.existsById(accountDto.getAccountUuid()))
         {
+            log.debug("AccountUuid is already exists!");
             throw new ApiException(HttpStatus.CONFLICT,"AccountUuid is already exists!");
         }
         if(accountRepository.existsByUsername(accountDto.getUsername()))
         {
+            log.debug("Username is already exists!");
             throw new ApiException(HttpStatus.CONFLICT,"Username is already exists!");
         }
         if(accountRepository.existsByEmail(accountDto.getEmail())){
+            log.debug("Email is already exists!");
             throw new ApiException(HttpStatus.CONFLICT,"Email is already exists!");
         }
             Account account = accountMapper.mapToEntity(accountDto);
             Set<String> roles = new HashSet<>();
             roles.add("ROLE_CUSTOMER");
             account.setRoles(roles);
+            log.debug("Set roles for new account");
             Account savedAccount = accountRepository.save(account);
+            log.debug("Account saved successfully");
             return accountMapper.mapToDto(savedAccount);
     }
 
@@ -80,14 +86,14 @@ public class AccountServiceImpl implements AccountService {
         {
             return () -> {
                 if (identifier instanceof String username) {
-                    logger.debug("account not found for username or email: {}", username);
+                    log.debug("account not found for username or email: {}", username);
                     throw new ApiException(HttpStatus.NOT_FOUND, "username or email not found");
                 } else if (identifier instanceof UUID accountUuid) {
-                    logger.debug("account not found for accountUuid: {}", accountUuid);
+                    log.debug("account not found for accountUuid: {}", accountUuid);
                     throw new ApiException(HttpStatus.NOT_FOUND, "accountUuid does not exist");
                 } else {
                     // should never happen
-                    logger.debug("account not found for identifier: {}", identifier);
+                    log.debug("account not found for identifier: {}", identifier);
                     throw new ApiException(HttpStatus.NOT_FOUND, "account not found");
                 }
             };

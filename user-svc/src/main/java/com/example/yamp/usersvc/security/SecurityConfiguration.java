@@ -32,7 +32,6 @@ public class SecurityConfiguration {
                 authorizeRequests
                         .requestMatchers(HttpMethod.POST,"/get-me").authenticated()
                         .anyRequest().permitAll());
-        http.headers(header -> header.addHeaderWriter(new TraceHeaderWriter()));
         return http.build();
     }
 

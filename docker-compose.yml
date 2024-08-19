@@ -1,44 +1,93 @@
 services:
   redis-svc:
+    networks:
+      - yamp-network
     image: redis:6.2.5
     ports:
       - 6379:6379
-  share-db:
-    ports:
-      - 5432:5432
-    image: postgres:16.4-bullseye
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-  gateway-svc:
-    environment:
-      - ENCRYPT_KEY=${ENCRYPT_KEY}
-      - SPRING_PROFILES_ACTIVE=local-dev
-    image: ghcr.io/ngodat0103/yamp/gateway-svc:${VERSION}
-    ports:
-      - 8000:8000
-  auth-svc:
-   environment:
-    - SPRING_PROFILES_ACTIVE=dev
-    - ENCRYPT_KEY=${ENCRYPT_KEY}
-   image: ghcr.io/ngodat0103/yamp/auth-svc:${VERSION}
-   depends_on:
-    - redis-svc
-    - share-db
-   ports:
-    - 8001:8001
-  user-svc:
-    environment:
-      - SPRING_PROFILES_ACTIVE=local-dev
-      - ENCRYPT_KEY=${ENCRYPT_KEY}
+#  share-db:
+#    networks:
+#      - yamp-network
+#    ports:
+#      - 5432:5432
+#    image: postgres:16.4-bullseye
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_DB: postgres
 
-    depends_on:
-      - share-db
-      - redis-svc
-    image: ghcr.io/ngodat0103/yamp/user-svc:${VERSION}
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    network_mode: host
     ports:
-      - 8002:8002
+      - "9090:9090"
+    volumes:
+      - ./observation-and-monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  tempo:
+    network_mode: host
+#    networks:
+#      - yamp-network
+    image: grafana/tempo:latest
+    command: -config.file=/etc/tempo/config.yaml
+    volumes:
+      - ./observation-and-monitoring/tempo/config.yaml:/etc/tempo/config.yaml
+    ports:
+      - 3100:3100
+      - 4317:4317
+  grafana:
+    network_mode: host
+    image: grafana/grafana:latest
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        /run.sh
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./observation-and-monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+
+#  gateway-svc:
+#    networks:
+#      - yamp-network
+#    environment:
+#      - ENCRYPT_KEY=${ENCRYPT_KEY}
+#      - SPRING_PROFILES_ACTIVE=local-dev
+#    image: ghcr.io/ngodat0103/yamp/gateway-svc:${VERSION}
+#    ports:
+#      - 8000:8000
+#  auth-svc:
+#   environment:
+#    - SPRING_PROFILES_ACTIVE=dev
+#    - ENCRYPT_KEY=${ENCRYPT_KEY}
+#   image: ghcr.io/ngodat0103/yamp/auth-svc:${VERSION}
+#   depends_on:
+#    - redis-svc
+#    - share-db
+#   ports:
+#    - 8001:8001
+#  user-svc:
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=local-dev
+#      - ENCRYPT_KEY=${ENCRYPT_KEY}
+#
+#    depends_on:
+#      - share-db
+#      - redis-svc
+#    image: ghcr.io/ngodat0103/yamp/user-svc:${VERSION}
+#    ports:
+#      - 8002:8002
 #  read:
 #    image: grafana/loki:3.0.0
 #    command: "-config.file=/etc/loki/config.yaml -target=read"
@@ -118,41 +167,6 @@ services:
 #    networks:
 #      - dev-network
 #
-#  grafana:
-#    image: grafana/grafana:latest
-#    environment:
-#      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-#      - GF_AUTH_ANONYMOUS_ENABLED=true
-#      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-#    depends_on:
-#      - gateway
-#    entrypoint:
-#      - sh
-#      - -euc
-#      - |
-#        mkdir -p /etc/grafana/provisioning/datasources
-#        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
-#        apiVersion: 1
-#        datasources:
-#          - name: Loki
-#            type: loki
-#            access: proxy
-#            url: http://gateway:3100
-#            jsonData:
-#              httpHeaderName1: "X-Scope-OrgID"
-#            secureJsonData:
-#              httpHeaderValue1: "tenant1"
-#        EOF
-#        /run.sh
-#    ports:
-#      - "3000:3000"
-#    healthcheck:
-#      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
-#    networks:
-#      - dev-network
 #
 #  backend:
 #    image: grafana/loki:3.0.0
@@ -235,3 +249,6 @@ services:
 #      retries: 5
 #    networks:
 #      - dev-network
+
+networks:
+  yamp-network:

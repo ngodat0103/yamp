@@ -36,8 +36,10 @@ spring:
   datasource:
     url:
 logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
   level:
-    com.example.gateway.filter: DEBUG
+    com.github.ngodat0103.yamp.gateway: DEBUG
     org.springframework.security: DEBUG
 
 

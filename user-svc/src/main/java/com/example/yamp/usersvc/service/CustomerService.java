@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import javax.security.auth.login.AccountNotFoundException;
 
 public interface CustomerService {
-    void register(CustomerRegisterDto customerRegisterDto, String correlationId);
+    void register(CustomerRegisterDto customerRegisterDto);
     CustomerDto getCustomer(Jwt jwt, String correlationId) throws AccountNotFoundException;
 
 }

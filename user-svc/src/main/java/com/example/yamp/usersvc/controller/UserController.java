@@ -7,6 +7,7 @@ import com.example.yamp.usersvc.constant.AuthServiceUri;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -16,6 +17,7 @@ import javax.security.auth.login.AccountNotFoundException;
 
 @RestController
 @RequestMapping()
+@Slf4j
 public class UserController {
     private  final CustomerService customerService;
 
@@ -26,9 +28,9 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@RequestBody @Valid CustomerRegisterDto customerRegisterDto, HttpServletRequest request) {
-        String correlationId = request.getHeader(AuthServiceUri.CORRELATION_ID_HEADER);
-        customerService.register(customerRegisterDto,correlationId);
+    public void register(@RequestBody @Valid CustomerRegisterDto customerRegisterDto) {
+        log.debug("Controller register method called");
+        customerService.register(customerRegisterDto);
     }
 
     @SecurityRequirement(name = "http-basic")

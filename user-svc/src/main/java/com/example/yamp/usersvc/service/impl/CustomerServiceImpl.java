@@ -13,6 +13,7 @@ import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
 import com.example.yamp.usersvc.service.CustomerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -31,8 +32,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerServiceImpl implements CustomerService {
-    private final Logger logger = getLogger(CustomerServiceImpl.class);
     private final  CustomerRepository  customerRepository;
     private final AddressRepository addressRepository;
     private final CustomerMapper customerMapper;
@@ -45,13 +46,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Transactional
     @Override
-    public void register(CustomerRegisterDto customerRegisterDto, String correlationId) {
+    public void register(CustomerRegisterDto customerRegisterDto) {
         Customer customer = customerMapper.mapToEntity(customerRegisterDto);
         customer = customerRepository.save(customer);
         AccountRegisterDto accountRegisterDtoRequest = customerMapper.maptoAccountRegisterDto(customerRegisterDto);
         accountRegisterDtoRequest.setPassword(passwordEncoder.encode(accountRegisterDtoRequest.getPassword()));
         accountRegisterDtoRequest.setAccountUuid(customer.getCustomerUuid());
-        logger.debug("New customerUuid {} saved but not commit, wait for auth-svc response", customer.getCustomerUuid());
+        log.debug("New customerUuid {} saved but not commit, wait for auth-svc response", customer.getCustomerUuid());
         webClient.post()
                 .uri(AUTH_SVC_REG_URI)
                 .bodyValue(accountRegisterDtoRequest)
@@ -62,7 +63,7 @@ public class CustomerServiceImpl implements CustomerService {
                         accountRegisterDtoResponse -> {
                             accountRegisterDtoRequest.setPassword(null);
                             if(accountRegisterDtoResponse.equals(accountRegisterDtoRequest)){
-                                logger.debug("Account created successfully: {}", accountRegisterDtoResponse.getAccountUuid());
+                                log.debug("Account created successfully: {}", accountRegisterDtoResponse.getAccountUuid());
                             }
                             else {
                                 throw new RuntimeException("Inconsistent account data");
@@ -91,14 +92,14 @@ public class CustomerServiceImpl implements CustomerService {
 
     Supplier<CustomerNotFoundException> accountNotFoundExceptionSupplier(UUID customerUuid){
         return ()-> {
-            logger.debug("Account not found for UUID: {}", customerUuid);
+            log.debug("Account not found for UUID: {}", customerUuid);
             return new CustomerNotFoundException(customerUuid);
         };
     }
 
     Supplier<AddressNotFoundException> addressNotFoundExceptionSupplier(UUID addressUuid){
         return ()-> {
-            logger.debug("Address not found for UUID: {}", addressUuid);
+            log.debug("Address not found for UUID: {}", addressUuid);
             return new AddressNotFoundException(addressUuid);
         };
     }
@@ -107,15 +108,15 @@ public class CustomerServiceImpl implements CustomerService {
     private Consumer<?super Throwable> getOnError(UUID customerUuid){
         return (error)->{
             if(error instanceof WebClientResponseException responseException){
-                logger.debug("WebClientResponseException: {}", responseException.getResponseBodyAsString());
+                log.debug("WebClientResponseException: {}", responseException.getResponseBodyAsString());
             }
             else if(error instanceof WebClientRequestException requestException){
-                logger.error("WebClientRequestException: {}", requestException.getMessage());
+                log.debug("WebClientRequestException: {}", requestException.getMessage());
             }
             else {
-                logger.error("Exception: {}", error.getMessage());
+                log.debug("Exception: {}", error.getMessage());
             }
-            logger.debug("Roll back customer creation for customerUUid: {}", customerUuid);
+            log.debug("Roll back customer creation for customerUUid: {}", customerUuid);
         };
     }
 

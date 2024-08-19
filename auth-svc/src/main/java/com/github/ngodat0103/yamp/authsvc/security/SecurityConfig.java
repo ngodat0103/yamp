@@ -24,10 +24,8 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain oauth2FilterChain(HttpSecurity http) throws Exception {
-
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
-        http.headers( h-> h.addHeaderWriter(new TraceHeaderWriter()));
         http.exceptionHandling(e -> e.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")));
         return http.build();
     }
@@ -36,10 +34,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
         http.logout(AbstractHttpConfigurer::disable);
-        http.headers( h-> h.addHeaderWriter(new TraceHeaderWriter()));
         http.formLogin(Customizer.withDefaults());
-
-
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers( HttpMethod.GET,"/api/v1/auth/actuator/prometheus").hasAnyRole("CUSTOMER")
                 .requestMatchers(HttpMethod.POST,"/api/v1/auth/account/register").permitAll()

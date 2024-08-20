@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 @Setter
 public class CustomerRegisterDto {
     @Email(message = "Email should be valid")
+    @NotNull
     private String email;
     @NotNull
     private String firstName;

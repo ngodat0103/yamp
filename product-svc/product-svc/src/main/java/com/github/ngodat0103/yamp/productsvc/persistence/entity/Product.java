@@ -19,12 +19,9 @@ public class Product  extends BaseEntity{
     private UUID categoryUuid;
 
 
-
-
-
     @OneToOne
     @JoinColumn(name = "categoryUuid", insertable = false, updatable = false)
-    private ProductCategory productCategory;
+    private Category category;
     @OneToMany(mappedBy = "product",fetch = FetchType.EAGER)
     private Set<ProductImage> productImageSet;
     @OneToOne(mappedBy = "product" ,fetch = FetchType.EAGER)

@@ -1,4 +1,4 @@
-package com.github.ngodat0103.yamp.authsvc.exception;
+package com.github.ngodat0103.yamp.util.exception;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,7 +8,10 @@ import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 
 
 @RestControllerAdvice

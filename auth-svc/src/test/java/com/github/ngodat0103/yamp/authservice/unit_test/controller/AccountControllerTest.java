@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.ngodat0103.yamp.authsvc.controller.AccountController;
 import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
-import com.github.ngodat0103.yamp.authsvc.exception.ApiException;
+import com.github.ngodat0103.yamp.authsvc.exception.ConflictException;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class AccountControllerTest {
     AccountDto accountDto = AccountDto.builder()
             .username("test")
             .password("password")
-            .accountUuid(UUID.randomUUID())
+            .accountUuid(UUID.randomUUID().toString())
             .email("example@gmail.com")
             .build();
 
@@ -65,7 +65,7 @@ class AccountControllerTest {
     }
     @Test
     void testRegisterAccountWhenAccountUuidFound() throws Exception {
-        doThrow(new ApiException(HttpStatus.CONFLICT,"AccountUuid is already exists!"))
+        doThrow(new ConflictException("AccountUuid is already exists!"))
                 .when(accountService)
                 .register(any(AccountDto.class));
         mockMvc.perform(post("/account/register")
@@ -77,7 +77,7 @@ class AccountControllerTest {
     }
     @Test
     void testRegisterAccountWhenUsernameFound() throws Exception {
-        doThrow(new ApiException(HttpStatus.CONFLICT,"Username is already exists!"))
+        doThrow(new ConflictException("Username is already exists!"))
                 .when(accountService)
                 .register(any(AccountDto.class));
 
@@ -90,7 +90,7 @@ class AccountControllerTest {
     }
     @Test
     void testRegisterAccountWhenEmailFound() throws Exception {
-        doThrow(new ApiException(HttpStatus.CONFLICT,"Email is already exists!"))
+        doThrow(new ConflictException("Email is already exists!"))
                 .when(accountService)
                 .register(any(AccountDto.class));
         mockMvc.perform(post("/account/register")

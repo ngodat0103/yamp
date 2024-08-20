@@ -12,15 +12,15 @@ import java.util.UUID;
 @Setter
 @Entity
 @NoArgsConstructor
-public class ProductCategory extends BaseEntity{
+public class Category extends BaseEntity{
     @Column(unique = true)
     private String name;
     private UUID parentCategoryUuid;
     @ManyToOne
     @JoinColumn(name = "parentCategoryUuid", insertable = false, updatable = false)
-    private ProductCategory parentProductCategory;
-    @OneToMany(mappedBy = "parentProductCategory")
-    private Set<ProductCategory> subCategories;
+    private Category parentCategory;
+    @OneToMany(mappedBy = "parentCategory")
+    private Set<Category> subCategories;
 
 
 
@@ -28,7 +28,7 @@ public class ProductCategory extends BaseEntity{
     @JoinColumn(name = "uuid")
     private Set<Product> productSet;
 
-    public ProductCategory(UUID createdBy) {
+    public Category(UUID createdBy) {
         super(createdBy);
     }
 

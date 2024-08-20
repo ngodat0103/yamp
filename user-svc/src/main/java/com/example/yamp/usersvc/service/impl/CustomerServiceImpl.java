@@ -5,8 +5,7 @@ import com.example.yamp.usersvc.dto.customer.CustomerDto;
 import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
 import com.example.yamp.usersvc.dto.mapper.AddressMapper;
 import com.example.yamp.usersvc.dto.mapper.CustomerMapper;
-import com.example.yamp.usersvc.exception.AddressNotFoundException;
-import com.example.yamp.usersvc.exception.CustomerNotFoundException;
+import com.example.yamp.usersvc.exception.NotFoundException;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import com.example.yamp.usersvc.persistence.repository.AddressRepository;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
@@ -14,7 +13,6 @@ import com.example.yamp.usersvc.service.CustomerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -27,6 +25,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static com.example.yamp.usersvc.constant.AuthServiceUri.*;
+import static com.example.yamp.usersvc.exception.Util.customerNotFoundExceptionSupplier;
 import static org.slf4j.LoggerFactory.getLogger;
 
 
@@ -74,13 +73,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
 
-
-
     @Override
     public CustomerDto getCustomer(Jwt jwt, String correlationId) {
         UUID customerUuid = UUID.fromString(jwt.getClaimAsString("X-Account-Uuid"));
         Customer customer = customerRepository.findById(customerUuid)
-                .orElseThrow(accountNotFoundExceptionSupplier(customerUuid));
+                .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
         CustomerDto customerDto = customerMapper.mapToDto(customer);
         String username = jwt.getClaimAsString("username");
         String email = jwt.getClaimAsString("email");
@@ -89,20 +86,6 @@ public class CustomerServiceImpl implements CustomerService {
         return customerDto;
     }
 
-
-    Supplier<CustomerNotFoundException> accountNotFoundExceptionSupplier(UUID customerUuid){
-        return ()-> {
-            log.debug("Account not found for UUID: {}", customerUuid);
-            return new CustomerNotFoundException(customerUuid);
-        };
-    }
-
-    Supplier<AddressNotFoundException> addressNotFoundExceptionSupplier(UUID addressUuid){
-        return ()-> {
-            log.debug("Address not found for UUID: {}", addressUuid);
-            return new AddressNotFoundException(addressUuid);
-        };
-    }
 
 
     private Consumer<?super Throwable> getOnError(UUID customerUuid){

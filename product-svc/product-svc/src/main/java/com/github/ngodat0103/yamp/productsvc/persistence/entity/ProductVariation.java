@@ -16,7 +16,7 @@ public class ProductVariation extends BaseEntity {
     private String name;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryUuid",updatable = false,insertable = false)
-    private ProductCategory category;
+    private Category category;
 
 
 

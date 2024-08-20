@@ -2,8 +2,6 @@ package com.example.userservice.unit_test;
 import com.example.yamp.usersvc.controller.AddressController;
 import com.example.yamp.usersvc.dto.address.AddressDto;
 import com.example.yamp.usersvc.dto.address.AddressResponseDto;
-import com.example.yamp.usersvc.exception.AddressNotFoundException;
-import com.example.yamp.usersvc.exception.CustomerNotFoundException;
 import com.example.yamp.usersvc.service.AddressService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

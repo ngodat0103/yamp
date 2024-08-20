@@ -2,15 +2,14 @@ package com.example.yamp.usersvc.service.impl;
 import com.example.yamp.usersvc.dto.address.AddressDto;
 import com.example.yamp.usersvc.dto.address.AddressResponseDto;
 import com.example.yamp.usersvc.dto.mapper.AddressMapper;
-import com.example.yamp.usersvc.exception.AddressNameConflictException;
-import com.example.yamp.usersvc.exception.AddressNotFoundException;
-import com.example.yamp.usersvc.exception.CustomerNotFoundException;
+import com.example.yamp.usersvc.exception.NotFoundException;
 import com.example.yamp.usersvc.persistence.entity.Address;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import com.example.yamp.usersvc.persistence.repository.AddressRepository;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
 import com.example.yamp.usersvc.service.AddressService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,23 +18,26 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static com.example.yamp.usersvc.exception.Util.addressNotFoundExceptionSupplier;
+import static com.example.yamp.usersvc.exception.Util.customerNotFoundExceptionSupplier;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository ;
     private final CustomerRepository customerRepository;
     private final AddressMapper addressMapper;
-    private static final Logger logger = LoggerFactory.getLogger(AddressServiceImpl.class);
 
     @Override
     public void createAddress(UUID customerUuid, AddressDto addressDto) {
         Customer customer = customerRepository.findCustomerByCustomerUuid(customerUuid)
-                .orElseThrow(customerNotFoundExceptionSupplier(customerUuid));
+                .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
 
         addressRepository.findAddressByCustomerUuidAndName(customerUuid,addressDto.getName())
                 .ifPresent(address -> {
-                    logger.debug("Address name conflict for customer UUID: {} and address name: {}", customerUuid, addressDto.getName());
-                    throw new AddressNameConflictException(address.getName());
+                    log.debug("Address name conflict for customer UUID: {} and address name: {}", customerUuid, addressDto.getName());
+                    throw new NotFoundException(address.getName());
                 });
         Address address = addressMapper.mapToEntity(addressDto);
         address.setCustomerUuid(customerUuid);
@@ -47,11 +49,11 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public AddressResponseDto getAddresses(UUID customerUuid) {
         customerRepository.findCustomerByCustomerUuid(customerUuid)
-                .orElseThrow(customerNotFoundExceptionSupplier(customerUuid));
+                .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
 
         Set<Address> addresses = addressRepository.findAddressByCustomerUuid(customerUuid);
         if(addresses.isEmpty()){
-            logger.debug("No address found for customer UUID: {}", customerUuid);
+            log.debug("No address found for customer UUID: {}", customerUuid);
 
         }
         Set<AddressDto> addressDtos = addressMapper.mapToDtos(addresses);
@@ -69,9 +71,9 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public void updateAddress(UUID customerUuid,UUID addressUuid, AddressDto addressDto) {
         Customer customer = customerRepository.findCustomerByCustomerUuid(customerUuid)
-                .orElseThrow(customerNotFoundExceptionSupplier(customerUuid));
+                .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
         addressRepository.findAddressByCustomerUuidAndName(customerUuid, addressDto.getName())
-                .orElseThrow(addressNotFoundExceptionSupplier(addressUuid));
+                .orElseThrow(addressNotFoundExceptionSupplier(log,addressUuid));
         Address  address = addressMapper.mapToEntity(addressDto);
 
 
@@ -87,25 +89,11 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public void deleteAddress(UUID customerUuid, UUID addressUuid) {
         customerRepository.findCustomerByCustomerUuid(customerUuid)
-                .orElseThrow(customerNotFoundExceptionSupplier(customerUuid));
+                .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
         addressRepository.deleteByUuid(addressUuid);
 
     }
 
-
-    Supplier<CustomerNotFoundException> customerNotFoundExceptionSupplier(UUID customerUuid){
-        return ()-> {
-            logger.debug("Account not found for UUID: {}", customerUuid);
-            return new CustomerNotFoundException(customerUuid);
-        };
-    }
-
-    Supplier<AddressNotFoundException> addressNotFoundExceptionSupplier(UUID addressUuid){
-        return ()-> {
-            logger.debug("Address not found for UUID: {}", addressUuid);
-            return new AddressNotFoundException(addressUuid);
-        };
-    }
 
 
 

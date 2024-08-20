@@ -1,4 +1,4 @@
-package com.example.yamp.usersvc.exception;
+package com.github.ngodat0103.yamp.authsvc.exception;
 
 
 import org.springframework.http.HttpStatus;

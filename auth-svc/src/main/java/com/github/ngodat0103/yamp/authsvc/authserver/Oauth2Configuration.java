@@ -4,12 +4,16 @@ import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
 import com.github.ngodat0103.yamp.authsvc.vault.HcpVault;
 import com.github.ngodat0103.yamp.authsvc.vault.HcpVaultConfiguration;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -26,21 +30,22 @@ import java.util.stream.Collectors;
 @Configuration
 public class Oauth2Configuration {
     @Bean
-    @ConditionalOnBean(HcpVaultConfiguration.class)
-    JWKSource<SecurityContext> jwkSourceFromHcpVault(HcpVault hcpVault) throws ParseException {
-        String jwk = hcpVault.getSecret();
-        RSAKey rsaKey = RSAKey.parse(jwk);
-        JWKSet jwkSet = new JWKSet(rsaKey);
-        return new ImmutableJWKSet<>(jwkSet);
-    }
+    JWKSource<SecurityContext> jwkSourceFromHcpVault(ApplicationContext ctx) throws ParseException, JOSEException {
+    HcpVault hcpVault;
+        try{
+            hcpVault = ctx.getBean(HcpVault.class);
+            String jwk = hcpVault.getSecret();
+            RSAKey rsaKey = RSAKey.parse(jwk);
+            JWKSet jwkSet = new JWKSet(rsaKey);
+            return new ImmutableJWKSet<>(jwkSet);
+        }
+        catch (NoSuchBeanDefinitionException e){
+            RSAKey rsaKey = new RSAKeyGenerator(2048).generate();
+            JWKSet jwkSet = new JWKSet(rsaKey);
+            return new ImmutableJWKSet<>(jwkSet);
+        }
 
-//    @Bean
-//    @ConditionalOnMissingBean(HcpVaultConfiguration.class)
-//    JWKSource<SecurityContext> jwkSource() throws JOSEException {
-//        RSAKey rsaKey = new RSAKeyGenerator(2048).generate();
-//        JWKSet jwkSet = new JWKSet(rsaKey);
-//        return new ImmutableJWKSet<>(jwkSet);
-//    }
+    }
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer(AccountRepository accountRepository) {

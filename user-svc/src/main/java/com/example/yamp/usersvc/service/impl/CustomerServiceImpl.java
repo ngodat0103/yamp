@@ -74,7 +74,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public CustomerDto getCustomer(Jwt jwt, String correlationId) {
+    public CustomerDto getCustomer(Jwt jwt) {
         UUID customerUuid = UUID.fromString(jwt.getClaimAsString("X-Account-Uuid"));
         Customer customer = customerRepository.findById(customerUuid)
                 .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));

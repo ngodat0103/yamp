@@ -2,6 +2,7 @@ package com.github.ngodat0103.yamp.authsvc.vault;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Getter
 @ConfigurationProperties(prefix = "hcp-vault")
+@ConditionalOnProperty(prefix = "hcp-vault", name = "jwk-secret-path")
 @Configuration
 @Setter
 public class HcpVaultConfiguration{

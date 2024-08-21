@@ -12,18 +12,20 @@ import java.util.UUID;
 @MappedSuperclass
 @NoArgsConstructor
 public class BaseEntity {
-    @Setter(AccessLevel.PRIVATE)
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Setter(AccessLevel.PRIVATE)
     private UUID uuid;
     @Column(nullable = false)
+    @Setter(AccessLevel.PRIVATE)
     private UUID createdBy;
     @Column(nullable = false)
     private UUID lastModifiedBy;
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    @Setter(AccessLevel.PRIVATE)
+    private LocalDateTime createdAt = LocalDateTime.now();
     @Column(nullable = false)
-    private LocalDateTime lastModifiedAt;
+    private LocalDateTime lastModifiedAt = LocalDateTime.now();
 
 
     public BaseEntity(UUID createdBy) {

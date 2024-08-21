@@ -14,8 +14,6 @@ public class ProductDto {
 
 
     CategoryDto productCategory;
-    BrantDto productBrand;
-
     Set<ProductVariationDto> productVariationSet;
     Set<ProductImageDto> productImageSet;
 }

@@ -9,11 +9,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping()
@@ -35,13 +37,9 @@ public class UserController {
 
     @SecurityRequirement(name = "http-basic")
     @GetMapping( "/get-me")
-    public CustomerDto getMe(JwtAuthenticationToken authenticationToken, HttpServletRequest request) throws AccountNotFoundException {
-        if(authenticationToken == null){
-            throw new AccountNotFoundException("Account not found");
-        }
-        Jwt jwt = authenticationToken.getToken();
-        String xCorrelationId = request.getHeader(AuthServiceUri.CORRELATION_ID_HEADER);
-        return customerService.getCustomer(jwt,xCorrelationId);
+    public CustomerDto getMe(JwtAuthenticationToken authentication) throws AccountNotFoundException {
+        assert authentication != null;
+        return customerService.getCustomer(authentication.getToken());
 
     }
 

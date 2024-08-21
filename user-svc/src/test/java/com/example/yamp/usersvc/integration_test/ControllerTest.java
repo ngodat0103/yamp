@@ -1,4 +1,4 @@
-package com.example.userservice.integration_test;
+package com.example.yamp.usersvc.integration_test;
 
 
 import jakarta.transaction.Transactional;

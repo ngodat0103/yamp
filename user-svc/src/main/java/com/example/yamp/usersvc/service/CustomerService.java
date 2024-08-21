@@ -5,9 +5,10 @@ import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.UUID;
 
 public interface CustomerService {
     void register(CustomerRegisterDto customerRegisterDto);
-    CustomerDto getCustomer(Jwt jwt, String correlationId) throws AccountNotFoundException;
+    CustomerDto getCustomer(Jwt jwt) throws AccountNotFoundException;
 
 }

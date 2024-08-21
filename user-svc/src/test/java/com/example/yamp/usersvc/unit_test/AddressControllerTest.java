@@ -1,7 +1,8 @@
-package com.example.userservice.unit_test;
+package com.example.yamp.usersvc.unit_test;
 import com.example.yamp.usersvc.controller.AddressController;
 import com.example.yamp.usersvc.dto.address.AddressDto;
 import com.example.yamp.usersvc.dto.address.AddressResponseDto;
+import com.example.yamp.usersvc.exception.NotFoundException;
 import com.example.yamp.usersvc.service.AddressService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,8 +23,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.ArgumentMatchers.eq;
-@WebMvcTest(value = AddressController.class)
-@ActiveProfiles("local-dev")
+
+
+
+@WebMvcTest(AddressController.class)
+@ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 class AddressControllerTest {
     private final static String CUSTOMER_UUID_HEADER = "X-Customer-Uuid";
@@ -52,7 +56,7 @@ class AddressControllerTest {
     @Test
     void getAddressWhenCustomerUuidNotFound() throws Exception {
         UUID customerUuid = UUID.randomUUID();
-        when(addressService.getAddresses(eq(customerUuid))).thenThrow(new CustomerNotFoundException(customerUuid));
+        when(addressService.getAddresses(eq(customerUuid))).thenThrow(new NotFoundException("Customer not found for UUID: " + customerUuid));
         mockMvc.perform(get("/address")
                 .header(CUSTOMER_UUID_HEADER, customerUuid.toString())
                 .contentType(MediaType.APPLICATION_JSON))
@@ -75,7 +79,7 @@ class AddressControllerTest {
         UUID addressUuid = UUID.randomUUID();
         UUID customerUuid = UUID.randomUUID();
 
-        doThrow(new AddressNotFoundException(addressUuid))
+        doThrow(new NotFoundException("Address not found for UUID: " + addressUuid))
                 .when(addressService).updateAddress(customerUuid,addressUuid,addressDto);
         mockMvc.perform(put("/address/{addressUuid}",addressUuid)
                 .header(CUSTOMER_UUID_HEADER,customerUuid.toString())

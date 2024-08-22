@@ -1,5 +1,4 @@
 package com.github.ngodat0103.yamp.authsvc.exception;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;

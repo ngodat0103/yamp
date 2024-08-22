@@ -3,7 +3,7 @@ spring:
     default: local-dev
   config:
     import:
-      - "optional:test.yaml"
+      - "optional:unit-test.yaml"
       - "optional:local-dev.yaml"
       - "optional:docker-dev.yaml"
       - "optional:prod.yaml"

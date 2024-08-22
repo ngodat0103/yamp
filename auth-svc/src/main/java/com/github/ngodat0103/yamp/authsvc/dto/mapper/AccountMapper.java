@@ -11,5 +11,7 @@ import java.util.UUID;
 public interface AccountMapper {
     @Mapping(target = "roles", ignore = true)
     Account mapToEntity(AccountDto accountDto);
+
+    @Mapping(target = "password", ignore = true)
     AccountDto mapToDto(Account account);
 }

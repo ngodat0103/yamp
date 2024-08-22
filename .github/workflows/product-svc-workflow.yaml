@@ -1,0 +1,24 @@
+on:
+  push:
+    paths:
+      - "product-svc/**"
+  pull_request:
+    paths:
+      - "product-svc/**"
+jobs:
+  push:
+    name: product-svc-push
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/ci-push-template.yaml
+    with:
+      SERVICE_NAME: product-svc
+      SERVICE_PORT: 8003
+    secrets: inherit
+  pr:
+    name: user-svc-pr
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/ci-pr-template.yaml
+    with:
+      SERVICE_NAME: product-svc
+      SERVICE_PORT: 8003
+    secrets: inherit

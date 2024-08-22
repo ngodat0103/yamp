@@ -22,18 +22,11 @@ import java.util.function.Supplier;
 @Slf4j
 public class AccountServiceImpl implements AccountService {
 
-
-    private static final String ROLE_NOT_FOUND = "Role not found!";
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
-    final PasswordEncoder passwordEncoder ;
-    public AccountServiceImpl(AccountRepository accountRepository,
-                              AccountMapper accountMapper,
-                              PasswordEncoder passwordEncoder,
-                              JWKSource<SecurityContext> jwkSource) {
+    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper) {
         this.accountRepository = accountRepository;
         this.accountMapper = accountMapper;
-        this.passwordEncoder = passwordEncoder;
     }
 
 

@@ -1,9 +1,0 @@
-spring:
-  config:
-    activate:
-      on-profile: test
-  datasource:
-    username: test
-    password: test
-    url: jdbc:postgresql://share-db:5432/test
-    driver-class-name: org.postgresql.Driver

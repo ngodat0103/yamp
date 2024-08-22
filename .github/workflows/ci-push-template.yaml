@@ -11,33 +11,33 @@ on:
         required: true
         type: string
 jobs:
-#  unit-test:
-#    name: Run Unit test
-#    runs-on: ubuntu-latest
-#    container:
-#      image: maven:3.9.8-eclipse-temurin-17-alpine
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 1
-#      - name: set up cache
-#        uses: actions/cache@v4.0.2
-#        with:
-#          path: ~/.m2
-#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-#          restore-keys: ${{ runner.os }}-m2
-#      - name: Running test
-#        working-directory: ${{inputs.SERVICE_NAME}}
-#        run: mvn test -q -Dtest="**.unit_test.**"
-#      - name: Create summary
-#        working-directory: ${{inputs.SERVICE_NAME}}/target/surefire-reports
-#        run: |
-#         echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
-#         echo "All unit tests have been executed." >> $GITHUB_STEP_SUMMARY
-#         echo "- **Service Name**: ${{ inputs.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY
-#         echo "- **Service Port**: ${{ inputs.SERVICE_PORT }}" >> $GITHUB_STEP_SUMMARY
-#         cat $(ls | grep unit_test | grep .txt) >> $GITHUB_STEP_SUMMARY
+  unit-test:
+    name: Run Unit test
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3.9.8-eclipse-temurin-17-alpine
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: set up cache
+        uses: actions/cache@v4.0.2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Running test
+        working-directory: ${{inputs.SERVICE_NAME}}
+        run: mvn test -Dtest=*UnitTest
+      - name: Create summary
+        working-directory: ${{inputs.SERVICE_NAME}}/target/surefire-reports
+        run: |
+         echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
+         echo "All unit tests have been executed." >> $GITHUB_STEP_SUMMARY
+         echo "- **Service Name**: ${{ inputs.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY
+         echo "- **Service Port**: ${{ inputs.SERVICE_PORT }}" >> $GITHUB_STEP_SUMMARY
+         cat $(ls | grep unit_test | grep .txt) >> $GITHUB_STEP_SUMMARY
 
   scan_quality_code:
     name: Scan quality

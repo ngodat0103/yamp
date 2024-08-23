@@ -35,6 +35,8 @@ public class SecurityConfiguration {
         http.oauth2Client(Customizer.withDefaults());
         http.oauth2Login(Customizer.withDefaults());
 
+        http.oauth2ResourceServer(resource-> resource.jwt(Customizer.withDefaults()));
+
         http.addFilterAfter(new AddJwtHeaderFilter(reactiveOAuth2AuthorizedClientService), SecurityWebFiltersOrder.AUTHORIZATION);
         WebSessionServerSecurityContextRepository webSessionServerSecurityContextRepository = new WebSessionServerSecurityContextRepository();
         webSessionServerSecurityContextRepository.setCacheSecurityContext(false);

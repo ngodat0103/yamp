@@ -4,7 +4,8 @@ spring:
   config:
     import:
       - "optional:local-dev.yaml"
-      - "optional:test.yaml"
+      - "optional:unit-test.yaml"
+      - "optional:demo.yaml"
   application:
     name: gateway
   cloud:
@@ -43,6 +44,7 @@ spring:
       httpclient:
         connect-timeout: 1000
         response-timeout: 5s
+
 server:
   port: 8000
 management:

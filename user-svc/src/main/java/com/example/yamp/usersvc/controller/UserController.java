@@ -35,7 +35,7 @@ public class UserController {
         customerService.register(customerRegisterDto);
     }
 
-    @SecurityRequirement(name = "http-basic")
+    @SecurityRequirement(name = "oauth2")
     @GetMapping( "/get-me")
     public CustomerDto getMe(JwtAuthenticationToken authentication) throws AccountNotFoundException {
         assert authentication != null;

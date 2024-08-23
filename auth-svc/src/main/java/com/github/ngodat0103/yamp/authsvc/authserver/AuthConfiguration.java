@@ -21,11 +21,7 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 @Configuration
 @Setter
 @Getter
-@ConfigurationProperties(prefix = "init-swagger-client")
 public class AuthConfiguration {
-    private String swaggerSecret;
-    private String redirectUri;
-    private String logoutUri;
 
     @Bean
     RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate){

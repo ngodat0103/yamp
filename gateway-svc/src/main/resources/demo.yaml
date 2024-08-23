@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: local-dev
+      on-profile: demo
   cloud:
     gateway:
       httpclient:
@@ -17,18 +17,23 @@ spring:
     oauth2:
       client:
         provider:
-          auth-service:
+#          auth-service-internal:
+#            authorization-uri: http://auth-svc:8001/api/v1/auth/oauth2/authorize
+#            token-uri: http://auth-svc:8001/api/v1/auth/oauth2/token
+#            jwk-set-uri: http://auth-svc:8001/api/v1/auth/oauth2/jwks
+          auth-service-external:
             authorization-uri: http://localhost:8000/api/v1/auth/oauth2/authorize
             token-uri: http://localhost:8000/api/v1/auth/oauth2/token
-            jwk-set-uri: http://auth-svc:8001/api/v1/auth/oauth2/jwks
+            jwk-set-uri: http://localhost:8000/api/v1/auth/oauth2/jwks
+
         registration:
           gateway-service:
             redirect-uri: "http://localhost:8000/login/oauth2/code/gateway-service"
-            provider: auth-service
+            provider: auth-service-external
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_basic
             client-id: gateway-service
-            client-secret: "{cipher}806472b06e24fc5a178e34594f1c6406cc662fb95c63596dece4d03e10bd8ee6ba014c5d22f5b13ce206544f3cbb2e20"
+            client-secret: "gateway-service-secret"
             scope: user.read,openid,profile,message.read,message.write
       resourceserver:
         jwt:
@@ -43,8 +48,6 @@ logging:
   level:
     com.github.ngodat0103.yamp.gateway: DEBUG
     org.springframework.security: DEBUG
-
-
 springdoc:
   api-docs:
     path: /api-docs
@@ -53,7 +56,7 @@ springdoc:
     enabled: true
     oauth:
       client-id: swagger-client
-      client-secret: "{cipher}dcbe3d737b10508e19c95bf72cfe2d22b734104965350a20d6297ebed9953bdfabd761772530e5bb6c2fbc7e30d64551"
+      client-secret: "swagger-client-secret"
       use-basic-authentication-with-access-code-grant: true
     oauth2-redirect-url: http://localhost:8000/webjars/swagger-ui/oauth2-redirect.html
     urls:

@@ -1,10 +1,10 @@
 /.idea/
-/.env
+/example/.env
 /auth-service/src/main/resources/rsa.jwk
-/k8s-development/.dockerconfigjson
-/k8s-development/registry-secret.yaml
+/development-environment/kubernetes/.dockerconfigjson
+/development-environment/kubernetes/registry-secret.yaml
 /observation-and-monitoring/
 /erd_ecommerce_database.png
 /Untitled.png
-/sqluser.sql
+/example/init.sql
 /draft/

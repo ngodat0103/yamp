@@ -2,21 +2,24 @@ package com.example.yamp.usersvc.service.impl;
 import com.example.yamp.usersvc.dto.address.AddressDto;
 import com.example.yamp.usersvc.dto.address.AddressResponseDto;
 import com.example.yamp.usersvc.dto.mapper.AddressMapper;
+import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.exception.NotFoundException;
 import com.example.yamp.usersvc.persistence.entity.Address;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import com.example.yamp.usersvc.persistence.repository.AddressRepository;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
 import com.example.yamp.usersvc.service.AddressService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import static com.example.yamp.usersvc.exception.Util.addressNotFoundExceptionSupplier;
 import static com.example.yamp.usersvc.exception.Util.customerNotFoundExceptionSupplier;
@@ -30,14 +33,16 @@ public class AddressServiceImpl implements AddressService {
     private final AddressMapper addressMapper;
 
     @Override
-    public void createAddress(UUID customerUuid, AddressDto addressDto) {
+    @Transactional
+    public void createAddress(AddressDto addressDto) {
+        UUID customerUuid = getCustomerUuidFromAuthentication();
         Customer customer = customerRepository.findCustomerByCustomerUuid(customerUuid)
                 .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
 
         addressRepository.findAddressByCustomerUuidAndName(customerUuid,addressDto.getName())
                 .ifPresent(address -> {
                     log.debug("Address name conflict for customer UUID: {} and address name: {}", customerUuid, addressDto.getName());
-                    throw new NotFoundException(address.getName());
+                    throw new ConflictException("Address name conflict");
                 });
         Address address = addressMapper.mapToEntity(addressDto);
         address.setCustomerUuid(customerUuid);
@@ -47,7 +52,8 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public AddressResponseDto getAddresses(UUID customerUuid) {
+    public AddressResponseDto getAddresses() {
+        UUID customerUuid = getCustomerUuidFromAuthentication();
         customerRepository.findCustomerByCustomerUuid(customerUuid)
                 .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
 
@@ -65,19 +71,18 @@ public class AddressServiceImpl implements AddressService {
                 .currentPage(1)
                 .totalPages(1)
                 .build();
-
     }
 
     @Override
-    public void updateAddress(UUID customerUuid,UUID addressUuid, AddressDto addressDto) {
+    @Transactional
+    public void updateAddress(UUID addressUuid, AddressDto addressDto) {
+
+        UUID customerUuid = getCustomerUuidFromAuthentication();
         Customer customer = customerRepository.findCustomerByCustomerUuid(customerUuid)
                 .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
-        addressRepository.findAddressByCustomerUuidAndName(customerUuid, addressDto.getName())
+        addressRepository.findById(addressUuid)
                 .orElseThrow(addressNotFoundExceptionSupplier(log,addressUuid));
         Address  address = addressMapper.mapToEntity(addressDto);
-
-
-
 
         address.setCustomerUuid(customerUuid);
         address.setUuid(addressUuid);
@@ -86,16 +91,25 @@ public class AddressServiceImpl implements AddressService {
         customerRepository.save(customer);
     }
 
+
+    @Transactional
     @Override
-    public void deleteAddress(UUID customerUuid, UUID addressUuid) {
+    public void deleteAddress(UUID addressUuid) {
+        UUID customerUuid = getCustomerUuidFromAuthentication();
         customerRepository.findCustomerByCustomerUuid(customerUuid)
                 .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
-        addressRepository.deleteByUuid(addressUuid);
 
+        if(!addressRepository.existsById(addressUuid)){
+            log.debug("Address not found for customer UUID: {} and address UUID: {}", customerUuid, addressUuid);
+            throw new NotFoundException("Address not found");
+        }
+        addressRepository.deleteByUuid(addressUuid);
     }
 
-
-
-
-
+    private UUID getCustomerUuidFromAuthentication(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Assert.notNull(authentication,"Authentication is required");
+        Assert.notNull(authentication.getName(),"Customer UUID is required");
+        return UUID.fromString(authentication.getName());
+    }
 }

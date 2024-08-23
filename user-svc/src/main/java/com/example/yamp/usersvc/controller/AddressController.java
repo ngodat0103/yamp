@@ -2,44 +2,46 @@ package com.example.yamp.usersvc.controller;
 import com.example.yamp.usersvc.dto.address.AddressDto;
 import com.example.yamp.usersvc.dto.address.AddressResponseDto;
 import com.example.yamp.usersvc.service.AddressService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.UUID;
+
+
 @RestController
 @RequestMapping(value = "/address")
+@SecurityRequirement(name = "oauth2")
 public class AddressController {
-    private static final String CUSTOMER_UUID_HEADER = "X-Customer-Uuid";
-    private static final String ADDRESS_UUID_HEADER = "X-Address-Uuid";
     private final AddressService addressService;
-
     public AddressController(AddressService addressService) {
         this.addressService = addressService;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createAddress(@RequestBody @Valid AddressDto addressDto,
-                              @RequestHeader (value = CUSTOMER_UUID_HEADER) UUID xCusomerUuid) throws AccountNotFoundException {
-        addressService.createAddress(xCusomerUuid,addressDto);
+    public void createAddress(@RequestBody @Valid AddressDto addressDto) throws AccountNotFoundException {
+        addressService.createAddress(addressDto);
     }
     @GetMapping
-    public AddressResponseDto getAddresses(@RequestHeader (value = CUSTOMER_UUID_HEADER)  UUID xCusomerUuid) throws AccountNotFoundException {
-        return addressService.getAddresses(xCusomerUuid);
+    public AddressResponseDto getAddresses() throws AccountNotFoundException {
+
+        return addressService.getAddresses();
     }
-    @PutMapping
+    @PutMapping("/{addressUuid}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void updateAddress(@RequestBody @Valid AddressDto addressDto
-            ,@RequestHeader (value = CUSTOMER_UUID_HEADER)  UUID xCusomerUuid
-            ,@RequestHeader(value = ADDRESS_UUID_HEADER) UUID addressUuid) throws AccountNotFoundException {
-        addressService.updateAddress(xCusomerUuid,addressUuid,addressDto);
+    public void updateAddress(@RequestBody @Valid AddressDto addressDto,@PathVariable UUID addressUuid) throws AccountNotFoundException {
+        addressService.updateAddress(addressUuid,addressDto);
     }
-    @DeleteMapping
+    @DeleteMapping(path = "/{addressUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteAddress(@RequestHeader(value = CUSTOMER_UUID_HEADER) UUID xCusomerUuid
-            , @RequestHeader(value = ADDRESS_UUID_HEADER) UUID addressUuid) throws AccountNotFoundException {
-        addressService.deleteAddress(xCusomerUuid,addressUuid);
+    public void deleteAddress(Authentication authentication, @PathVariable UUID addressUuid) throws AccountNotFoundException {
+        Assert.notNull(authentication, "Authentication must not be null");
+        Assert.notNull(authentication.getName(), "Authentication name must not be null");
+        addressService.deleteAddress(addressUuid);
     }
 
 }

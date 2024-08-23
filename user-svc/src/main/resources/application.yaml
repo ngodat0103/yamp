@@ -6,6 +6,7 @@ spring:
       - "optional:local-dev.yaml"
       - "optional:unit-test.yaml"
       - "optional:demo.yaml"
+      - "optional:integration-test.yaml"
   application:
     name: user-service
   security:

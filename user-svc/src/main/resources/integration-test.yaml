@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://share-db:5432/test
+    username: 'test'
+    password: 'test'
+  config:
+    activate:
+      on-profile: integration-test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true

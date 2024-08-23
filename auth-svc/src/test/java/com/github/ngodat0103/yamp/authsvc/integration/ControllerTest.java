@@ -8,7 +8,9 @@ import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
-import org.junit.jupiter.api.AfterEach;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,7 +28,8 @@ import static org.hamcrest.Matchers.containsString;
 
 @SpringBootTest (webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
+@Transactional
 public class ControllerTest {
     @Autowired
     WebTestClient webTestClient;
@@ -39,7 +42,6 @@ public class ControllerTest {
             .password("testPassword")
             .email("test@gmail.com")
             .build();
-
     AccountDto accountDtoResponse = AccountDto.builder()
             .username(accountDtoRequest.getUsername())
             .email(accountDtoRequest.getEmail())
@@ -51,17 +53,8 @@ public class ControllerTest {
     private AccountRepository accountRepository ;
 
     @Test
-    public void contextLoads() {
-    }
-
-
-    @AfterEach
-    public void tearDown() {
-        accountRepository.deleteAll();
-    }
-
-    @Test
-    public void testRegisterAccountWhenNotFound() throws Exception {
+    @DisplayName("Register account")
+    public void givenAccountDto_whenRegister_thenReturnAccountDto() throws Exception {
         webTestClient.post()
                 .uri("/account/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -73,9 +66,11 @@ public class ControllerTest {
     }
 
     @Test
-    public void testRegisterAccountWhenFound() throws Exception {
+    @DisplayName("Register Account but conflict")
+    public void givenAccountDto_whenRegister_thenReturnConflictException() throws Exception {
         Account account = accountMapper.mapToEntity(accountDtoRequest);
         accountRepository.save(account);
+
 
         webTestClient.post()
                 .uri("/account/register")

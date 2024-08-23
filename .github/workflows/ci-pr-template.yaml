@@ -38,7 +38,7 @@ jobs:
         working-directory: ${{inputs.SERVICE_NAME}}
         env:
           ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
-        run: mvn test -q -Dtest="**.integration_test.**"
+        run: mvn test -Dtest=*IntegrationTest
 
 
   build-and-push:

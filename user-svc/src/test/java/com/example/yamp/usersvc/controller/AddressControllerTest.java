@@ -1,4 +1,4 @@
-package com.example.yamp.usersvc.integration;
+package com.example.yamp.usersvc.controller;
 import com.example.yamp.usersvc.controller.AddressController;
 import com.example.yamp.usersvc.dto.address.AddressDto;
 import com.example.yamp.usersvc.dto.address.AddressResponseDto;
@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 
 
 @WebMvcTest(AddressController.class)
-@ActiveProfiles("test")
+@ActiveProfiles("unit-test")
 @AutoConfigureMockMvc(addFilters = false)
 class AddressControllerTest {
     private final static String CUSTOMER_UUID_HEADER = "X-Customer-Uuid";

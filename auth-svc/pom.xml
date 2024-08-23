@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.2</version> <!-- Update to a version that includes the required spring-web version -->
+        <version>3.3.3</version> <!-- Update to a version that includes the required spring-web version -->
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.ngodat0103.yamp</groupId>
@@ -50,12 +50,6 @@
                 <artifactId>spring-webmvc</artifactId>
                 <version>6.1.12</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-seucirty-config</artifactId>
-                <version>6.3.2</version>
-            </dependency>
-
 
         </dependencies>
     </dependencyManagement>

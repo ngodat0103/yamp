@@ -1,8 +1,6 @@
 package com.example.yamp.usersvc.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,6 +21,8 @@ public class SecurityConfiguration {
         http.cors(AbstractHttpConfigurer::disable);
         http.csrf(AbstractHttpConfigurer::disable);
         http.oauth2ResourceServer((resourceServer) -> resourceServer.jwt(withDefaults()));
+
+
         http.sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests((authorizeRequests) ->
                 authorizeRequests
@@ -36,5 +36,4 @@ public class SecurityConfiguration {
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
 }

@@ -5,6 +5,7 @@ spring:
     import:
       - 'optional:classpath:/dev-local.yaml'
       - 'optional:test.yaml'
+      - "optional:integration-test.yaml"
   application:
     name: product-svc
 server:

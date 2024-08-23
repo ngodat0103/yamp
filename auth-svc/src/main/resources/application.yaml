@@ -6,6 +6,7 @@ spring:
       - "optional:unit-test.yaml"
       - "optional:local-dev.yaml"
       - "optional:demo.yaml"
+      - "optional:integration-test.yaml"
   application:
     name: auth-service
 server:

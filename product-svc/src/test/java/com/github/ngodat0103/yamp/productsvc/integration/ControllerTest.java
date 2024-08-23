@@ -1,14 +1,18 @@
-package com.example.yamp.usersvc.controller;
+package com.github.ngodat0103.yamp.productsvc.integration;
 
 
 import jakarta.transaction.Transactional;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("integration-test")
 @Transactional
-@ActiveProfiles("test")
 public class ControllerTest {
+    // todo: add later
+
+    @Test
+    public void contextLoad() {
+    }
 }

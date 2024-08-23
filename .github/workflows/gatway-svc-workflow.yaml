@@ -7,7 +7,7 @@ on:
       - "gateway-svc/**"
 jobs:
   push:
-    name: auth-svc-push
+    name: gateway-svc-push
     if: github.event_name == 'push'
     uses: ./.github/workflows/ci-push-template.yaml
     with:
@@ -16,7 +16,7 @@ jobs:
     secrets: inherit
 
   pr:
-    name: auth-svc-pr
+    name: gateway-svc-pr
     if: github.event_name == 'pull_request'
     uses: ./.github/workflows/ci-pr-template.yaml
     with:

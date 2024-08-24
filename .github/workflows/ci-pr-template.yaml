@@ -105,6 +105,7 @@ jobs:
             SERVICE_PORT=${{inputs.SERVICE_PORT}}
       - name: tag the image with pr-latest
         run: |
+          docker image ls
           docker tag ${{steps.meta.outputs.tags}} ghcr.io/ngodat0103/yamp/${{inputs.SERVICE_NAME}}:pr-latest
           docker push ghcr.io/ngodat0103/yamp/${{inputs.SERVICE_NAME}}:pr-latest
           

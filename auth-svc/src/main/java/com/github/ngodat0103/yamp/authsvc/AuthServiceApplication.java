@@ -12,7 +12,7 @@ public class AuthServiceApplication {
 
      ApplicationContext context=  SpringApplication.run(AuthServiceApplication.class, args);
 
-
+//test
      ClassLoader classLoader = context.getClassLoader();
      int stop = 0 ;
     }

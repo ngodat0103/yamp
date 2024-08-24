@@ -1,5 +1,6 @@
 services:
   redis-svc:
+    container_name: redis-svc
     extends:
       file: common-config.yaml
       service: network-deploy-service
@@ -7,6 +8,7 @@ services:
     ports:
       - 6379:6379
   share-db:
+    container_name: share-db
     extends:
       file: common-config.yaml
       service: network-deploy-service
@@ -19,9 +21,10 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./init/users-and-database.sql:/docker-entrypoint-initdb.d/users-and-database.sql
 
   prometheus:
+    container_name: prometheus
     image: prom/prometheus:v2.50.1
     extends:
       file: common-config.yaml
@@ -31,16 +34,18 @@ services:
     volumes:
       - ../observation-and-monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
   tempo:
+    container_name: tempo
     networks:
       - yamp-network
     image: grafana/tempo:latest
     command: -config.file=/etc/tempo/config.yaml
     volumes:
       - ../observation-and-monitoring/tempo/config.yaml:/etc/tempo/config.yaml
-    ports:
-      - 3100:3100
-      - 4317:4317
+#    ports:
+#      - 3100:3100
+#      - 4317:4317
   grafana:
+    container_name: grafana
     extends:
       file: common-config.yaml
       service: network-deploy-service
@@ -55,7 +60,7 @@ services:
       - |
         /run.sh
     ports:
-      - "3000:3000"
+      - "9000:3000"
     volumes:
       - ../observation-and-monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
     healthcheck:
@@ -65,15 +70,10 @@ services:
       retries: 5
 
 
-  gateway-svc:
-    extends:
-      file: common-config.yaml
-      service: microservice-base-config
-    image: ghcr.io/ngodat0103/yamp/gateway-svc:${VERSION}
-    ports:
-      - 8000:8000
+
   auth-svc:
    image: ghcr.io/ngodat0103/yamp/auth-svc:${VERSION}
+   container_name: auth-svc
    extends:
      file: common-config.yaml
      service: microservice-base-config
@@ -83,16 +83,30 @@ services:
    ports:
     - 8001:8001
   user-svc:
+    container_name: user-svc
     extends:
       file: common-config.yaml
       service: microservice-base-config
     depends_on:
       - share-db
-      - redis-svc
     image: ghcr.io/ngodat0103/yamp/user-svc:${VERSION}
     ports:
       - 8002:8002
+  gateway-svc:
+    container_name: gateway-svc
+    depends_on:
+      - auth-svc
+      - user-svc
+    extends:
+      file: common-config.yaml
+      service: microservice-base-config
+    image: ghcr.io/ngodat0103/yamp/gateway-svc:${VERSION}
+    ports:
+      - 8000:8000
 
+volumes:
+  postgres-data:
+    name: postgres-data
 networks:
   yamp-network:
     driver: bridge

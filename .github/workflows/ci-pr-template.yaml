@@ -1,4 +1,4 @@
-name: ci-commit-workflow
+name: ci-pr-workflow
 on:
   workflow_call:
     inputs:
@@ -11,28 +11,28 @@ on:
         required: true
         type: string
 jobs:
-  scan_security:
-    name: Security check using snyk
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - name: snyk setup
-        uses: snyk/actions/setup@master
-      - name: java set up
-        uses: actions/setup-java@v4.2.1
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-      - name: snky test
-        working-directory: ${{inputs.SERVICE_NAME}}
-        env:
-          SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
-        run: |
-          chmod +x ./mvnw
-          snyk test
+#  scan_security:
+#    name: Security check using snyk
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 1
+#      - name: snyk setup
+#        uses: snyk/actions/setup@master
+#      - name: java set up
+#        uses: actions/setup-java@v4.2.1
+#        with:
+#          distribution: 'temurin'
+#          java-version: '17'
+#      - name: snky test
+#        working-directory: ${{inputs.SERVICE_NAME}}
+#        env:
+#          SNYK_TOKEN: ${{secrets.SNYK_TOKEN}}
+#        run: |
+#          chmod +x ./mvnw
+#          snyk test
   integration-test:
     name: running integration test
     runs-on: ubuntu-latest

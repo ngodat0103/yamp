@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.github.ngodat0103.yamp</groupId>
-    <artifactId>usersvc</artifactId>
+    <artifactId>user-svc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>usersvc</name>
     <description>User-service</description>

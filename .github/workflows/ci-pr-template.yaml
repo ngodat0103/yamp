@@ -103,13 +103,19 @@ jobs:
           build-args: |
             SERVICE_NAME=${{inputs.SERVICE_NAME}}
             SERVICE_PORT=${{inputs.SERVICE_PORT}}
-      - name: tag the image with pr-latest
-        run: |
-          docker image ls
-          docker tag ${{steps.meta.outputs.tags}} ghcr.io/ngodat0103/yamp/${{inputs.SERVICE_NAME}}:pr-latest
-          docker push ghcr.io/ngodat0103/yamp/${{inputs.SERVICE_NAME}}:pr-latest
-          
-
+      - name: build and push with latest pr tag
+        uses: docker/build-push-action@v6.3.0
+        with:
+          context: ${{inputs.SERVICE_NAME}}
+          file: Dockerfile-For-CI
+          push: true
+          tags: ghcr.io/ngodat0103/yamp/${{inputs.SERVICE_NAME}}:pr-latest
+          labels: ${{steps.meta.outputs.labels}}
+          #          cache-from: type=gha
+          #          cache-to: type=gha,mode=max
+          build-args: |
+            SERVICE_NAME=${{inputs.SERVICE_NAME}}
+            SERVICE_PORT=${{inputs.SERVICE_PORT}}
   security_check:
     name: Security check for docker image
     needs: build-and-push

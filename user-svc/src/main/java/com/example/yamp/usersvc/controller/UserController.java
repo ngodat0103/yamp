@@ -3,19 +3,13 @@ package com.example.yamp.usersvc.controller;
 import com.example.yamp.usersvc.dto.customer.CustomerDto;
 import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
 import com.example.yamp.usersvc.service.CustomerService;
-import com.example.yamp.usersvc.constant.AuthServiceUri;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.UUID;
 
 @RestController
 @RequestMapping()
@@ -37,9 +31,8 @@ public class UserController {
 
     @SecurityRequirement(name = "oauth2")
     @GetMapping( "/get-me")
-    public CustomerDto getMe(JwtAuthenticationToken authentication) throws AccountNotFoundException {
-        assert authentication != null;
-        return customerService.getCustomer(authentication.getToken());
+    public CustomerDto getMe() throws AccountNotFoundException {
+        return customerService.getCustomer();
 
     }
 

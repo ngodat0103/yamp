@@ -14,6 +14,5 @@ public interface CustomerMapper {
     CustomerDto mapToDto(Customer customer);
 
     Customer mapToEntity(CustomerRegisterDto customerRegisterDto);
-    @Mapping(target = "accountUuid",ignore = true)
     AccountRegisterDto maptoAccountRegisterDto(CustomerRegisterDto customerRegisterDto);
 }

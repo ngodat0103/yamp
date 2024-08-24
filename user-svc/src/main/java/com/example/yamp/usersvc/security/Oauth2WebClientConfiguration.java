@@ -1,5 +1,4 @@
 package com.example.yamp.usersvc.security;
-import com.example.yamp.usersvc.constant.AuthServiceUri;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -9,12 +8,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class Oauth2WebClientConfiguration {
+  public static final String AUTH_SVC_BASE = "http://auth-svc:8001/api/v1/auth";
 
   //todo: Will implement using redis cache for further optimization
     @Bean
     WebClient webClient() {
       return WebClient.builder()
-              .baseUrl(AuthServiceUri.AUTH_SVC_BASE)
+              .baseUrl(AUTH_SVC_BASE)
               .build();
     }
 }

@@ -9,6 +9,6 @@ import java.util.UUID;
 
 public interface CustomerService {
     void register(CustomerRegisterDto customerRegisterDto);
-    CustomerDto getCustomer(Jwt jwt) throws AccountNotFoundException;
+    CustomerDto getCustomer() throws AccountNotFoundException;
 
 }

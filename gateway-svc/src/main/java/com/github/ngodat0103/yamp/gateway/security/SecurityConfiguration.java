@@ -28,6 +28,8 @@ public class SecurityConfiguration {
                         .pathMatchers("/api/v1/user/get-me").authenticated()
                         .pathMatchers("/api/v1/user/test-endpoint").authenticated()
                         .pathMatchers("/actuator/**").authenticated()
+                        .pathMatchers("/api/v1/auth/account/**").denyAll()
+                        .pathMatchers("/api/v1/auth/account").denyAll()
                         .anyExchange().permitAll()
 
         );

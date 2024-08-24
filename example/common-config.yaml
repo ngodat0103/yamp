@@ -11,6 +11,6 @@ services:
           memory: 700m
     environment:
       SPRING_PROFILES_ACTIVE: demo
-      JAVA_TOOL_OPTIONS: "-javaagent:/opt/app/libs/opentelemetry-javaagent-1.28.0.jar"
+      JAVA_TOOL_OPTIONS: "-javaagent:/opt/app/BOOT-INF/lib/opentelemetry-javaagent-1.28.0.jar"
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
       OTEL_METRICS_EXPORTER: none

@@ -10,7 +10,6 @@ public class AuthServiceApplication {
 
     public static void main(String[] args) {
 
-        // fsdfdsfsffdsffdsffdsffdsffdsfdfdfddsadasd
      ApplicationContext context=  SpringApplication.run(AuthServiceApplication.class, args);
 
 

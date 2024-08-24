@@ -17,6 +17,9 @@ spec:
       containers:
         - name: auth-svc
           image: ghcr.io/ngodat0103/yamp/auth-svc:pr-latest
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: demo
           imagePullPolicy: Always
           ports:
             - containerPort: 8001

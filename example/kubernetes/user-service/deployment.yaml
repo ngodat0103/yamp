@@ -13,10 +13,13 @@ spec:
         app: user-svc
     spec:
       imagePullSecrets:
-        - name: ghcr.io-secret
+        - name: ghcr-secret
       containers:
         - name: auth-svc
-          image: ghcr.io/ngodat0103/user-svc:pr-latest
+          image: ghcr.io/ngodat0103/yamp/user-svc:pr-latest
           imagePullPolicy: Always
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: demo
           ports:
             - containerPort: 8002

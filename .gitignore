@@ -1,5 +1,5 @@
 /.idea/
-/example/.env
+/example/docker/.env
 /auth-service/src/main/resources/rsa.jwk
 /development-environment/kubernetes/.dockerconfigjson
 /development-environment/kubernetes/registry-secret.yaml
@@ -8,3 +8,4 @@
 /Untitled.png
 /example/init/users-and-database.sql
 /draft/
+/example/kubernetes/ghcr-secret.yaml

@@ -1,4 +1,3 @@
-## How to run this project locally
 ### Prerequisites
 - Docker
 - Docker Compose

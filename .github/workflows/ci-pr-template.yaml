@@ -64,6 +64,7 @@ jobs:
 
 
   build-and-push:
+    name: Build and push with pull request tag
     outputs:
       tags: ${{ steps.meta.outputs.tags }}
       labels: ${{ steps.meta.outputs.labels }}
@@ -71,7 +72,6 @@ jobs:
       contents: read
       packages: write
     needs: [integration-test]
-    name: Build and push
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -85,14 +85,12 @@ jobs:
           registry: ghcr.io
           username: ${{github.repository_owner}}
           password: ${{secrets.GITHUB_TOKEN}}
-
-
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5.5.1
         with:
           images: ghcr.io/ngodat0103/yamp/${{inputs.SERVICE_NAME}}
-      - name: build and push
+      - name: build and push with specific tag
         uses: docker/build-push-action@v6.3.0
         with:
           context: ${{inputs.SERVICE_NAME}}
@@ -105,6 +103,11 @@ jobs:
           build-args: |
             SERVICE_NAME=${{inputs.SERVICE_NAME}}
             SERVICE_PORT=${{inputs.SERVICE_PORT}}
+      - name: tag the image with pr-latest
+        run: |
+          docker tag ${{steps.meta.outputs.tags}} ghcr.io/ngodat0103/yamp/${{inputs.SERVICE_NAME}}:pr-latest
+          docker push ghcr.io/ngodat0103/yamp/${{inputs.SERVICE_NAME}}:pr-latest
+          
 
   security_check:
     name: Security check for docker image

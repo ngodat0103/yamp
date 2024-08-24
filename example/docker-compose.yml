@@ -21,7 +21,7 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./init/users-and-database.sql:/docker-entrypoint-initdb.d/users-and-database.sql
 
   prometheus:
     container_name: prometheus
@@ -41,9 +41,9 @@ services:
     command: -config.file=/etc/tempo/config.yaml
     volumes:
       - ../observation-and-monitoring/tempo/config.yaml:/etc/tempo/config.yaml
-    ports:
-      - 3100:3100
-      - 4317:4317
+#    ports:
+#      - 3100:3100
+#      - 4317:4317
   grafana:
     container_name: grafana
     extends:
@@ -60,7 +60,7 @@ services:
       - |
         /run.sh
     ports:
-      - "3000:3000"
+      - "9000:3000"
     volumes:
       - ../observation-and-monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
     healthcheck:
@@ -83,6 +83,7 @@ services:
    ports:
     - 8001:8001
   user-svc:
+    container_name: user-svc
     extends:
       file: common-config.yaml
       service: microservice-base-config
@@ -92,6 +93,7 @@ services:
     ports:
       - 8002:8002
   gateway-svc:
+    container_name: gateway-svc
     depends_on:
       - auth-svc
       - user-svc
@@ -102,11 +104,9 @@ services:
     ports:
       - 8000:8000
 
-
 volumes:
   postgres-data:
-      name: postgres-data
-      driver: local
+    name: postgres-data
 networks:
   yamp-network:
     driver: bridge

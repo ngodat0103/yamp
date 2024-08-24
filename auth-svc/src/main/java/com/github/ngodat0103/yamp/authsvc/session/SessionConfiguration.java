@@ -23,8 +23,4 @@ public class SessionConfiguration {
     }
 
 
-    @Bean
-    public LettuceConnectionFactory connectionFactory() {
-        return new LettuceConnectionFactory();
-    }
 }

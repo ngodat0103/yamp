@@ -12,7 +12,7 @@ jobs:
     uses: ./.github/workflows/ci-push-template.yaml
     with:
       SERVICE_NAME: gateway-svc
-      SERVICE_PORT: 8001
+      SERVICE_PORT: 8000
     secrets: inherit
 
   pr:
@@ -21,5 +21,5 @@ jobs:
     uses: ./.github/workflows/ci-pr-template.yaml
     with:
       SERVICE_NAME: gateway-svc
-      SERVICE_PORT: 8001
+      SERVICE_PORT: 8000
     secrets: inherit

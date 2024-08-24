@@ -1,4 +1,4 @@
-name: ci-commit-workflow
+name: ci-pr-workflow
 on:
   workflow_call:
     inputs:

@@ -33,7 +33,6 @@ public class SecurityConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
-        http.logout(AbstractHttpConfigurer::disable);
         http.formLogin(Customizer.withDefaults());
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers( HttpMethod.GET,"/api/v1/auth/actuator/prometheus").hasAnyRole("CUSTOMER")

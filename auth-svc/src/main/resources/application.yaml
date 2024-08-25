@@ -7,8 +7,9 @@ spring:
       - "optional:local-dev.yaml"
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
+      - "optional:pre-proc.yaml"
   application:
-    name: auth-service
+    name: auth-svc
 server:
   port: 8001
   forward-headers-strategy: framework
@@ -28,3 +29,5 @@ springdoc:
         name: NgoDat0103
         url: https://github.com/NGODAT0103
         email: 21521935@gm.uit.edu.vn
+  show-login-endpoint: true
+  show-actuator: true

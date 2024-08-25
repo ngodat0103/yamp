@@ -1,7 +1,6 @@
 package com.github.ngodat0103.yamp.gateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
@@ -10,7 +9,9 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 @EnableWebFlux
 public class ApiGatewayServerApplication {
 	public static void main(String[] args) {
-	ApplicationContext ctx =  SpringApplication.run(ApiGatewayServerApplication.class, args);
+
+
+		SpringApplication.run(ApiGatewayServerApplication.class, args);
 
     }
 

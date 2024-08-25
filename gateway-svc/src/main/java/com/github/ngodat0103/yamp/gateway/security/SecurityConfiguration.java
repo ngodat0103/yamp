@@ -22,7 +22,7 @@ public class SecurityConfiguration {
         http.authorizeExchange(exchange ->exchange
                         .pathMatchers("/favicon.ico").permitAll()
                         .pathMatchers("/api/v1/auth/oauth2/authorize").permitAll()
-                        .pathMatchers("/api/v1/auth/login").permitAll()
+                        .pathMatchers("/api/v1/auth/login","/api/v1/auth/logout").permitAll()
                         .pathMatchers("/api/v1/auth/oauth2/token").permitAll()
                         .pathMatchers("/login/oauth2/code/gateway-service").permitAll()
                         .pathMatchers("/api/v1/user/get-me").authenticated()
@@ -34,8 +34,11 @@ public class SecurityConfiguration {
 
         );
 
-        http.oauth2Client(Customizer.withDefaults());
-        http.oauth2Login(Customizer.withDefaults());
+//        http.oauth2Client(Customizer.withDefaults());
+//        http.oauth2Login(Customizer.withDefaults());
+//
+//        http.logout(logout -> logout.logoutUrl("/api/v1/auth/logout"));
+
 
         http.oauth2ResourceServer(resource-> resource.jwt(Customizer.withDefaults()));
 

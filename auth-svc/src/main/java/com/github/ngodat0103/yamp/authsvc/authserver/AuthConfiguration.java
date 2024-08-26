@@ -25,7 +25,6 @@ public class AuthConfiguration {
 
     @Bean
     RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate){
-
         return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
 

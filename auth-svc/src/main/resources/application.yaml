@@ -10,6 +10,10 @@ spring:
       - "optional:pre-proc.yaml"
   application:
     name: auth-svc
+  data:
+    redis:
+      url: redis://redis-svc:6379
+      client-name: auth-svc
 server:
   port: 8001
   forward-headers-strategy: framework
@@ -31,3 +35,10 @@ springdoc:
         email: 21521935@gm.uit.edu.vn
   show-login-endpoint: true
   show-actuator: true
+
+logging:
+  level:
+    com.github.ngodat0103.yamp.authsvc.service: DEBUG
+    com.github.ngodat0103.yamp.authsvc.controller: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

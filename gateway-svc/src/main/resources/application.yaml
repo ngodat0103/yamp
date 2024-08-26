@@ -2,6 +2,12 @@ spring:
   profiles:
     active: local-dev
     default: local-dev
+  data:
+    redis:
+      url: redis://redis-svc:6379
+      client-type: lettuce
+      database: 1
+      client-name: gateway-svc
   config:
     import:
       - "optional:local-dev.yaml"
@@ -10,7 +16,14 @@ spring:
       - "optional:integration-test.yaml"
       - "optional:pre-proc.yaml"
   application:
-    name: gateway
+    name: gateway-svc
+  security:
+   oauth2:
+     resourceserver:
+       jwt:
+         authorities-claim-name: "roles"
+         authority-prefix: "ROLE_"
+         jwk-set-uri: http://auth-svc:8001/api/v1/auth/oauth2/jwks
   cloud:
     gateway:
       routes:
@@ -47,6 +60,13 @@ spring:
       httpclient:
         connect-timeout: 1000
         response-timeout: 5s
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+  level:
+    com.github.ngodat0103.yamp.gateway: DEBUG
+    org.springframework.security: DEBUG
 server:
   port: 8000
 management:
@@ -57,3 +77,18 @@ management:
   endpoint:
     gateway:
       enabled: true
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /ui-docs
+    enabled: true
+    oauth:
+      use-basic-authentication-with-access-code-grant: true
+    oauth2-redirect-url: http://${spring.cloud.inetutils.default-hostname}:8000/webjars/swagger-ui/oauth2-redirect.html
+    urls:
+      - name: "auth-svc"
+        url: "http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/api-docs"
+      - name: "user-svc"
+        url: "http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/user/api-docs"
+    use-root-path: true

@@ -2,24 +2,24 @@ package com.github.ngodat0103.yamp.authsvc.authserver;
 
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
-import com.github.ngodat0103.yamp.authsvc.vault.HcpVault;
-import com.github.ngodat0103.yamp.authsvc.vault.HcpVaultConfiguration;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.ApplicationContext;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.util.Assert;
 
 import java.text.ParseException;
 import java.util.Collections;
@@ -28,24 +28,20 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Configuration
+@Setter
 public class Oauth2Configuration {
-    @Bean
-    JWKSource<SecurityContext> jwkSourceFromHcpVault(ApplicationContext ctx) throws ParseException, JOSEException {
-    HcpVault hcpVault;
-        try{
-            hcpVault = ctx.getBean(HcpVault.class);
-            String jwk = hcpVault.getSecret();
-            RSAKey rsaKey = RSAKey.parse(jwk);
-            JWKSet jwkSet = new JWKSet(rsaKey);
-            return new ImmutableJWKSet<>(jwkSet);
-        }
-        catch (NoSuchBeanDefinitionException e){
-            RSAKey rsaKey = new RSAKeyGenerator(2048).generate();
-            JWKSet jwkSet = new JWKSet(rsaKey);
-            return new ImmutableJWKSet<>(jwkSet);
-        }
 
+
+    // Create a JWKSource bean that reads the JWK from the k8s secret,
+    // If not present, the JwkSource random key will be used base on spring autoconfiguration
+    @Bean
+    @ConditionalOnProperty(prefix = "k8s.secret", name = "jwk")
+    JWKSource<SecurityContext> jwkSourceFromK8sSecret(@Value("${k8s.secret.jwk}") String jwk) throws ParseException {
+        Assert.notNull(jwk, "jwk must not be null");
+        JWKSet jwkSet = new JWKSet(RSAKey.parse(jwk));
+        return new ImmutableJWKSet<>(jwkSet);
     }
+
 
     @Bean
     public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer(AccountRepository accountRepository) {

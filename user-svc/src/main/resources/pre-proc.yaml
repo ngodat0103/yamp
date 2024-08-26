@@ -1,0 +1,35 @@
+spring:
+  config:
+    activate:
+      on-profile: pre-proc
+  cloud:
+    inetutils:
+      default-hostname: yamp-backend.ngodat0103.live
+  datasource:
+    url: jdbc:postgresql://share-db:5432/user-svc-db
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto:  update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always

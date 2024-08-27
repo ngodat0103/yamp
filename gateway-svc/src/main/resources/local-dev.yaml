@@ -7,3 +7,18 @@ spring:
       httpclient:
         connect-timeout: 1000
         response-timeout: 5s
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /ui-docs
+    enabled: true
+    oauth:
+      use-basic-authentication-with-access-code-grant: true
+    oauth2-redirect-url: http://${spring.cloud.inetutils.default-hostname}:${server.port}/webjars/swagger-ui/oauth2-redirect.html
+    urls:
+      - name: "auth-svc"
+        url: "http://${spring.cloud.inetutils.default-hostname}:${server.port}/api/v1/auth/api-docs"
+      - name: "user-svc"
+        url: "http://${spring.cloud.inetutils.default-hostname}:${server.port}/api/v1/user/api-docs"
+    use-root-path: true

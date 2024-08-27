@@ -4,9 +4,9 @@ spring:
       client:
         provider:
           auth-service-external:
-            authorization-uri: http://localhost:8000/api/v1/auth/oauth2/authorize
-            token-uri: http://localhost:8000/api/v1/auth/oauth2/token
-            jwk-set-uri: http://localhost:8000/api/v1/auth/oauth2/jwks
+            authorization-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/authorize
+            token-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/token
+            jwk-set-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/jwks
   config:
     activate:
       on-profile: local-dev

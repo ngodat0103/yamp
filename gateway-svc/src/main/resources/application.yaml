@@ -85,10 +85,10 @@ springdoc:
     enabled: true
     oauth:
       use-basic-authentication-with-access-code-grant: true
-    oauth2-redirect-url: http://${spring.cloud.inetutils.default-hostname}:8000/webjars/swagger-ui/oauth2-redirect.html
+    oauth2-redirect-url: http://${spring.cloud.inetutils.default-hostname}/webjars/swagger-ui/oauth2-redirect.html
     urls:
       - name: "auth-svc"
-        url: "http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/api-docs"
+        url: "http://${spring.cloud.inetutils.default-hostname}/api/v1/auth/api-docs"
       - name: "user-svc"
-        url: "http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/user/api-docs"
+        url: "http://${spring.cloud.inetutils.default-hostname}/api/v1/user/api-docs"
     use-root-path: true

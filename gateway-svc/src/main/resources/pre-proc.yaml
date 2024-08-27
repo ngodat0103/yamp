@@ -3,10 +3,6 @@ spring:
     activate:
       on-profile: pre-proc
   cloud:
-    gateway:
-      httpclient:
-        connect-timeout: 5000
-        response-timeout: 5s
     inetutils:
       default-hostname: yamp-backend.ngodat0103.live
 springdoc:

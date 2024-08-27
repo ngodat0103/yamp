@@ -57,9 +57,6 @@ spring:
 #              args:
 #                name: user-service-breaker
 #                fallbackUri: forward:/fallback
-      httpclient:
-        connect-timeout: 1000
-        response-timeout: 5s
 
 logging:
   pattern:

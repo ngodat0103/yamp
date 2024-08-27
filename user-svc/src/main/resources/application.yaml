@@ -7,8 +7,9 @@ spring:
       - "optional:unit-test.yaml"
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
+      - "optional:pre-proc.yaml"
   application:
-    name: user-service
+    name: user-svc
   security:
     oauth2:
       resourceserver:
@@ -23,7 +24,12 @@ server:
     encoding:
       enabled: false
     context-path: /api/v1/user
-
+logging:
+  level:
+    com.example.yamp.usersvc.controller: DEBUG
+    com.example.yamp.usersvc.service: debug
+  pattern:
+    level:  "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 springdoc:
   api-docs:
     path: /api-docs

@@ -7,7 +7,6 @@ public class UserServiceApplication {
 
 
 
-	//dsadasdas
 	public static void main(String[] args) {
 	  SpringApplication.run(UserServiceApplication.class, args);
 	}

@@ -40,6 +40,7 @@ jobs:
          cat $(ls | grep unit_test | grep .txt) >> $GITHUB_STEP_SUMMARY
 
   scan_quality_code:
+    needs: [unit-test]
     name: Scan quality
     runs-on: ubuntu-latest
     steps:
@@ -73,6 +74,7 @@ jobs:
 
 
   scan_vulnerability:
+    needs: [scan_quality_code]
     name: check vulnerability using trivy
     runs-on: ubuntu-latest
     steps:
@@ -94,6 +96,7 @@ jobs:
           TRIVY_PASSWORD: ${{github.token}}
         run: trivy fs --exit-code 1 --severity HIGH,CRITICAL .
   scan_misconfig:
+    needs: [scan_vulnerability]
     name: check misconfiguration
     runs-on: ubuntu-latest
     steps:

@@ -1,5 +1,7 @@
 package com.github.ngodat0103.yamp.authsvc.session;
 
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.cloud.commons.util.InetUtilsProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -13,11 +15,11 @@ public class SessionConfiguration {
 
     @Primary
     @Bean
-    DefaultCookieSerializer cookieSerializer() {
+    DefaultCookieSerializer cookieSerializer(InetUtilsProperties inetUtilsProperties, ServerProperties serverProperties) {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
         serializer.setCookieName("AUTHSESSIONID");
-        serializer.setDomainName("localhost");
-        serializer.setCookiePath("/");
+        serializer.setDomainName(inetUtilsProperties.getDefaultHostname());
+        serializer.setCookiePath(serverProperties.getServlet().getContextPath());
         serializer.setUseBase64Encoding(false);
         return serializer;
     }

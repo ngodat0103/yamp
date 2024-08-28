@@ -69,7 +69,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: master
-          fetch-depth: 1
           repository: ngodat0103/yamp-deployment
       - name: Create a staging branch
         run: git checkout -b staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}

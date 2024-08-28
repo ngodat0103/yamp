@@ -72,9 +72,14 @@ jobs:
           fetch-depth: 1
           repository: ngodat0103/yamp-deployment
       - name: Create a staging branch
-        run: git checkout -b staging-${NEXT_VERSION}
+        run: git checkout -b staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
       - name: update image manifest to use new version
         working-directory: yamp/${{inputs.SERVICE_NAME}}
         run: |
           sed -i "s|image:.*|image: ghcr.io/${{github.repository_owner}}/yamp/${{inputs.SERVICE_NAME}}:${NEXT_VERSION}|" ${{inputs.SERVICE_NAME}}-deployment.yaml
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "Deploying(): update ${inputs.SERVICE_NAME} to version ${NEXT_VERSION}"
+          git push origin staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
 

@@ -22,3 +22,10 @@ jobs:
     with:
       SERVICE_NAME: user-svc
       SERVICE_PORT: 8002
+  aggregator-svc-deployment:
+    needs: [gateway-svc-deployment, auth-svc-deployment, user-svc-deployment]
+    name: "Aggregation branch and create pull request"
+    runs-on: ubuntu-latest
+    steps:
+      - name: place holder
+        run: echo "do Nothing

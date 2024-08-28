@@ -1,4 +1,4 @@
-name: CD reusable workflow
+name: CD workflow call
 on:
   workflow_call:
     inputs:

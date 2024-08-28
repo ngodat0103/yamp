@@ -1,0 +1,24 @@
+name: Deployment workflow
+on:
+  push:
+jobs:
+  gateway-svc-deployment:
+    name: "Deploying gateway-svc"
+    uses: ./.github/workflows/cd-workflow-call.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: gateway-svc
+      SERVICE_PORT: 8000
+  auth-svc-deployment:
+    name: "Deploying auth-svc"
+    uses: ./.github/workflows/cd-workflow-call.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: auth-svc
+      SERVICE_PORT: 8001
+  user-svc-deployment:
+    uses: ./.github/workflows/cd-workflow-call.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: user-svc
+      SERVICE_PORT: 8002

@@ -15,6 +15,8 @@ jobs:
 #    environment: pre-production
     name: build ready container
     runs-on: ubuntu-latest
+    outputs:
+      next-version: ${{ steps.next-version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,34 +26,55 @@ jobs:
         uses: reecetech/version-increment@2024.4.4
         id: next-version
         with:
+          release_branch: release
           scheme: semver
           increment: patch
-      - name: checkout
+#      - name: checkout
+#        uses: actions/checkout@v4
+#      - name: set up buildx
+#        uses: docker/setup-buildx-action@v3.4.0
+#      - name: docker login credential
+#        uses: docker/login-action@v3.2.0
+#        with:
+#          registry: ghcr.io
+#          username: ${{github.repository_owner}}
+#          password: ${{secrets.GITHUB_TOKEN}}
+#
+#      - name: Extract metadata (tags, labels) for Docker
+#        id: meta
+#        uses: docker/metadata-action@v5.5.1
+#        with:
+#          images: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}
+#      - name: build and push with specific tag
+#        uses: docker/build-push-action@v6.3.0
+#        with:
+#          context: ${{inputs.SERVICE_NAME}}
+#          file: Dockerfile-For-CI
+#          push: true
+#          tags: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}:${{ steps.next-version.outputs.version }}
+#          labels: ${{steps.meta.outputs.labels}}
+#          #          cache-from: type=gha
+#          #          cache-to: type=gha,mode=max
+#          build-args: |
+#            SERVICE_NAME=${{inputs.SERVICE_NAME}}
+#            SERVICE_PORT=${{inputs.SERVICE_PORT}}
+  change-deployment-repo:
+    needs: [build-ready-container]
+    name: Update deployment repo manifest
+    runs-on: ubuntu-latest
+    env:
+      NEXT_VERSION: ${{needs.build-ready-container.outputs.next-version}}
+    steps:
+      - name: Checkout deployment repository
         uses: actions/checkout@v4
-      - name: set up buildx
-        uses: docker/setup-buildx-action@v3.4.0
-      - name: docker login credential
-        uses: docker/login-action@v3.2.0
         with:
-          registry: ghcr.io
-          username: ${{github.repository_owner}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          ref: master
+          fetch-depth: 1
+          repository: ngodat0103/yamp-deployment
+      - name: Create a staging branch
+        run: git checkout -b staging-${NEXT_VERSION}
+      - name: update image manifest to use new version
+        working-directory: yamp/${{inputs.SERVICE_NAME}}
+        run: |
+          sed -i "s|image:.*|image: ghcr.io/${{github.repository_owner}}/yamp/${{inputs.SERVICE_NAME}}:${NEXT_VERSION}|" ${{inputs.SERVICE_NAME}}-deployment.yaml
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5.5.1
-        with:
-          images: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}
-      - name: build and push with specific tag
-        uses: docker/build-push-action@v6.3.0
-        with:
-          context: ${{inputs.SERVICE_NAME}}
-          file: Dockerfile-For-CI
-          push: true
-          tags: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}:${{ steps.next-version.outputs.version }}
-          labels: ${{steps.meta.outputs.labels}}
-          #          cache-from: type=gha
-          #          cache-to: type=gha,mode=max
-          build-args: |
-            SERVICE_NAME=${{inputs.SERVICE_NAME}}
-            SERVICE_PORT=${{inputs.SERVICE_PORT}}

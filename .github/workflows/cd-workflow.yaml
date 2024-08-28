@@ -61,7 +61,7 @@ jobs:
           ref: master
           token: ${{secrets.PET_TOKEN}}
       - name: Create a staging branch
-        run: git branch -b $STAGING_BRANCH_NAME
+        run: git checkout -b $STAGING_BRANCH_NAME
       - name: Merge sub branches
         run: |
           git merge --no-commit origin/staging-gateway-svc-$NEXT_VERSION

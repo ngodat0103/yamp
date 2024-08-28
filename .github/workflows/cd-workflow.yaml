@@ -73,11 +73,7 @@ jobs:
           git merge --no-edit origin/staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
       - name: Commit and push changes
         working-directory: yamp-deployment
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git commit -m "Update new version to ${{ needs.get-new-version.outputs.next-version }}" 
-          git push --set-upstream origin staging-${{needs.get-new-version.outputs.next-version}}
+        run: git push --set-upstream origin staging-${{needs.get-new-version.outputs.next-version}}
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6.1.0
         with:

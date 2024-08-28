@@ -64,15 +64,15 @@ jobs:
         run: git checkout -b $STAGING_BRANCH_NAME
       - name: Merge sub branches
         run: |
-          git merge --no-commit origin/staging-gateway-svc-$NEXT_VERSION
-          git merge --no-commit origin/staging-auth-svc-$NEXT_VERSION
-          git merge --no-commit origin/staging-user-svc-$NEXT_VERSION
+          git merge --no-commit origin/staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
+          git merge --no-commit origin/staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
+          git merge --no-commit origin/staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
       - name: Commit and push changes
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git commit -m "Update new version to $NEXT_VERSION" 
-          git push --set-upstream origin $STAGING_BRANCH_NAME
+          git commit -m "Update new version to ${{ needs.get-new-version.outputs.next-version }}" 
+          git push --set-upstream origin staging-${{needs.get-new-version.outputs.next-version}}
       - name: Create pull request
         uses: peter-evans/create-pull-request@v6.1.0
         with:
@@ -87,7 +87,7 @@ jobs:
            assignees: ngodat0103
       - name: Clean up sub branches
         run: |
-          git push origin --delete staging-gateway-svc-$NEXT_VERSION
-          git push origin --delete staging-auth-svc-$NEXT_VERSION
-          git push origin --delete staging-user-svc-$NEXT_VERSION 
+          git push origin --delete staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
+          git push origin --delete staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
+          git push origin --delete staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
           

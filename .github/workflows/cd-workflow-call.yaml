@@ -77,9 +77,12 @@ jobs:
         run: |
           sed -i "s|image:.*|image: ghcr.io/${{github.repository_owner}}/yamp/${{inputs.SERVICE_NAME}}:${NEXT_VERSION}|" ${{inputs.SERVICE_NAME}}-deployment.yaml
       - name: Commit and push changes
-        uses: actions-js/push@v1.5
-        with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
-          message: "Update image version for ${{inputs.SERVICE_NAME}} to ${{env.NEXT_VERSION}}"
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add .
+          git commit -m "Update image version for ${{inputs.SERVICE_NAME}} to ${NEXT_VERSION}"
+          git push
+      
 
 

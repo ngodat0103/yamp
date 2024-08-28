@@ -74,18 +74,6 @@ jobs:
       - name: Commit and push changes
         working-directory: yamp-deployment
         run: git push --set-upstream origin staging-${{needs.get-new-version.outputs.next-version}}
-      - name: Create pull request
-        uses: peter-evans/create-pull-request@v6.1.0
-        with:
-           token: ${{secrets.PET_TOKEN}}
-           commit-message: "Update new version to $NEXT_VERSION"
-           title: "Update new version to $NEXT_VERSION"
-           body: "Update new version to $NEXT_VERSION"
-           branch: $STAGING_BRANCH_NAME
-           base: master
-           labels: staging
-           reviewers: ngodat0103
-           assignees: ngodat0103
       - name: Clean up sub branches
         working-directory: yamp-deployment
         run: |

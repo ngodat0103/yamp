@@ -78,8 +78,8 @@ jobs:
         run: |
           sed -i "s|image:.*|image: ghcr.io/${{github.repository_owner}}/yamp/${{inputs.SERVICE_NAME}}:${NEXT_VERSION}|" ${{inputs.SERVICE_NAME}}-deployment.yaml
       - name: Commit and push changes
-        run: |
-          git add .
-          git commit -m "Deploying(): update ${{inputs.SERVICE_NAME}} to version ${NEXT_VERSION}"
-          git push origin staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
+        uses: actions-js/push@v1.5
+        with:
+          message: "Update image version for ${{inputs.SERVICE_NAME}} to ${{env.NEXT_VERSION}}"
+
 

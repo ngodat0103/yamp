@@ -59,9 +59,7 @@ jobs:
         with:
           credentials: ${{secrets.GIT_CREDENTIALS}}
       - name: Clone deployment repo
-        env:
-          DEPLOYMENT_REPO: "ngodat0103/yamp-deployment"
-        run: git clone $DEPLOYMENT_REPO
+        run: git clone https://github.com/ngodat0103/yamp-deployment.git
       - name: Create a $STAGING_BRANCH_NAME branch
         working-directory: yamp-deployment
         run: git checkout -b $STAGING_BRANCH_NAME

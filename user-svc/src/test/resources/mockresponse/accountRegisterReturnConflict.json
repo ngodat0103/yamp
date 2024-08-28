@@ -1,0 +1,7 @@
+{
+  "type": "https://problems-registry.smartbear.com/already-exists",
+  "title": "Already exists",
+  "status": 409,
+  "detail": "AccountUuid is already exists!",
+  "instance": "/account/register"
+}

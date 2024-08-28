@@ -1,7 +1,7 @@
 FROM maven:3.9.8-eclipse-temurin-17-alpine AS builder
 WORKDIR build
 COPY . .
-RUN mvn -q clean install -DskipTests
+RUN mvn  clean package -DskipTests
 
 FROM eclipse-temurin:17-jre AS layers
 ARG SERVICE_NAME
@@ -22,4 +22,9 @@ USER app
 EXPOSE ${SERVICE_PORT}
 HEALTHCHECK --interval=30s --timeout=3s --retries=1 CMD wget -qO- http://localhost:${SERVICE_PORT}/actuator/health/ | grep UP || exit 1
 LABEL org.opencontainers.image.source=https://github.com/ngodat0103/yamp
+LABEL  org.opencontainers.image.description="YAMP - Yet Another Microservice Project"
+LABEL  org.opencontainers.image.source=https://github.com/NGODAT0103/YAMP
+LABEL  org.opencontainers.image.title=YAMP
+LABEL  org.opencontainers.image.url=https://github.com/NGODAT0103/YAMP
+LABEL  org.opencontainers.image.version=pr-26
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

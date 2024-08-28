@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+/src/main/java/com/example/yamp/usersvc/.env
+/.env
+/src/main/resources/pre-proc.yaml

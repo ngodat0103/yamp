@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  config:
+    activate:
+      on-profile: test
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.github.ngodat0103.yamp..productsvc.service: DEBUG
+    com.github.ngodat0103.yamp..productsvc.controller: DEBUG

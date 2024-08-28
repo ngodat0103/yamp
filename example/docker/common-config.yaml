@@ -1,0 +1,16 @@
+services:
+  network-deploy-service:
+    networks:
+      - yamp-network
+  microservice-base-config:
+    extends:
+      service: network-deploy-service
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    environment:
+      SPRING_PROFILES_ACTIVE: demo
+      JAVA_TOOL_OPTIONS: "-javaagent:/opt/app/BOOT-INF/lib/opentelemetry-javaagent-1.28.0.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      OTEL_METRICS_EXPORTER: none

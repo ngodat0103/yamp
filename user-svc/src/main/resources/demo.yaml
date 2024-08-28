@@ -1,0 +1,49 @@
+spring:
+  config:
+    activate:
+      on-profile: demo
+  datasource:
+    url: jdbc:postgresql://share-db:5432/user-svc-db
+    username: 'user-svc-user'
+    password: 'user-svc-user-password'
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto:  update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    oauth2:
+      client:
+        provider:
+          auth-service-external:
+            authorization-uri: http://localhost:8000/api/v1/auth/oauth2/authorize
+            token-uri: http://localhost:8000/api/v1/auth/oauth2/token
+            jwk-set-uri: http://localhost:8000/api/v1/auth/oauth2/jwks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always
+logging:
+  level:
+    com.example.userservice.security: DEBUG
+    com.example.userservice.exception: ERROR
+    com.example.userservice.service: DEBUG
+  pattern:
+    level:  "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

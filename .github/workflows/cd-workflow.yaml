@@ -58,15 +58,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ngodat0103/yamp-deployment
-          ref: master
           token: ${{secrets.PET_TOKEN}}
       - name: Create a staging branch
         run: git checkout -b $STAGING_BRANCH_NAME
       - name: Merge sub branches
         run: |
-          git merge --no-commit origin/staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
-          git merge --no-commit origin/staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
-          git merge --no-commit origin/staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
+          git merge --no-edit origin/staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
+          git merge --no-edit origin/staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
+          git merge --no-edit origin/staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
       - name: Commit and push changes
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"

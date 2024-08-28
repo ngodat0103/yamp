@@ -82,7 +82,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git add .
           git commit -m "Update image version for ${{inputs.SERVICE_NAME}} to ${NEXT_VERSION}"
-          git push
+          git push --set-upstream origin staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
       
 
 

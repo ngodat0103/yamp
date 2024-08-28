@@ -16,6 +16,10 @@ jobs:
     name: build ready container
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - name: Get next version
         uses: reecetech/version-increment@2024.4.4
         id: next-version

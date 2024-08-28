@@ -54,19 +54,25 @@ jobs:
       STAGING_BRANCH_NAME: staging-${{needs.get-new-version.outputs.next-version}}
     runs-on: ubuntu-latest
     steps:
-      - name: Clone deployment repo
-        uses: actions/checkout@v4
+      - name: Set up credential
+        uses: de-vri-es/setup-git-credentials@v2.1.2
         with:
-          repository: ngodat0103/yamp-deployment
-          token: ${{secrets.PET_TOKEN}}
-      - name: Create a staging branch
+          credentials: ${{secrets.GIT_CREDENTIALS}}
+      - name: Clone deployment repo
+        env:
+          DEPLOYMENT_REPO: "ngodat0103/yamp-deployment"
+        run: git clone $DEPLOYMENT_REPO
+      - name: Create a $STAGING_BRANCH_NAME branch
+        working-directory: yamp-deployment
         run: git checkout -b $STAGING_BRANCH_NAME
       - name: Merge sub branches
+        working-directory: yamp-deployment
         run: |
           git merge --no-edit origin/staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
           git merge --no-edit origin/staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
           git merge --no-edit origin/staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
       - name: Commit and push changes
+        working-directory: yamp-deployment
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"

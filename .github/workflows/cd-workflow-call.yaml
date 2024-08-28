@@ -80,6 +80,6 @@ jobs:
       - name: Commit and push changes
         run: |
           git add .
-          git commit -m "Deploying(): update ${inputs.SERVICE_NAME} to version ${NEXT_VERSION}"
+          git commit -m "Deploying(): update ${{inputs.SERVICE_NAME}} to version ${NEXT_VERSION}"
           git push origin staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
 

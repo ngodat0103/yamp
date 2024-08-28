@@ -66,6 +66,8 @@ jobs:
       - name: Merge sub branches
         working-directory: yamp-deployment
         run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
           git merge --no-edit origin/staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
           git merge --no-edit origin/staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
           git merge --no-edit origin/staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
@@ -89,6 +91,7 @@ jobs:
            reviewers: ngodat0103
            assignees: ngodat0103
       - name: Clean up sub branches
+        working-directory: yamp-deployment
         run: |
           git push origin --delete staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
           git push origin --delete staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}

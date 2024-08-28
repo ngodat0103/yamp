@@ -80,6 +80,7 @@ jobs:
       - name: Commit and push changes
         uses: actions-js/push@v1.5
         with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
           message: "Update image version for ${{inputs.SERVICE_NAME}} to ${{env.NEXT_VERSION}}"
 
 

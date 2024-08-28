@@ -70,6 +70,7 @@ jobs:
         with:
           ref: master
           repository: ngodat0103/yamp-deployment
+          token: ${{secrets.PET_TOKEN}}
       - name: Create a staging branch
         run: git checkout -b staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
       - name: update image manifest to use new version

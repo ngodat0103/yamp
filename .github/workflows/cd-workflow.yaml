@@ -75,6 +75,7 @@ jobs:
         working-directory: yamp-deployment
         run: git push --set-upstream origin staging-${{needs.get-new-version.outputs.next-version}}
       - name: Create a PR
+        working-directory: yamp-deployment
         env:
           GITHUB_TOKEN: ${{secrets.PET_TOKEN}}
         run: |

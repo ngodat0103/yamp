@@ -78,14 +78,15 @@ jobs:
     env:
       TRIVY_USERNAME: ${{github.repository_owner}}
       TRIVY_PASSWORD: ${{github.token}}
-      CACHE_DIR: ~/.trivy
+      CACHE_DIR: /tmp/trivy
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Trivy Cache
-        uses: yogeshlonkar/trivy-cache-action@v0.1.6
+      - name: Cache trivy database
+        uses: actions/cache@v4.0.2
         with:
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/trivy
+          key: ${{ runner.os }}-trivy
       - name: Set up trivy
         run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v0.53.0/trivy_0.53.0_Linux-64bit.deb

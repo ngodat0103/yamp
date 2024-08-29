@@ -5,10 +5,10 @@ on:
     paths:
       - "auth-svc/**"
   pull_request:
-#    branches:
-#      - "feature/**"
-#    paths:
-#      - "auth-svc/**"
+    branches:
+      - "feature/**"
+    paths:
+      - "auth-svc/**"
 
 jobs:
   push:

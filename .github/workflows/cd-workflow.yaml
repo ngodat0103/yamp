@@ -68,12 +68,17 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git merge --no-edit origin/staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
-          git merge --no-edit origin/staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
-          git merge --no-edit origin/staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
+          git merge --no-edit origin/staging-gateway-svc-$NEXT_VERSION
+          git merge --no-edit origin/staging-auth-svc-$NEXT_VERSION
+          git merge --no-edit origin/staging-user-svc-$NEXT_VERSION
       - name: Commit and push changes
         working-directory: yamp-deployment
         run: git push --set-upstream origin staging-${{needs.get-new-version.outputs.next-version}}
+      - name: Create a PR
+        env:
+          GITHUB_TOKEN: ${{secrets.PET_TOKEN}}
+        run: |
+          gh pr create --base master --head $STAGING_BRANCH_NAME --title "[bot]: Update version to $NEXT_VERSION" --body "Update version to $NEXT_VERSION"
       - name: Clean up sub branches
         working-directory: yamp-deployment
         run: |

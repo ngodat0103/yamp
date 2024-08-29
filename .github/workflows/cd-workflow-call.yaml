@@ -48,8 +48,8 @@ jobs:
           push: true
           tags: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}:${{inputs.NEXT_VERSION}}
           labels: ${{steps.meta.outputs.labels}}
-          #          cache-from: type=gha
-          #          cache-to: type=gha,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           build-args: |
             SERVICE_NAME=${{inputs.SERVICE_NAME}}
             SERVICE_PORT=${{inputs.SERVICE_PORT}}

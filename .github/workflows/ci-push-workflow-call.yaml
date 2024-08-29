@@ -71,49 +71,28 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: mvn -DskipTests -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=NGODAT0103_KLTN_469d6be5-1cc8-4567-ae29-7f3f9dc29ff6 -Dsonar.projectName='KLTN'
 
-
-
   scan_vulnerability:
     needs: [scan_quality_code]
     name: check vulnerability using trivy
     runs-on: ubuntu-latest
+    env:
+      TRIVY_USERNAME: ${{github.repository_owner}}
+      TRIVY_PASSWORD: ${{github.token}}
+      CACHE_DIR: ~/.trivy
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: set up cache
-        uses: actions/cache@v4.0.2
+      - name: Trivy Cache
+        uses: yogeshlonkar/trivy-cache-action@v0.1.6
         with:
-          path: ~/.cache/trivy
-          key: ${{ runner.os }}-trivy
-      - name: set up trivy
+          gh-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up trivy
         run: |
           wget https://github.com/aquasecurity/trivy/releases/download/v0.53.0/trivy_0.53.0_Linux-64bit.deb
           sudo dpkg -i trivy_0.53.0_Linux-64bit.deb
-      - name: trivy scan
+      - name: Scan file system
         working-directory: ${{inputs.SERVICE_NAME}}
-        env:
-          TRIVY_USERNAME: ${{github.repository_owner}}
-          TRIVY_PASSWORD: ${{github.token}}
-        run: trivy fs --exit-code 1 --severity HIGH,CRITICAL .
-  scan_misconfig:
-    needs: [scan_vulnerability]
-    name: check misconfiguration
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: set up cache trivy
-        uses: actions/cache@v4.0.2
-        with:
-          path: ~/.cache/trivy
-          key: ${{ runner.os }}-trivy
-      - name: set up trivy
-        run: |
-          wget https://github.com/aquasecurity/trivy/releases/download/v0.53.0/trivy_0.53.0_Linux-64bit.deb
-          sudo dpkg -i trivy_0.53.0_Linux-64bit.deb
-      - name: trivy scan
+        run: trivy --cache-dir=$CACHE_DIR fs --exit-code 1 --severity HIGH,CRITICAL .
+      - name: Scan configuration
         working-directory: ${{inputs.SERVICE_NAME}}
-        env:
-          TRIVY_USERNAME: ${{github.repository_owner}}
-          TRIVY_PASSWORD: ${{secrets.GITHUB_TOKEN}}
-        run: trivy fs --scanners misconfig --exit-code 1 --severity HIGH,CRITICAL .
+        run: trivy --cache-dir=$CACHE_DIR fs --scanners misconfig --exit-code 1 --severity HIGH,CRITICAL .

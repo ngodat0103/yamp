@@ -1,4 +1,4 @@
-name: CD reusable workflow
+name: CD workflow call
 on:
   workflow_call:
     inputs:
@@ -10,18 +10,20 @@ on:
         description: "name of the service to trigger the CD"
         required: true
         type: string
+      NEXT_VERSION:
+        description: "next version of the service"
+        required: true
+        type: string
 jobs:
   build-ready-container:
 #    environment: pre-production
     name: build ready container
     runs-on: ubuntu-latest
     steps:
-      - name: Get next version
-        uses: reecetech/version-increment@2024.4.4
-        id: next-version
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          scheme: semver
-          increment: patch
+          fetch-depth: 1
       - name: checkout
         uses: actions/checkout@v4
       - name: set up buildx
@@ -44,10 +46,39 @@ jobs:
           context: ${{inputs.SERVICE_NAME}}
           file: Dockerfile-For-CI
           push: true
-          tags: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}:${{ steps.next-version.outputs.version }}
+          tags: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}:${{inputs.NEXT_VERSION}}
           labels: ${{steps.meta.outputs.labels}}
-          #          cache-from: type=gha
-          #          cache-to: type=gha,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           build-args: |
             SERVICE_NAME=${{inputs.SERVICE_NAME}}
             SERVICE_PORT=${{inputs.SERVICE_PORT}}
+  change-deployment-repo:
+    needs: [build-ready-container]
+    name: Update deployment repo manifest
+    runs-on: ubuntu-latest
+    env:
+      NEXT_VERSION: ${{inputs.NEXT_VERSION}}
+    steps:
+      - name: Checkout deployment repository
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          repository: ngodat0103/yamp-deployment
+          token: ${{secrets.PET_TOKEN}}
+      - name: Create a staging branch
+        run: git checkout -b staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
+      - name: update image manifest to use new version
+        working-directory: yamp/${{inputs.SERVICE_NAME}}
+        run: |
+          sed -i "s|image:.*|image: ghcr.io/${{github.repository_owner}}/yamp/${{inputs.SERVICE_NAME}}:${NEXT_VERSION}|" ${{inputs.SERVICE_NAME}}-deployment.yaml
+      - name: Commit and push changes
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add .
+          git commit -m "Update image version for ${{inputs.SERVICE_NAME}} to ${NEXT_VERSION}"
+          git push --set-upstream origin staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
+      
+
+

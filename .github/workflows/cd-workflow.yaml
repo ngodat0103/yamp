@@ -1,0 +1,103 @@
+name: Deployment workflow
+on:
+  push:
+    branches:
+      - release
+jobs:
+  get-new-version:
+    name: Get new version
+    runs-on: ubuntu-latest
+    outputs:
+      next-version: ${{ steps.next-version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Get next version
+        uses: reecetech/version-increment@2024.4.4
+        id: next-version
+        with:
+          release_branch: release
+          scheme: semver
+          increment: patch
+  gateway-svc-deployment:
+    needs: [get-new-version]
+    name: "Deploying gateway-svc"
+    uses: ./.github/workflows/cd-workflow-call.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: gateway-svc
+      SERVICE_PORT: 8000
+      NEXT_VERSION: ${{ needs.get-new-version.outputs.next-version }}
+  auth-svc-deployment:
+    needs: [ get-new-version ]
+    name: "Deploying auth-svc"
+    uses: ./.github/workflows/cd-workflow-call.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: auth-svc
+      SERVICE_PORT: 8001
+      NEXT_VERSION: ${{ needs.get-new-version.outputs.next-version }}
+  user-svc-deployment:
+    name: "Deploying user-svc"
+    needs: [ get-new-version ]
+    uses: ./.github/workflows/cd-workflow-call.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: user-svc
+      SERVICE_PORT: 8002
+      NEXT_VERSION: ${{ needs.get-new-version.outputs.next-version }}
+  aggregator-svc-deployment:
+    needs: [gateway-svc-deployment, auth-svc-deployment, user-svc-deployment, get-new-version]
+    name: "Aggregation branches and create pull request"
+    env:
+      NEXT_VERSION: ${{ needs.get-new-version.outputs.next-version }}
+      STAGING_BRANCH_NAME: staging-${{needs.get-new-version.outputs.next-version}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up credential
+        uses: de-vri-es/setup-git-credentials@v2.1.2
+        with:
+          credentials: ${{secrets.GIT_CREDENTIALS}}
+      - name: Clone deployment repo
+        run: git clone https://github.com/ngodat0103/yamp-deployment.git
+      - name: Create a $STAGING_BRANCH_NAME branch
+        working-directory: yamp-deployment
+        run: git checkout -b $STAGING_BRANCH_NAME
+      - name: Merge sub branches
+        working-directory: yamp-deployment
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git merge --no-edit origin/staging-gateway-svc-$NEXT_VERSION
+          git merge --no-edit origin/staging-auth-svc-$NEXT_VERSION
+          git merge --no-edit origin/staging-user-svc-$NEXT_VERSION
+      - name: Commit and push changes
+        working-directory: yamp-deployment
+        run: git push --set-upstream origin staging-${{needs.get-new-version.outputs.next-version}}
+      - name: Create a PR
+        working-directory: yamp-deployment
+        env:
+          GITHUB_TOKEN: ${{secrets.PET_TOKEN}}
+        run: |
+          gh pr create --base master --head $STAGING_BRANCH_NAME --title "[bot]: Update version to $NEXT_VERSION" --body "Update version to $NEXT_VERSION"
+      - name: Clean up sub branches
+        working-directory: yamp-deployment
+        run: |
+          git push origin --delete staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
+          git push origin --delete staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
+          git push origin --delete staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
+#  clean-up-packages:
+#    needs: [aggregator-svc-deployment]
+#    name: Clean up packages
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Clean up untagged package_name
+#        uses: Chizkiyahu/delete-untagged-ghcr-action@v4.0.1
+#        with:
+#          token: ${{secrets.GITHUB_TOKEN}}
+#          repository: ngodat0103/yamp
+#          owner_type: user
+
+          

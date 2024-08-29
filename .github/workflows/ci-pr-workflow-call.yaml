@@ -123,6 +123,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Cache trivy database
+        uses: actions/cache@v4.0.2
+        with:
+          path: /tmp/trivy
+          key: ${{ runner.os }}-trivy
       - name: Scan security
         id: generate-report
         uses: aquasecurity/trivy-action@0.24.0
@@ -132,6 +137,7 @@ jobs:
           vuln-type: os,library
           exit-code: 1
           format: template
+          cache-dir: /tmp/trivy
           template: '@/contrib/html.tpl'
           output: ${{inputs.SERVICE_NAME}}-report-${{github.sha}}.html
         env:

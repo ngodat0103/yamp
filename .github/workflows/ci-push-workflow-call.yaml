@@ -21,15 +21,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: set up cache
+      - name: Cache Maven packages
         uses: actions/cache@v4.0.2
         with:
-          path: ~/.m2
+          path: ~/.m2/repository
           key: ${{ runner.os }}-m2-v1-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2-v1-
       - name: Running test
         working-directory: ${{inputs.SERVICE_NAME}}
-        run: mvn test -Dtest=*UnitTest
+        run: mvn  test -Dtest=*UnitTest
       - name: Create summary
         working-directory: ${{inputs.SERVICE_NAME}}/target/surefire-reports
         run: |

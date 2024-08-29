@@ -1,8 +1,8 @@
 name: Deployment workflow
 on:
   push:
-    branches:
-      - release
+#    branches:
+#      - release
 jobs:
   get-new-version:
     name: Get new version
@@ -88,4 +88,15 @@ jobs:
           git push origin --delete staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
           git push origin --delete staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
           git push origin --delete staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
+  clean-up-packages:
+    needs: [aggregator-svc-deployment]
+    name: Clean up packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean up untagged package_name
+        uses: Chizkiyahu/delete-untagged-ghcr-action@v4.0.1
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          repository: ngodat0103/yamp
+
           

@@ -98,5 +98,6 @@ jobs:
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           repository: ngodat0103/yamp
+          owner_type: user
 
           

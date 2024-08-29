@@ -1,8 +1,8 @@
 name: Deployment workflow
 on:
   push:
-#    branches:
-#      - release
+    branches:
+      - release
 jobs:
   get-new-version:
     name: Get new version

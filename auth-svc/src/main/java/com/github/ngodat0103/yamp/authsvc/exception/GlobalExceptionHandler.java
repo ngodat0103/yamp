@@ -34,6 +34,17 @@ public class GlobalExceptionHandler  {
         problemDetails.setInstance(URI.create(request.getServletPath()));
         return problemDetails;
     }
+    @ExceptionHandler(NotFoundException.class)
+    public ProblemDetail handleNotFoundException(NotFoundException e, HttpServletRequest request) {
+        ProblemDetail problemDetails = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problemDetails.setDetail(e.getMessage());
+        problemDetails.setType(URI.create("https://problems-registry.smartbear.com/not-found"));
+        problemDetails.setTitle("Not found");
+        problemDetails.setInstance(URI.create(request.getServletPath()));
+        return problemDetails;
+    }
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {

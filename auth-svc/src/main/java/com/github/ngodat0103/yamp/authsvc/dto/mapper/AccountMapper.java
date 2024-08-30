@@ -5,13 +5,11 @@ import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.UUID;
-
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
-    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "role",ignore = true)
     Account mapToEntity(AccountDto accountDto);
 
-    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "roleName",expression = "java(account.getRole().getRoleName())")
     AccountDto mapToDto(Account account);
 }

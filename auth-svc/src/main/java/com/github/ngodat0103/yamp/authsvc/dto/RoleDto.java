@@ -1,12 +1,15 @@
 package com.github.ngodat0103.yamp.authsvc.dto;
 
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
-@AllArgsConstructor
 public class RoleDto {
-    private String RoleName;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private UUID roleUuid;
+    private String roleName;
     private String roleDescription;
 }

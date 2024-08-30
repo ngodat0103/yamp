@@ -1,6 +1,10 @@
 package com.example.yamp.usersvc.security;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
 
@@ -12,8 +16,13 @@ public class Oauth2WebClientConfiguration {
 
   //todo: Will implement using redis cache for further optimization
     @Bean
-    WebClient webClient() {
+    WebClient webClient(OAuth2AuthorizedClientManager authorizedClientManager) {
+      ServletOAuth2AuthorizedClientExchangeFilterFunction exchangeFilterFunction = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+      exchangeFilterFunction.setDefaultClientRegistrationId("user-service");
+      exchangeFilterFunction.setDefaultOAuth2AuthorizedClient(true);
+      exchangeFilterFunction.oauth2Configuration();
       return WebClient.builder()
+              .apply(exchangeFilterFunction.oauth2Configuration())
               .baseUrl(AUTH_SVC_BASE)
               .build();
     }

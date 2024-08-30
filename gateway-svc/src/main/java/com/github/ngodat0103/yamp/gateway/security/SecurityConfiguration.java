@@ -2,6 +2,7 @@ package com.github.ngodat0103.yamp.gateway.security;
 import com.github.ngodat0103.yamp.gateway.security.filter.AddJwtHeaderFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -27,9 +28,11 @@ public class SecurityConfiguration {
                         .pathMatchers("/login/oauth2/code/gateway-service").permitAll()
                         .pathMatchers("/api/v1/user/get-me").authenticated()
                         .pathMatchers("/api/v1/user/test-endpoint").authenticated()
-                        .pathMatchers("/actuator/**").authenticated()
-                        .pathMatchers("/api/v1/auth/account/**").denyAll()
-                        .pathMatchers("/api/v1/auth/account").denyAll()
+                        .pathMatchers("/actuator/**").denyAll()
+                        .pathMatchers("/api/v1/auth/actuator/**").denyAll()
+                        .pathMatchers("/api/v1/auth/accounts/roles").authenticated()
+                        .pathMatchers(HttpMethod.POST,"/api/v1/auth/oauth2/authorize").permitAll()
+                        .pathMatchers(HttpMethod.POST,"/api/v1/auth/oauth2/token").permitAll()
                         .anyExchange().permitAll()
 
         );

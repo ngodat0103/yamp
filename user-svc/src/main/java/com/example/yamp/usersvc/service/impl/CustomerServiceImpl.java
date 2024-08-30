@@ -36,7 +36,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerMapper customerMapper;
     private final WebClient webClient;
     private final PasswordEncoder passwordEncoder;
-    public final static String REGISTER_PATH = "/account/register";
+    public final static String ACCOUNT_PATH = "/account";
 
 
 
@@ -50,7 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
         accountRegisterDtoRequest.setAccountUuid(customer.getCustomerUuid());
         log.debug("New customerUuid {} saved but not commit, wait for auth-svc response", customer.getCustomerUuid());
         webClient.post()
-                .uri(REGISTER_PATH)
+                .uri(ACCOUNT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(accountRegisterDtoRequest)

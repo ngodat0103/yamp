@@ -26,7 +26,5 @@ public class CircruitBreakerConfiguration {
                 .circuitBreakerConfig(circuitBreakerConfig)
                 .build();
     });
-
-
     }
 }

@@ -1,12 +1,26 @@
 spring:
+  cloud:
+    inetutils:
+      default-hostname: localhost
   security:
     oauth2:
       client:
         provider:
+          auth-service-internal:
+            token-uri: http://auth-svc:8001/api/v1/auth/oauth2/token
           auth-service-external:
             authorization-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/authorize
             token-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/token
             jwk-set-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/jwks
+        registration:
+          user-service:
+            client-id: user-service
+            client-secret: "{cipher}e256a67c78a19d92012597e4883a0f2c26b8919abe197a6e070dae506935262d3ae6bc840d9697adb7e038cd36751954"
+            scope: auth-svc.write
+            provider: auth-service-internal
+            client-name: User Service
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: client_credentials
   config:
     activate:
       on-profile: local-dev
@@ -22,6 +36,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+
 
 management:
   endpoints:

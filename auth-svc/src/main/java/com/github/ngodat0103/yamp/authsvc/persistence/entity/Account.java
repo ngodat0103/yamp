@@ -1,7 +1,6 @@
 package com.github.ngodat0103.yamp.authsvc.persistence.entity;
 
 
-import com.github.ngodat0103.yamp.authsvc.persistence.converter.RoleConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,8 +21,11 @@ public class Account {
     private String email;
     @Column (nullable=false)
     private String password;
-    @Convert(converter = RoleConverter.class)
-    private Set<String> roles = new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "roleUuid")
+    private Role role;
+
     public Account(UUID accountUuid ,String email,String username, String password){
         this.username = username;
         this.password = password;

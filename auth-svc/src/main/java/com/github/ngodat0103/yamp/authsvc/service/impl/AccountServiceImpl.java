@@ -4,19 +4,18 @@ import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
 import com.github.ngodat0103.yamp.authsvc.exception.ConflictException;
 import com.github.ngodat0103.yamp.authsvc.exception.NotFoundException;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.Role;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
+import com.github.ngodat0103.yamp.authsvc.persistence.repository.RoleRepository;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -24,9 +23,13 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
-    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper) {
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.accountRepository = accountRepository;
         this.accountMapper = accountMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
 
@@ -49,31 +52,50 @@ public class AccountServiceImpl implements AccountService {
             log.debug("Email is already exists!");
             throw new ConflictException("Email is already exists!");
         }
-            Set<String> roles = new HashSet<>();
-            roles.add("ROLE_CUSTOMER");
-            account.setRoles(roles);
-            log.debug("Set roles for new account");
-            Account savedAccount = accountRepository.save(account);
-            log.debug("Account saved successfully");
-            return accountMapper.mapToDto(savedAccount);
-    }
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
 
+        String roleName = accountDto.getRoleName();
+        Role  role  = roleRepository.findRoleByRoleName(roleName).orElseThrow(roleNotFoundSupplier(roleName));
+        account.setRole(role);
+        Account savedAccount = accountRepository.save(account);
+        return accountMapper.mapToDto(savedAccount);
+    }
 
     @Override
-    public void addRole(UUID accountUuid, String roleName) {
-        Account currentAccount = accountRepository.findById(accountUuid)
-                .orElseThrow(accountNotFoundSupplier(accountUuid));
-
-        Set<String> roles = currentAccount.getRoles();
-        if (!roles.contains(roleName)) {
-            roles.add("ROLE_" + roleName.toUpperCase());
-            currentAccount.setRoles(roles);
-            accountRepository.save(currentAccount);
-            return;
-        }
-        throw new ConflictException("Role is already exists!");
-
+    public Set<AccountDto> getAccounts() {
+        log.debug("Getting all accounts");
+     return  accountRepository.findAll().stream().map(account -> {
+                    AccountDto accountDto = accountMapper.mapToDto(account);
+                    accountDto.setRoleName(account.getRole().getRoleName());
+                    return accountDto;
+                }).collect(Collectors.toUnmodifiableSet());
     }
+
+    @Override
+    public Set<AccountDto> getAccountFilter(Set<String> roles, UUID accountUuid, String username) {
+
+
+        log.debug("Getting accounts with filter");
+        if(accountUuid!=null){
+            Account account = accountRepository.findById(accountUuid).orElseThrow(accountNotFoundSupplier(accountUuid));
+            return Set.of(accountMapper.mapToDto(account));
+        }
+        else if(username!=null){
+            Account account = accountRepository.findByUsername(username).orElseThrow(accountNotFoundSupplier(username));
+            return Set.of(accountMapper.mapToDto(account));
+        }
+        else {
+           roles = roles.stream().map(String::toUpperCase).collect(Collectors.toUnmodifiableSet());
+
+          return roleRepository.findRolesByRoleNameIn(roles).stream()
+                  .map(Role::getAccounts)
+                  .flatMap(Set::stream)
+                  .map(accountMapper::mapToDto)
+                  .collect(Collectors.toUnmodifiableSet());
+
+        }
+    }
+
 
     private Supplier<NotFoundException> accountNotFoundSupplier(Object identifier) {
         {
@@ -93,5 +115,11 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    private Supplier<NotFoundException> roleNotFoundSupplier(String roleName){
+        return () -> {
+            log.debug("Role not found for roleName: {}", roleName);
+            throw new NotFoundException("Role not found");
+        };
+    }
 
 }

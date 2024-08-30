@@ -1,30 +1,31 @@
 package com.github.ngodat0103.yamp.authsvc.controller;
 import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.util.Set;
 import java.util.UUID;
 
 
 
 
 @Slf4j
-@RequestMapping(value = "/account",produces = "application/json")
+@RequestMapping(value = "/accounts",produces = "application/json")
 @RestController
+@SecurityRequirement(name = "oauth2")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN','SCOPE_auth-svc.write')")
 //@Hidden
 public class AccountController {
     private final AccountService accountService;
-    private final static String ACCOUNT_UUID_HEADER = "X-Account-Uuid";
-
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
 
-
-
-    @PostMapping(value = "/register")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AccountDto register(@Valid @RequestBody AccountDto accountDto){
         log.debug("Controller register method called");
@@ -32,13 +33,18 @@ public class AccountController {
     }
 
 
-
-    @PostMapping("/role")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public void addRole(@RequestHeader (value = ACCOUNT_UUID_HEADER) @Valid UUID accountUuid,
-                        @RequestHeader(value = "X-Role-Name") String roleName)
-    {
-        accountService.addRole(accountUuid,roleName);
+    @GetMapping
+    public Set<AccountDto > getAccounts() {
+        log.debug("Controller getAccounts method called");
+        return accountService.getAccounts();
     }
+
+    @GetMapping(value = "/filter")
+    public Set<AccountDto> getAccountsFilterByRoles(@RequestParam(required = false) Set<String> roles,
+                                                    @RequestParam(required = false) UUID accountUuid,
+                                                    @RequestParam(required = false) String username) {
+            return accountService.getAccountFilter(roles, accountUuid, username);
+    }
+
 
 }

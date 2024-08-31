@@ -44,7 +44,7 @@ jobs:
           INIT_SQL: ${{ secrets.INIT_SQL }}
         run: |
           echo $INIT_SQL > /tmp/init.sql
-          psql -h 127.0.0.1 -U $POSTGRES_USER -d $POSTGRES_DB -f /tmp/init.sql
+          docker exec -i share-db psql -U postgres -d postgres < /tmp/init.sql
       - name: Checkout
         uses: actions/checkout@v4
         with:

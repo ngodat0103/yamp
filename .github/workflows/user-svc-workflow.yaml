@@ -1,14 +1,14 @@
 on:
   push:
-    branches:
-      - "features/**"
-    paths:
-      - "user-svc/**"
-  pull_request:
-    branches:
-      - "features/**"
-    paths:
-      - "user-svc/**"
+#    branches:
+#      - "features/**"
+#    paths:
+#      - "user-svc/**"
+#  pull_request:
+#    branches:
+#      - "features/**"
+#    paths:
+#      - "user-svc/**"
 jobs:
   push:
     name: user-svc-push

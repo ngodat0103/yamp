@@ -62,7 +62,6 @@ jobs:
           ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
         run: mvn test -Dtest=*IntegrationTest
 
-
   pr-push-image:
     name: user-svc-pr
     if: github.event_name == 'pull_request'

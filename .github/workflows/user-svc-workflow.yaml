@@ -46,7 +46,7 @@ jobs:
           INIT_SQL: ${{ secrets.INIT_SQL }}
         run: |
           echo $INIT_SQL > /tmp/init.sql
-          psql -U $POSTGRES_USER -d $POSTGRES_DB < /tmp/init.sql
+          psql -h 127.0.0.1 -U $POSTGRES_USER -d $POSTGRES_DB < /tmp/init.sql
       - name: Checkout
         uses: actions/checkout@v4
         with:

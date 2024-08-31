@@ -68,7 +68,7 @@ public class CustomerServiceTest {
         this.customerRepository = Mockito.mock(CustomerRepository.class);
         URI mockBaseUri = this.mockWebServer.url("/").uri();
         WebClient webClient = WebClient.builder().baseUrl(mockBaseUri.toString()).build();
-        this.customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper, webClient, passwordEncoder);
+        this.customerService = new CustomerServiceImpl(this.customerRepository, this.customerMapper, webClient);
         this.customerRegisterDto = CustomerRegisterDto.builder()
                 .username(username)
                 .firstName(firstName)

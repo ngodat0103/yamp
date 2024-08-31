@@ -35,8 +35,8 @@ public class CustomerServiceImpl implements CustomerService {
     private final  CustomerRepository  customerRepository;
     private final CustomerMapper customerMapper;
     private final WebClient webClient;
-    private final PasswordEncoder passwordEncoder;
-    public final static String ACCOUNT_PATH = "/account";
+    private final static String ACCOUNT_PATH = "/accounts";
+    private final static String DEFAULT_ROLE = "CUSTOMER";
 
 
 
@@ -46,8 +46,9 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerMapper.mapToEntity(customerRegisterDto);
         customer = customerRepository.save(customer);
         AccountRegisterDto accountRegisterDtoRequest = customerMapper.maptoAccountRegisterDto(customerRegisterDto);
-        accountRegisterDtoRequest.setPassword(passwordEncoder.encode(accountRegisterDtoRequest.getPassword()));
+        accountRegisterDtoRequest.setPassword(customerRegisterDto.getPassword());
         accountRegisterDtoRequest.setAccountUuid(customer.getCustomerUuid());
+        accountRegisterDtoRequest.setRoleName(DEFAULT_ROLE);
         log.debug("New customerUuid {} saved but not commit, wait for auth-svc response", customer.getCustomerUuid());
         webClient.post()
                 .uri(ACCOUNT_PATH)
@@ -78,7 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
         Assert.notNull(authentication,"Authentication cannot be null");
         if(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken){
             Jwt jwt = jwtAuthenticationToken.getToken();
-            UUID customerUuid = UUID.fromString(jwt.getClaimAsString("X-Account-Uuid"));
+            UUID customerUuid = UUID.fromString(jwt.getSubject());
             Customer customer = customerRepository.findById(customerUuid)
                     .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
             CustomerDto customerDto = customerMapper.mapToDto(customer);

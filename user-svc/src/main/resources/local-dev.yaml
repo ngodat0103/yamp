@@ -16,7 +16,7 @@ spring:
           user-service:
             client-id: user-service
             client-secret: "{cipher}e256a67c78a19d92012597e4883a0f2c26b8919abe197a6e070dae506935262d3ae6bc840d9697adb7e038cd36751954"
-            scope: auth-svc.write
+            scope: auth-service.write
             provider: auth-service-internal
             client-name: User Service
             client-authentication-method: client_secret_basic

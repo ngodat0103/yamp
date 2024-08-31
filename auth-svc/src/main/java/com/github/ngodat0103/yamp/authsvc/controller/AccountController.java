@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequestMapping(value = "/accounts",produces = "application/json")
 @RestController
 @SecurityRequirement(name = "oauth2")
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN','SCOPE_auth-svc.write')")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN','SCOPE_auth-service.write')")
 //@Hidden
 public class AccountController {
     private final AccountService accountService;

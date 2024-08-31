@@ -7,8 +7,9 @@ import java.util.UUID;
 @Data
 
 public class AccountRegisterDto {
+    private UUID accountUuid;
     private String username;
     private String email;
     private String password;
-    private UUID accountUuid;
+    private String roleName;
 }

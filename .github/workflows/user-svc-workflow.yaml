@@ -40,9 +40,7 @@ jobs:
     steps:
       - name: Init sql
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
+          PGPASSWORD: postgres
           INIT_SQL: ${{ secrets.INIT_SQL }}
         run: |
           echo $INIT_SQL > /tmp/init.sql

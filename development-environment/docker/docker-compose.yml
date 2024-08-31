@@ -1,4 +1,13 @@
 services:
+  share-db:
+    container_name: share-db
+    image: postgres:16.3-bullseye
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
   redis-svc:
     networks:
       - yamp-network

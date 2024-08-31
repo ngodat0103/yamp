@@ -1,5 +1,6 @@
 on:
   push:
+  pull_request:
 #    branches:
 #      - "features/**"
 #    paths:
@@ -10,14 +11,14 @@ on:
 #    paths:
 #      - "user-svc/**"
 jobs:
-  push:
-    name: user-svc-push
-    if: github.event_name == 'push'
-    uses: ./.github/workflows/ci-push-workflow-call.yaml
-    with:
-      SERVICE_NAME: user-svc
-      SERVICE_PORT: 8002
-    secrets: inherit
+#  push:
+#    name: user-svc-push
+#    if: github.event_name == 'push'
+#    uses: ./.github/workflows/ci-push-workflow-call.yaml
+#    with:
+#      SERVICE_NAME: user-svc
+#      SERVICE_PORT: 8002
+#    secrets: inherit
 
   pr-integration-test:
     name: user-svc-integration-test

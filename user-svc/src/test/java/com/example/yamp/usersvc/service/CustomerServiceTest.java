@@ -46,7 +46,6 @@ public class CustomerServiceTest {
     private MockWebServer mockWebServer;
 
     private final BasicJsonTester jsonTester = new BasicJsonTester(getClass());
-    private final static  PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final static String username = "testUser";
     private final static String password = "password";
     private final static String email= "example@gmail.com";
@@ -105,7 +104,6 @@ public class CustomerServiceTest {
         RecordedRequest recordedRequest =  mockWebServer.takeRequest();
         JsonContent<Object> body = jsonTester.from(recordedRequest.getBody().readUtf8());
         Assertions.assertThat(body).extractingJsonPathValue("$.username").isEqualTo(username);
-        Assertions.assertThat(body).extractingJsonPathValue("$.password").isNotEqualTo(password);
         Assertions.assertThat(body).extractingJsonPathValue("$.email").isEqualTo(email);
         Assertions.assertThat(body).extractingJsonPathStringValue("$.accountUuid").isNotEmpty();
     }

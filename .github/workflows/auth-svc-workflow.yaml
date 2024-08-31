@@ -20,11 +20,55 @@ jobs:
       SERVICE_PORT: 8001
     secrets: inherit
 
-  pr:
-    name: auth-svc-pr
+  pr-integration-test:
+    name: auth-svc-integration-test
     if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    services:
+      redis-svc:
+        image: redis:6.2.6
+        ports:
+          - 6379:6379
+      share-db:
+        image: postgres:16.3-bullseye
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+    steps:
+      - name: Init sql
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+          INIT_SQL: ${{ secrets.INIT_SQL }}
+        run: | 
+          echo $INIT_SQL > /tmp/init.sql
+          docker exec -i share-db psql -U $POSTGRES_USER -d $POSTGRES_DB < /tmp/init.sql
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Cache Maven packages
+        uses: actions/cache@v4.0.2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-v1-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2-v1-
+      - name: Running integration test
+        working-directory: ${{inputs.SERVICE_NAME}}
+        env:
+          ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
+        run: mvn test -Dtest=*IntegrationTest
+
+
+  pr-push-image:
+    name: auth-svc-pr-push-image
+    if: github.event_name == 'pull_request'
+    needs: [pr-integration-test]
     uses: ./.github/workflows/ci-pr-workflow-call.yaml
     with:
       SERVICE_NAME: auth-svc
       SERVICE_PORT: 8001
-    secrets: inherit

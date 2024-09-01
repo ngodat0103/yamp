@@ -1,7 +1,7 @@
 name: Deployment workflow
 on:
   release:
-    types: [published,released,edited]
+    types: [published,released,edited,created]
 jobs:
   get-current-version:
     name: Get current tag version

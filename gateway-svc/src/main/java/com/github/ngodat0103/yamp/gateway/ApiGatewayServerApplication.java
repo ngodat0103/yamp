@@ -10,7 +10,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 public class ApiGatewayServerApplication {
 	public static void main(String[] args) {
 
-
+//fdsf
 		SpringApplication.run(ApiGatewayServerApplication.class, args);
 
     }

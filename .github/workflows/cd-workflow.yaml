@@ -50,7 +50,7 @@ jobs:
       NEXT_VERSION: ${{ needs.get-new-version.outputs.next-version }}
   aggregator-svc-deployment:
     needs: [gateway-svc-deployment, auth-svc-deployment, user-svc-deployment, get-new-version]
-    name: "Aggregation branches and create pull request"
+    name: "Updating deployment repo and create pull request"
     env:
       NEXT_VERSION: ${{ needs.get-new-version.outputs.next-version }}
       STAGING_BRANCH_NAME: staging-${{needs.get-new-version.outputs.next-version}}
@@ -65,39 +65,24 @@ jobs:
       - name: Create a $STAGING_BRANCH_NAME branch
         working-directory: yamp-deployment
         run: git checkout -b $STAGING_BRANCH_NAME
-      - name: Merge sub branches
+      - name: change version to $NEXT_VERSION
+        working-directory: yamp-deployment/yamp
+        run: |
+          sed -i "0,/version:.*/s/version:.*/version: $NEXT_VERSION/" Chart.yaml
+          sed -i "s|appVersion:.*|appVersion: $NEXT_VERSION|" Chart.yaml
+          helm package . --destination charts/
+          helm repo index . --merge index.yaml
+      - name: Commit changes and push changes
         working-directory: yamp-deployment
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git merge --no-edit origin/staging-gateway-svc-$NEXT_VERSION
-          git merge --no-edit origin/staging-auth-svc-$NEXT_VERSION
-          git merge --no-edit origin/staging-user-svc-$NEXT_VERSION
-      - name: Commit and push changes
-        working-directory: yamp-deployment
-        run: git push --set-upstream origin staging-${{needs.get-new-version.outputs.next-version}}
-      - name: Create a PR
+          git config --global user.name "github-actions[bot]" 
+          git add .
+          git commit -m "Update version to $NEXT_VERSION"
+          git push -u origin $STAGING_BRANCH_NAME
+      - name: Create a PR for $STAGING_BRANCH_NAME
         working-directory: yamp-deployment
         env:
           GITHUB_TOKEN: ${{secrets.PET_TOKEN}}
         run: |
           gh pr create --base master --head $STAGING_BRANCH_NAME --title "[bot]: Update version to $NEXT_VERSION" --body "Update version to $NEXT_VERSION"
-      - name: Clean up sub branches
-        working-directory: yamp-deployment
-        run: |
-          git push origin --delete staging-gateway-svc-${{ needs.get-new-version.outputs.next-version }}
-          git push origin --delete staging-auth-svc-${{ needs.get-new-version.outputs.next-version }}
-          git push origin --delete staging-user-svc-${{ needs.get-new-version.outputs.next-version }}
-#  clean-up-packages:
-#    needs: [aggregator-svc-deployment]
-#    name: Clean up packages
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Clean up untagged package_name
-#        uses: Chizkiyahu/delete-untagged-ghcr-action@v4.0.1
-#        with:
-#          token: ${{secrets.GITHUB_TOKEN}}
-#          repository: ngodat0103/yamp
-#          owner_type: user
-
-          

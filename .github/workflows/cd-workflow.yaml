@@ -1,7 +1,7 @@
 name: Deployment workflow
 on:
   release:
-    types: [published,released,edited,created]
+    types: [created]
 jobs:
   get-current-version:
     name: Get current tag version
@@ -78,7 +78,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]" 
           git add .
-          git commit -m "Update version to $NEXT_VERSION"
+          git commit -m "Update version to $VERSION"
           git push -u origin $STAGING_BRANCH_NAME
       - name: Create a PR for $STAGING_BRANCH_NAME
         working-directory: yamp-deployment

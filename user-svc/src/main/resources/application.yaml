@@ -38,7 +38,7 @@ springdoc:
     path: /ui-docs
   open-api:
     info:
-      version: 1.0.0
+      version: ${APP_VERSION}
       title: User Service
       description: User Service API
       contact:

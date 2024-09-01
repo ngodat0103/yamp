@@ -66,7 +66,7 @@ logging:
     com.github.ngodat0103.yamp.gateway: DEBUG
     org.springframework.security: DEBUG
 server:
-  port: 80
+  port: 8000
 management:
   endpoints:
     web:

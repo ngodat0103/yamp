@@ -1,16 +1,14 @@
 on:
   push:
+    branches:
+      - "feature/**"
+    paths:
+      - "auth-svc/**"
   pull_request:
-#  push:
-#    branches:
-#      - "feature/**"
-#    paths:
-#      - "auth-svc/**"
-#  pull_request:
-#    branches:
-#      - "feature/**"
-#    paths:
-#      - "auth-svc/**"
+    branches:
+      - "feature/**"
+    paths:
+      - "auth-svc/**"
 
 jobs:
   push:
@@ -54,8 +52,6 @@ jobs:
         env:
           ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
         run: mvn test -q -Dtest=*IntegrationTest
-
-
   pr-push-image:
     name: auth-svc-pr-push-image
     if: github.event_name == 'pull_request'

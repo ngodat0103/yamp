@@ -23,8 +23,7 @@ EXPOSE ${SERVICE_PORT}
 HEALTHCHECK --interval=30s --timeout=3s --retries=1 CMD wget -qO- http://localhost:${SERVICE_PORT}/actuator/health/ | grep UP || exit 1
 LABEL org.opencontainers.image.source=https://github.com/ngodat0103/yamp
 LABEL  org.opencontainers.image.description="YAMP - Yet Another Microservice Project"
-LABEL  org.opencontainers.image.source=https://github.com/NGODAT0103/YAMP
+LABEL  org.opencontainers.image.source=https://github.com/ngodat0103/yamp
 LABEL  org.opencontainers.image.title=YAMP
-LABEL  org.opencontainers.image.url=https://github.com/NGODAT0103/YAMP
-LABEL  org.opencontainers.image.version=pr-26
+LABEL  org.opencontainers.image.url=https://github.com/ngodat0103/yamp
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

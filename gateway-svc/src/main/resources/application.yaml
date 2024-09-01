@@ -15,6 +15,7 @@ spring:
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
       - "optional:pre-proc.yaml"
+      - "optional:proc.yaml "
   application:
     name: gateway-svc
   security:
@@ -65,13 +66,22 @@ logging:
     com.github.ngodat0103.yamp.gateway: DEBUG
     org.springframework.security: DEBUG
 server:
-  port: 8000
+  port: 80
 management:
   endpoints:
     web:
       exposure:
-        include: gateway,circuitbreakers
-  endpoint:
-    gateway:
+        include: "*"
+  health:
+    readiness-state:
       enabled: true
-
+    liveness-state:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true

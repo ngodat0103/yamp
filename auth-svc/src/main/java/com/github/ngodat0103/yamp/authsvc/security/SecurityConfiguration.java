@@ -1,7 +1,7 @@
 package com.github.ngodat0103.yamp.authsvc.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.server.resource.authentication.Delega
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import java.util.HashMap;
@@ -54,16 +56,22 @@ public class SecurityConfiguration {
     SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
-        http.securityMatcher("/accounts/**","/roles/**","/ui-docs/**","/api-docs/**");
+        http.securityMatcher("/accounts/**","/roles/**","/ui-docs/**","/api-docs/**","/actuator/**");
         http.oauth2ResourceServer(resource -> resource.jwt(jwt -> jwt.jwtAuthenticationConverter(getJwtAuthenticationConverter())));
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/ui-docs/**").permitAll()
                 .requestMatchers("/api-docs/**").permitAll()
+                .requestMatchers("/actuator/prometheus").permitAll()
+                .requestMatchers("/actuator/health/readiness").permitAll()
+                .requestMatchers("/actuator/health/liveness").permitAll()
+                .requestMatchers("/actuator/**").hasAnyRole("ACTUATOR","ADMIN")
                 .anyRequest().authenticated()
         );
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
+
+
 
 
     @Bean

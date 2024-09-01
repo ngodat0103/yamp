@@ -8,6 +8,7 @@ spring:
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
       - "optional:pre-proc.yaml"
+      - "optional:proc.yaml"
   application:
     name: auth-svc
   data:
@@ -45,3 +46,24 @@ logging:
     com.github.ngodat0103.yamp.authsvc.controller: DEBUG
   pattern:
     level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true

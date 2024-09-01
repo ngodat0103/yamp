@@ -29,6 +29,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/actuator/health/readiness").permitAll()
                 .requestMatchers("/actuator/health/liveness").permitAll()
                 .requestMatchers("/actuator/**").hasAnyRole("ACTUATOR","ADMIN")
+                .requestMatchers("/swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
         );
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

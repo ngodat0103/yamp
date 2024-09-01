@@ -50,7 +50,7 @@ jobs:
           key: ${{ runner.os }}-m2-v1-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2-v1-
       - name: Running integration test
-        working-directory: ${{inputs.SERVICE_NAME}}
+        working-directory: auth-svc
         env:
           ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
         run: mvn test -Dtest=*IntegrationTest

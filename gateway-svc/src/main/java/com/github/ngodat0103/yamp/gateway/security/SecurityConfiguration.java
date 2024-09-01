@@ -1,45 +1,55 @@
 package com.github.ngodat0103.yamp.gateway.security;
 import com.github.ngodat0103.yamp.gateway.security.filter.AddJwtHeaderFilter;
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.commons.util.InetUtilsProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
 @Configuration
 @EnableWebFlux
 public class SecurityConfiguration {
 
+    @Bean
+    SecurityWebFilterChain actuatorFilterChain(ServerHttpSecurity http) {
+        http.securityMatcher(new PathPatternParserServerWebExchangeMatcher("/actuator/health/**"));
+        http.authorizeExchange(exchange -> exchange.anyExchange().permitAll());
+        return http.build();
+    }
 
     @Bean
-    SecurityWebFilterChain httpSecurity(ServerHttpSecurity http, ReactiveOAuth2AuthorizedClientService reactiveOAuth2AuthorizedClientService){
+    SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http, ReactiveOAuth2AuthorizedClientService reactiveOAuth2AuthorizedClientService){
         http.cors(ServerHttpSecurity.CorsSpec::disable);
         http.csrf(ServerHttpSecurity.CsrfSpec::disable);
+        ServerWebExchangeMatcher apiMatcher = new PathPatternParserServerWebExchangeMatcher("/api/v1/**");
+        http.securityMatcher(apiMatcher);
         http.authorizeExchange(exchange ->exchange
                         .pathMatchers("/favicon.ico").permitAll()
                         .pathMatchers("/api/v1/auth/oauth2/authorize").permitAll()
                         .pathMatchers("/api/v1/auth/login","/api/v1/auth/logout").permitAll()
                         .pathMatchers("/api/v1/auth/oauth2/token").permitAll()
-                        .pathMatchers("/login/oauth2/code/gateway-service").permitAll()
+//                        .pathMatchers("/login/oauth2/code/gateway-service").permitAll()
                         .pathMatchers("/api/v1/user/get-me").authenticated()
                         .pathMatchers("/api/v1/user/test-endpoint").authenticated()
-                        .pathMatchers("/actuator/**").authenticated()
-                        .pathMatchers("/api/v1/auth/account/**").denyAll()
-                        .pathMatchers("/api/v1/auth/account").denyAll()
+                        .pathMatchers("/actuator/**").denyAll()
+                        .pathMatchers("/api/v1/auth/actuator/**").denyAll()
+                        .pathMatchers("/api/v1/auth/accounts/roles").authenticated()
+                        .pathMatchers(HttpMethod.POST,"/api/v1/auth/oauth2/authorize").permitAll()
+                        .pathMatchers(HttpMethod.POST,"/api/v1/auth/oauth2/token").permitAll()
                         .anyExchange().permitAll()
-
         );
-
 //        http.oauth2Client(Customizer.withDefaults());
 //        http.oauth2Login(Customizer.withDefaults());
-//
 //        http.logout(logout -> logout.logoutUrl("/api/v1/auth/logout"));
-
-
         http.oauth2ResourceServer(resource-> resource.jwt(Customizer.withDefaults()));
 
         http.addFilterAfter(new AddJwtHeaderFilter(reactiveOAuth2AuthorizedClientService), SecurityWebFiltersOrder.AUTHORIZATION);
@@ -48,23 +58,6 @@ public class SecurityConfiguration {
         http.securityContextRepository(webSessionServerSecurityContextRepository);
         return http.build();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -3,10 +3,8 @@ spring:
     activate:
       on-profile: local-dev
   cloud:
-    gateway:
-      httpclient:
-        connect-timeout: 1000
-        response-timeout: 5s
+    inetutils:
+      default-hostname: localhost
 springdoc:
   api-docs:
     path: /api-docs

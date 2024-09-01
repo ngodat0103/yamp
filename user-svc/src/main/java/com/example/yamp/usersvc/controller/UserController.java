@@ -33,7 +33,6 @@ public class UserController {
     @GetMapping( "/get-me")
     public CustomerDto getMe() throws AccountNotFoundException {
         return customerService.getCustomer();
-
     }
 
 

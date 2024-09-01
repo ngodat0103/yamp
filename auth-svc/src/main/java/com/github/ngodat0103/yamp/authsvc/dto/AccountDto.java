@@ -4,11 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
+
 
 @Data
 @AllArgsConstructor
@@ -25,6 +23,11 @@ public class AccountDto {
     @NotNull (message = "Password is required")
     @Length (min = 8, message = "Password must be at least 8 characters")
     private String password;
+    @NotNull (message = "Email is required")
     @Email ( message =  "Email is not valid")
     private String email;
+
+
+    private String roleName;
+
 }

@@ -8,6 +8,7 @@ spring:
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
       - "optional:pre-proc.yaml"
+      - "optional:proc.yaml"
   application:
     name: user-svc
   security:
@@ -44,3 +45,24 @@ springdoc:
         name: NgoDat0103
         url: https://github.com/NGODAT0103
         email: 21521935@gm.uit.edu.vn
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true

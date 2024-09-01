@@ -10,7 +10,7 @@ on:
         description: "name of the service to trigger the CD"
         required: true
         type: string
-      NEXT_VERSION:
+      VERSION:
         description: "next version of the service"
         required: true
         type: string
@@ -46,7 +46,7 @@ jobs:
           context: ${{inputs.SERVICE_NAME}}
           file: Dockerfile-For-CI
           push: true
-          tags: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}:${{inputs.NEXT_VERSION}}
+          tags: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}:${{inputs.VERSION}}
           labels: ${{steps.meta.outputs.labels}}
           cache-from: type=gha
           cache-to: type=gha,mode=max

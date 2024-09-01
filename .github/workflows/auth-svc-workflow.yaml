@@ -22,7 +22,7 @@ jobs:
       SERVICE_PORT: 8001
     secrets: inherit
   pr-integration-test:
-    name: user-svc-integration-test
+    name: auth-svc-integration-test
     if: github.event_name == 'pull_request'
     runs-on: cloud-uit
     services:
@@ -31,13 +31,13 @@ jobs:
       share-db:
         image: postgres:16.3-bullseye
         volumes:
-          - /home/github-runner/yamp-integration:/docker-entrypoint-initdb.d/
+          - /home/github-runner/yamp-integration/init.sql:/docker-entrypoint-initdb.d/init.sql
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
     container:
-      image: maven:3.9.8-eclipse-temurin-17-alpine
+      image: maven:3.8.4-openjdk-17
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
           key: ${{ runner.os }}-m2-v1-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2-v1-
       - name: Running integration test
-        working-directory: auth-svc
+        working-directory: ${{inputs.SERVICE_NAME}}
         env:
           ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
         run: mvn test -Dtest=*IntegrationTest

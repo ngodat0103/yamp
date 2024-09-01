@@ -9,3 +9,4 @@
 /example/init/users-and-database.sql
 /draft/
 /example/kubernetes/ghcr-secret.yaml
+/development-environment/docker/init.sql

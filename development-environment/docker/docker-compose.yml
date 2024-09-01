@@ -2,55 +2,71 @@ services:
   share-db:
     container_name: share-db
     image: postgres:16.3-bullseye
-    ports:
-      - 5432:5432
+#    ports:
+#      - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - yamp-network
+
   redis-svc:
     networks:
       - yamp-network
     image: redis:6.2.5
     ports:
       - 6379:6379
-  prometheus:
-    image: prom/prometheus:v2.50.1
-    network_mode: host
-    ports:
-      - "9090:9090"
-    volumes:
-      - ../observation-and-monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-  tempo:
-    network_mode: host
-    image: grafana/tempo:latest
-    command: -config.file=/etc/tempo/config.yaml
-    volumes:
-      - ../observation-and-monitoring/tempo/config.yaml:/etc/tempo/config.yaml
-    ports:
-      - 3100:3100
-      - 4317:4317
-  grafana:
-    network_mode: host
-    image: grafana/grafana:latest
+  auth-svc:
+    container_name: auth-svc
+    image: ghcr.io/ngodat0103/yamp/auth-svc:pr-latest
     environment:
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        /run.sh
-    ports:
-      - "3000:3000"
-    volumes:
-      - ../observation-and-monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
-    healthcheck:
-      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      SPRING_PROFILES_ACTIVE: demo
+    depends_on:
+      - share-db
+      - redis-svc
+    networks:
+      - yamp-network
+
+#  prometheus:
+#    image: prom/prometheus:v2.50.1
+#    network_mode: host
+#    ports:
+#      - "9090:9090"
+#    volumes:
+#      - ../observation-and-monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+#  tempo:
+#    network_mode: host
+#    image: grafana/tempo:latest
+#    command: -config.file=/etc/tempo/config.yaml
+#    volumes:
+#      - ../observation-and-monitoring/tempo/config.yaml:/etc/tempo/config.yaml
+#    ports:
+#      - 3100:3100
+#      - 4317:4317
+#  grafana:
+#    network_mode: host
+#    image: grafana/grafana:latest
+#    environment:
+#      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+#      - GF_AUTH_ANONYMOUS_ENABLED=true
+#      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+#    entrypoint:
+#      - sh
+#      - -euc
+#      - |
+#        /run.sh
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      - ../observation-and-monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+#    healthcheck:
+#      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
 
 networks:
   yamp-network:

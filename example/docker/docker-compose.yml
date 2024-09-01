@@ -21,7 +21,7 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ../init/users-and-database.sql:/docker-entrypoint-initdb.d/users-and-database.sql
+      - ../init/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   prometheus:
     container_name: prometheus

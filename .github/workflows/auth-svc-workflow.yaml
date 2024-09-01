@@ -53,7 +53,10 @@ jobs:
         working-directory: ${{inputs.SERVICE_NAME}}
         env:
           ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
-        run: mvn test -Dtest=*IntegrationTest
+        run: |
+          pwd
+          ls -la
+          mvn test -Dtest=*IntegrationTest
 
 
   pr-push-image:

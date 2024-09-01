@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://share-db:5432/test
-    username: 'test'
-    password: 'test'
+    url: jdbc:postgresql://share-db:5432/auth-svc-db
+    username: 'auth-svc-user'
+    password: '{cipher}e4b0a2a815e34f4e3ad39d30b1fbdffd994ce5695fb5976b370b9965d8d117f548b1303da957eb20c4865c3c3c0276b0'
   config:
     activate:
       on-profile: integration-test

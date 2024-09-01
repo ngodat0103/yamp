@@ -11,7 +11,7 @@ on:
       - "user-svc/**"
 jobs:
   push:
-    name: user-svc-push
+    name: user-svc-commit
     if: github.event_name == 'push'
     uses: ./.github/workflows/ci-push-workflow-call.yaml
     with:

@@ -14,6 +14,7 @@ services:
       - yamp-network
 
   redis-svc:
+    container_name: redis-svc
     networks:
       - yamp-network
     image: redis:6.2.5

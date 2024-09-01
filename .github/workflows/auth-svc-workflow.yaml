@@ -53,7 +53,7 @@ jobs:
         working-directory: auth-svc
         env:
           ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
-        run: mvn test -Dtest=*IntegrationTest
+        run: mvn test -q -Dtest=*IntegrationTest
 
 
   pr-push-image:

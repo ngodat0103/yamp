@@ -20,46 +20,43 @@ jobs:
 #      SERVICE_PORT: 8002
 #    secrets: inherit
 
-  pr-integration-test:
-    name: user-svc-integration-test
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    services:
-      redis-svc:
-          image: redis:6.2.6
-          ports:
-          - 6379:6379
-      share-db:
-        ports:
-          - 5432:5432
-        image: postgres:16.3-bullseye
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-    steps:
-      - name: Init sql
-        env:
-          PGPASSWORD: postgres
-          INIT_SQL: ${{ secrets.INIT_SQL }}
-        run: |
-          echo $INIT_SQL > /tmp/init.sql
-          docker exec -i share-db psql -U postgres -d postgres < /tmp/init.sql
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - name: Cache Maven packages
-        uses: actions/cache@v4.0.2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-v1-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2-v1-
-      - name: Running integration test
-        working-directory: ${{inputs.SERVICE_NAME}}
-        env:
-          ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
-        run: mvn test -Dtest=*IntegrationTest
+#  pr-integration-test:
+#    name: user-svc-integration-test
+#    if: github.event_name == 'pull_request'
+#    runs-on: cloud-uit
+#    services:
+#      redis-svc:
+#          image: redis:6.2.6
+#          ports:
+#          - 6379:6379
+#      share-db:
+#        ports:
+#          - 5432:5432
+#        image: postgres:16.3-bullseye
+#        volumes:
+#          - /home/github-runner/yamp-integration/init.sql:/docker-entrypoint-initdb.d/init.sql
+#        env:
+#          POSTGRES_USER: postgres
+#          POSTGRES_PASSWORD: postgres
+#          POSTGRES_DB: postgres
+#    container:
+#      image: maven:3.8.4-openjdk-17
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 1
+#      - name: Cache Maven packages
+#        uses: actions/cache@v4.0.2
+#        with:
+#          path: ~/.m2/repository
+#          key: ${{ runner.os }}-m2-v1-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: ${{ runner.os }}-m2-v1-
+#      - name: Running integration test
+#        working-directory: ${{inputs.SERVICE_NAME}}
+#        env:
+#          ENCRYPT_KEY: ${{secrets.ENCRYPT_KEY}}
+#        run: mvn test -Dtest=*IntegrationTest
 
   pr-push-image:
     name: user-svc-pr

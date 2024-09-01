@@ -1,14 +1,16 @@
 on:
   push:
-    branches:
-      - "feature/**"
-    paths:
-      - "auth-svc/**"
   pull_request:
-    branches:
-      - "feature/**"
-    paths:
-      - "auth-svc/**"
+#  push:
+#    branches:
+#      - "feature/**"
+#    paths:
+#      - "auth-svc/**"
+#  pull_request:
+#    branches:
+#      - "feature/**"
+#    paths:
+#      - "auth-svc/**"
 
 jobs:
   push:
@@ -19,34 +21,28 @@ jobs:
       SERVICE_NAME: auth-svc
       SERVICE_PORT: 8001
     secrets: inherit
-
   pr-integration-test:
-    name: auth-svc-integration-test
+    name: user-svc-integration-test
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: cloud-uit
     services:
       redis-svc:
         image: redis:6.2.6
         ports:
           - 6379:6379
       share-db:
-        image: postgres:16.3-bullseye
         ports:
           - 5432:5432
+        image: postgres:16.3-bullseye
+        volumes:
+          - /home/github-runner/yamp-integration/init.sql:/docker-entrypoint-initdb.d/init.sql
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
+    container:
+      image: maven:3.8.4-openjdk-17
     steps:
-      - name: Init sql
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-          INIT_SQL: ${{ secrets.INIT_SQL }}
-        run: | 
-          echo $INIT_SQL > /tmp/init.sql
-          docker exec -i share-db psql -U $POSTGRES_USER -d $POSTGRES_DB < /tmp/init.sql
       - name: Checkout
         uses: actions/checkout@v4
         with:

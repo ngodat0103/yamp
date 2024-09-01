@@ -53,32 +53,19 @@ jobs:
           build-args: |
             SERVICE_NAME=${{inputs.SERVICE_NAME}}
             SERVICE_PORT=${{inputs.SERVICE_PORT}}
-  change-deployment-repo:
+  clean-up-packages:
     needs: [build-ready-container]
-    name: Update deployment repo manifest
+    name: Clean up old packages, and untag old images
     runs-on: ubuntu-latest
-    env:
-      NEXT_VERSION: ${{inputs.NEXT_VERSION}}
     steps:
-      - name: Checkout deployment repository
-        uses: actions/checkout@v4
+      - name: Clean up untagged package_name
+        uses: actions/delete-package-versions@v5.0.0
         with:
-          ref: master
-          repository: ngodat0103/yamp-deployment
-          token: ${{secrets.PET_TOKEN}}
-      - name: Create a staging branch
-        run: git checkout -b staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
-      - name: update image manifest to use new version
-        working-directory: yamp/${{inputs.SERVICE_NAME}}
-        run: |
-          sed -i "s|image:.*|image: ghcr.io/${{github.repository_owner}}/yamp/${{inputs.SERVICE_NAME}}:${NEXT_VERSION}|" ${{inputs.SERVICE_NAME}}-deployment.yaml
-      - name: Commit and push changes
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-          git add .
-          git commit -m "Update image version for ${{inputs.SERVICE_NAME}} to ${NEXT_VERSION}"
-          git push --set-upstream origin staging-${{inputs.SERVICE_NAME}}-${NEXT_VERSION}
-      
+          token: ${{secrets.GITHUB_TOKEN}}
+          package-name: yamp/${{inputs.SERVICE_NAME}}
+          package-type: container
+          delete-only-untagged-versions: true
+          min-versions-to-keep: 10
+
 
 

@@ -37,7 +37,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
     container:
-      image: maven:3.8.4-openjdk-17
+      image: maven:3.9.8-eclipse-temurin-17-alpine
     steps:
       - name: Checkout
         uses: actions/checkout@v4

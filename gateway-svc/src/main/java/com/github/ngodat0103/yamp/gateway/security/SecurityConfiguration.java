@@ -1,7 +1,5 @@
 package com.github.ngodat0103.yamp.gateway.security;
 import com.github.ngodat0103.yamp.gateway.security.filter.AddJwtHeaderFilter;
-import org.springframework.cloud.commons.util.InetUtils;
-import org.springframework.cloud.commons.util.InetUtilsProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,6 +9,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.web.reactive.config.EnableWebFlux;
@@ -25,6 +24,18 @@ public class SecurityConfiguration {
         http.authorizeExchange(exchange -> exchange.anyExchange().permitAll());
         return http.build();
     }
+    @Bean
+    SecurityWebFilterChain docsFilterChain(ServerHttpSecurity httpSecurity){
+        OrServerWebExchangeMatcher orServerWebExchangeMatcher = new OrServerWebExchangeMatcher(
+                new PathPatternParserServerWebExchangeMatcher("/ui-docs/**"),
+                new PathPatternParserServerWebExchangeMatcher("/api-docs/**")
+        );
+        httpSecurity.securityMatcher(orServerWebExchangeMatcher);
+        httpSecurity.authorizeExchange(exchange -> exchange.anyExchange().permitAll());
+        return httpSecurity.build();
+    }
+
+
 
     @Bean
     SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http, ReactiveOAuth2AuthorizedClientService reactiveOAuth2AuthorizedClientService){

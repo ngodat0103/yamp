@@ -68,7 +68,6 @@ jobs:
       - name: change version to $VERSION
         working-directory: yamp-deployment/yamp
         run: |
-          sed -i "0,/version:.*/s/version:.*/version: $VERSION/" Chart.yaml
           sed -i "s|appVersion:.*|appVersion: $VERSION|" Chart.yaml
           helm package . --destination charts/
           helm repo index . --merge index.yaml

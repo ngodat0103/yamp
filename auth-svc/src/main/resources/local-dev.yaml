@@ -53,4 +53,5 @@ management:
       show-details: always
 logging:
   level:
-    org.springframework.security: DEBUG
+    com.github.ngodat0103.yamp.authsvc.service: DEBUG
+    com.github.ngodat0103.yamp.authsvc.controller: DEBUG

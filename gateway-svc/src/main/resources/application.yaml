@@ -28,6 +28,10 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: grafana
+          uri: http://grafana.monitoring.svc.cluster.local:3000
+          predicates:
+              - Path=/grafana/**
         - id: auth-svc
           uri: http://auth-svc:8001
           predicates:
@@ -62,9 +66,6 @@ spring:
 logging:
   pattern:
     level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
-  level:
-    com.github.ngodat0103.yamp.gateway: DEBUG
-    org.springframework.security: DEBUG
 server:
   port: 8000
 management:

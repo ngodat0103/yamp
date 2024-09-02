@@ -57,11 +57,11 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
 logging:
   level:
-    org.springframework.security: DEBUG
-    com.example.userservice.security: DEBUG
-    com.example.userservice.exception: ERROR
+    com.example.userservice.controller: DEBUG
     com.example.userservice.service: DEBUG
   pattern:
     level:  "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

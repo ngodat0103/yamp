@@ -2,13 +2,13 @@ apiVersion: 1
 deleteDatasources:
   - name: Prometheus
   - name: Tempo
-#  - name: Loki
+  - name: Loki
 
 datasources:
   - name: Prometheus
     type: prometheus
     uid: prometheus
-    url: http://prometheus:9090
+    url: http://prometheus.monitoring.svc.cluster.local:9090
     access: proxy
     orgId: 1
     basicAuth: false
@@ -20,7 +20,7 @@ datasources:
   - name: Tempo
     type: tempo
     uid: tempo
-    url: http://tempo:3100
+    url: http://tempo.monitoring.svc.cluster.local:3100
     access: proxy
     orgId: 1
     basicAuth: false

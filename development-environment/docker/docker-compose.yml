@@ -37,13 +37,13 @@ services:
 #    ports:
 #      - "9090:9090"
 #    volumes:
-#      - ../observation-and-monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+#      - ../observation-and-monitoring/prometheus/datasources.yaml:/etc/prometheus/datasources.yaml
 #  tempo:
 #    network_mode: host
 #    image: grafana/tempo:latest
-#    command: -config.file=/etc/tempo/config.yaml
+#    command: -config.file=/etc/tempo/datasources.yaml
 #    volumes:
-#      - ../observation-and-monitoring/tempo/config.yaml:/etc/tempo/config.yaml
+#      - ../observation-and-monitoring/tempo/datasources.yaml:/etc/tempo/datasources.yaml
 #    ports:
 #      - 3100:3100
 #      - 4317:4317
@@ -62,7 +62,7 @@ services:
 #    ports:
 #      - "3000:3000"
 #    volumes:
-#      - ../observation-and-monitoring/grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+#      - ../observation-and-monitoring/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
 #    healthcheck:
 #      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
 #      interval: 10s

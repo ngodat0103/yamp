@@ -20,8 +20,11 @@ public class SecurityConfiguration {
 
     @Bean
     SecurityWebFilterChain actuatorFilterChain(ServerHttpSecurity http) {
-        http.securityMatcher(new PathPatternParserServerWebExchangeMatcher("/actuator/health/**"));
-        http.authorizeExchange(exchange -> exchange.anyExchange().permitAll());
+        http.securityMatcher(new PathPatternParserServerWebExchangeMatcher("/actuator/**"));
+        http.authorizeExchange(exchange -> exchange
+                .pathMatchers("/actuator/health/liveness","/actuator/health/readiness").permitAll()
+                .pathMatchers("/actuator/prometheus").permitAll()
+                .anyExchange().hasRole("ACTUATOR_ADMIN"));
         return http.build();
     }
     @Bean
@@ -51,7 +54,6 @@ public class SecurityConfiguration {
 //                        .pathMatchers("/login/oauth2/code/gateway-service").permitAll()
                         .pathMatchers("/api/v1/user/get-me").authenticated()
                         .pathMatchers("/api/v1/user/test-endpoint").authenticated()
-                        .pathMatchers("/actuator/**").denyAll()
                         .pathMatchers("/api/v1/auth/actuator/**").denyAll()
                         .pathMatchers("/api/v1/auth/accounts/roles").authenticated()
                         .pathMatchers(HttpMethod.POST,"/api/v1/auth/oauth2/authorize").permitAll()

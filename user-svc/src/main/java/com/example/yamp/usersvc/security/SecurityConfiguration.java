@@ -13,7 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableWebSecurity (debug = true)
+@EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
     @Bean

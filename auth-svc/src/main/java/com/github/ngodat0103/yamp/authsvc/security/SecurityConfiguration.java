@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
 

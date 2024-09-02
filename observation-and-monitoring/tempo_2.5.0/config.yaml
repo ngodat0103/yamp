@@ -5,8 +5,6 @@ distributor:
     otlp:
       protocols:
         grpc:
-        http:
-
 ingester:
   trace_idle_period: 10s
   max_block_bytes: 1_000_000
@@ -22,7 +20,7 @@ storage:
   trace:
     backend: local
     local:
-      path: /tmp/tempo/blocks
+      path: ./data
     pool:
       max_workers: 100
       queue_depth: 10000

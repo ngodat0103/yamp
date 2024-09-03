@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
@@ -16,6 +18,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 
 @Configuration
 @EnableWebFlux
+@EnableWebFluxSecurity
 public class SecurityConfiguration {
 
     @Bean
@@ -28,22 +31,28 @@ public class SecurityConfiguration {
         return http.build();
     }
     @Bean
-    SecurityWebFilterChain docsFilterChain(ServerHttpSecurity httpSecurity){
+    SecurityWebFilterChain docsFilterChain(ServerHttpSecurity http){
         OrServerWebExchangeMatcher orServerWebExchangeMatcher = new OrServerWebExchangeMatcher(
                 new PathPatternParserServerWebExchangeMatcher("/ui-docs/**"),
                 new PathPatternParserServerWebExchangeMatcher("/api-docs/**")
         );
-        httpSecurity.securityMatcher(orServerWebExchangeMatcher);
-        httpSecurity.authorizeExchange(exchange -> exchange.anyExchange().permitAll());
-        return httpSecurity.build();
+        http.securityMatcher(orServerWebExchangeMatcher);
+        http.authorizeExchange(exchange -> exchange.anyExchange().permitAll());
+        return http.build();
     }
 
 
+    @Bean
+    SecurityWebFilterChain grafanaFilterChain(ServerHttpSecurity http){
+        http.cors(ServerHttpSecurity.CorsSpec::disable);
+        http.csrf(ServerHttpSecurity.CsrfSpec::disable);
+        http.securityMatcher(new PathPatternParserServerWebExchangeMatcher("/grafana/**"));
+        http.authorizeExchange(exchange -> exchange.anyExchange().permitAll());
+        return http.build();
+    }
 
     @Bean
     SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http, ReactiveOAuth2AuthorizedClientService reactiveOAuth2AuthorizedClientService){
-        http.cors(ServerHttpSecurity.CorsSpec::disable);
-        http.csrf(ServerHttpSecurity.CsrfSpec::disable);
         ServerWebExchangeMatcher apiMatcher = new PathPatternParserServerWebExchangeMatcher("/api/v1/**");
         http.securityMatcher(apiMatcher);
         http.authorizeExchange(exchange ->exchange

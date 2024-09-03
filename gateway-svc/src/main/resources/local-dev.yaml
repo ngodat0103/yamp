@@ -20,3 +20,6 @@ springdoc:
       - name: "user-svc"
         url: "http://${spring.cloud.inetutils.default-hostname}:${server.port}/api/v1/user/api-docs"
     use-root-path: true
+logging:
+  level:
+    org.springframework.security: DEBUG

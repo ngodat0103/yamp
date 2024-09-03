@@ -32,6 +32,10 @@ spring:
           uri: http://grafana.monitoring.svc.cluster.local:3000
           predicates:
               - Path=/grafana/**
+          filters:
+            - name: SetRequestHostHeader
+              args:
+                host: localhost:8000
         - id: auth-svc
           uri: http://auth-svc:8001
           predicates:

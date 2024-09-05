@@ -18,8 +18,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.github.ngodat0103.yamp.productsvc.security.Util.getAccountUuidFromAuthentication;
-import static com.github.ngodat0103.yamp.productsvc.exception.NotFoundException.throwNotFoundException;
+import static com.github.ngodat0103.yamp.productsvc.Util.getAccountUuidFromAuthentication;
+import static com.github.ngodat0103.yamp.productsvc.Util.throwNotFoundException;
 
 @Service
 @Slf4j
@@ -40,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
         UUID parentUuid = categoryDto.getParentCategoryUuid();
         if(parentUuid!=null && !categoryRepository.existsByParentCategoryUuid(categoryDto.getParentCategoryUuid())){
-            throwNotFoundException(log,"Parent category",parentUuid);
+            throwNotFoundException(log,"Category","parentCategoryUuid",parentUuid);
         }
 
         Category category = categoryMapper.mapToEntity(categoryDto,createBy);

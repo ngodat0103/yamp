@@ -23,6 +23,7 @@ import java.util.Set;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler  {
+
     @Getter
     static class Error{
         private final String detail;

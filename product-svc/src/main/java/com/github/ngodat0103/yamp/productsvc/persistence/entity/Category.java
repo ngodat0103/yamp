@@ -19,18 +19,18 @@ public class Category extends BaseEntity{
     private String slugName;
 
     private String thumbnailUrl;
+    @Column(name = "parent_category_Uuid")
     private UUID parentCategoryUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parentCategoryUuid", insertable = false, updatable = false)
+    @JoinColumn(name = "parent_category_Uuid", insertable = false, updatable = false)
     private Category parentCategory;
     @OneToMany(mappedBy = "parentCategory")
     private Set<Category> subCategories;
 
 
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "uuid")
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "category")
     private Set<Product> productSet;
 
 

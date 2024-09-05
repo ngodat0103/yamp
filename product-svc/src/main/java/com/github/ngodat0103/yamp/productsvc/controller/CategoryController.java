@@ -24,18 +24,18 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping
+    @GetMapping(path = "/all")
     public Set<CategoryDto> getCategory(){
         return categoryService.getAllCategories();
     }
 
-    @GetMapping(path = "/filter")
-    public CategoryDto getCategoryBySlugName(@RequestParam(name = "slugName") String slugName){
+    @GetMapping(path = "/{slugName}")
+    public CategoryDto getCategory(@PathVariable String slugName){
         return categoryService.getCategory(slugName);
     }
 
-    @GetMapping("/{categoryUuid}")
-    public CategoryDto getCategoryByUuid(@PathVariable UUID categoryUuid){
+    @GetMapping
+    public CategoryDto getCategoryByUuid(@RequestParam UUID categoryUuid){
         return categoryService.getCategory(categoryUuid);
     }
 

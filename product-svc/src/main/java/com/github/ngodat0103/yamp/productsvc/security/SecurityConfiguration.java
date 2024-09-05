@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 import java.util.UUID;
@@ -25,6 +26,7 @@ public class SecurityConfiguration {
     @Profile({"pre-prod","prod"})
     SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.addFilterBefore(new PreAuthorizeFilter(), AuthenticationFilter.class);
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(requests -> requests
                 .requestMatchers(HttpMethod.GET,"/ui-docs/**","/api-docs/**","/swagger-ui/**").permitAll()
@@ -43,6 +45,8 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable);
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(requests -> requests.anyRequest().permitAll());
+
+
 
         http.anonymous(anonymous -> {
             String principal = "3fa85f64-5717-4562-b3fc-2c963f66afa6";

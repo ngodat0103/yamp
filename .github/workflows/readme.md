@@ -7,7 +7,7 @@ Run the unit test ->
 Run the integration test -> 
 Build the docker image -> 
 Push the docker image to the docker registry ->
-Update the deployment repository with the new image tag ->  
+Update the deployment repository with the new image tag ->
 Deploy the application to the Kubernetes cluster
 - Support caching, Security scanning, quality check
 - Template for PR and Push

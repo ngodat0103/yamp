@@ -25,4 +25,4 @@ Deploy the application to the Kubernetes cluster
 ![snyk](../../draft/output/snyk.png)
 
 
-# **For more detail about how I deploy this repo in Kubernetes, please refer to the deployment repository [link](https://github.com/ngodat0103/yamp-deployment.git)** 
+# **For more detail about how I deploy this repo in Kubernetes, please refer to the [deployment repository](https://github.com/ngodat0103/yamp-deployment.git)** 

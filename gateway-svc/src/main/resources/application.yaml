@@ -49,6 +49,10 @@ spring:
           uri: http://user-svc:8002
           predicates:
             - Path=/api/v1/user/**
+        - id: product-svc
+          uri: http://product-svc:8003
+          predicates:
+            - Path=/api/v1/products/**
 #          filters:
 #            - name: RequestRateLimiter
 #              args:

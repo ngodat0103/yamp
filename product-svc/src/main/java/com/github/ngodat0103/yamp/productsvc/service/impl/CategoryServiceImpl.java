@@ -6,18 +6,20 @@ import com.github.ngodat0103.yamp.productsvc.exception.NotFoundException;
 import com.github.ngodat0103.yamp.productsvc.persistence.entity.Category;
 import com.github.ngodat0103.yamp.productsvc.persistence.repository.CategoryRepository;
 import com.github.ngodat0103.yamp.productsvc.service.CategoryService;
+import com.github.slugify.Slugify;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.github.ngodat0103.yamp.productsvc.security.Util.getAccountUuidFromAuthentication;
+import static com.github.ngodat0103.yamp.productsvc.exception.NotFoundException.throwNotFoundException;
 
 @Service
 @Slf4j
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final Slugify slugify;
 
 
     @Override
@@ -35,8 +38,13 @@ public class CategoryServiceImpl implements CategoryService {
             log.debug("Category already exists, Roll back");
             throw new ConflictException("Category name is already existed");
         }
+        UUID parentUuid = categoryDto.getParentCategoryUuid();
+        if(parentUuid!=null && !categoryRepository.existsByParentCategoryUuid(categoryDto.getParentCategoryUuid())){
+            throwNotFoundException(log,"Parent category",parentUuid);
+        }
 
         Category category = categoryMapper.mapToEntity(categoryDto,createBy);
+        category.setSlugName(slugify.slugify(category.getName()));
 
         log.debug("Creating category: {}", category);
          category =   categoryRepository.save(category);
@@ -46,17 +54,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Transactional
     @Override
-    public CategoryDto updateCategory(CategoryDto categoryDto) {
+    public CategoryDto updateCategory(UUID categoryUuid,CategoryDto categoryDto) {
         UUID updateBy = getAccountUuidFromAuthentication();
-        UUID uuid = categoryDto.getUuid();
         UUID parentCategoryUuid = categoryDto.getParentCategoryUuid();
-
-
         log.debug("Updating category: {}", categoryDto);
         Category currentCategory = categoryRepository
-                .findById(uuid).orElseThrow(() -> new NotFoundException("Category not found"));
-
-
+                .findById(categoryUuid).orElseThrow(() -> new NotFoundException("Category not found"));
         if(parentCategoryUuid!=null){
             if(!categoryRepository.existsById(parentCategoryUuid)){
                 log.debug("Parent category not found, Roll back");
@@ -64,19 +67,34 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
 
-        currentCategory.updateCategory(categoryDto, updateBy);
+
+        currentCategory.setName(categoryDto.getName());
+        currentCategory.setThumbnailUrl(categoryDto.getThumbnailUrl());
+        currentCategory.setParentCategoryUuid(parentCategoryUuid);
+        currentCategory.setSlugName(slugify.slugify(categoryDto.getName()));
+
+        currentCategory.setLastModifiedBy(updateBy);
+        currentCategory.setLastModifiedAt(LocalDateTime.now());
         currentCategory = categoryRepository.save(currentCategory);
+        log.debug("Category updated: {}", currentCategory);
         return categoryMapper.mapToDto(currentCategory);
     }
 
     @Override
     public void deleteCategory(UUID uuid) {
+        if(!categoryRepository.existsById(uuid)){
+            throw new NotFoundException("Category not found");
+        }
         categoryRepository.deleteById(uuid);
     }
 
     @Override
-    public CategoryDto getCategory(String categoryName) {
-        Category category = categoryRepository.findCategoryByName(categoryName).orElseThrow(() -> new NotFoundException("Category not found"));
+    public CategoryDto getCategory(String categorySlugName) {
+        Category category = categoryRepository.findCategoryBySlugName(categorySlugName).orElseThrow(() -> {
+            String message = String.format("Category with slugName %s not found", categorySlugName);
+            log.debug(message);
+            return new NotFoundException(message);
+        });
         return categoryMapper.mapToDto(category);
     }
 
@@ -94,9 +112,4 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
 
-    private UUID getAccountUuidFromAuthentication(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Assert.notNull(authentication,"Authentication object is required");
-        return UUID.fromString(authentication.getName());
-    }
 }

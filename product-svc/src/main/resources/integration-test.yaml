@@ -1,8 +1,12 @@
 spring:
+  config:
+    activate:
+      on-profile: integration-test
   datasource:
     url: jdbc:postgresql://share-db:5432/test
     username: 'test'
     password: 'test'
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: create-drop

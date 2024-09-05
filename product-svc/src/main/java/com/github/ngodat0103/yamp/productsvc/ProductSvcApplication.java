@@ -1,16 +1,26 @@
 package com.github.ngodat0103.yamp.productsvc;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+
+import com.github.slugify.Slugify;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 
-
+import java.util.Locale;
 
 @SpringBootApplication
-@OpenAPIDefinition
 public class ProductSvcApplication {
+
+    @Bean
+    Slugify slugify(){
+        Locale locale = new Locale("vi", "VN");
+        return Slugify.builder()
+                .locale(locale)
+                .lowerCase(true)
+                .build();
+    }
+
     public static void main(String[] args) {
-       ApplicationContext ctx =  SpringApplication.run(ProductSvcApplication.class, args);
+        SpringApplication.run(ProductSvcApplication.class, args);
     }
 
 }

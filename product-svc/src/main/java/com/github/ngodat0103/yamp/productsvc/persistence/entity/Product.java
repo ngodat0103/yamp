@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,21 +15,14 @@ public class Product  extends BaseEntity{
     private String name;
     private String description;
     private String productImage;
-    private UUID categoryUuid;
 
 
-    @OneToOne
-    @JoinColumn(name = "categoryUuid", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_uuid", insertable = false, updatable = false)
     private Category category;
     @OneToMany(mappedBy = "product",fetch = FetchType.EAGER)
     private Set<ProductImage> productImageSet;
     @OneToOne(mappedBy = "product" ,fetch = FetchType.EAGER)
     private ProductItem productItem;
-
-
-
-
-
-
 
 }

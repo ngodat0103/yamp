@@ -1,12 +1,30 @@
 spring:
   profiles:
-    default: dev-local
+    active: local-dev
   config:
     import:
-      - 'optional:classpath:/dev-local.yaml'
-      - 'optional:test.yaml'
+      - 'optional:local-dev.yaml'
+      - 'optional:unit-test.yaml'
       - "optional:integration-test.yaml"
   application:
     name: product-svc
 server:
   port: 8003
+  servlet:
+    context-path: /api/v1/product
+  forward-headers-strategy: framework
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /ui-docs
+  open-api:
+    info:
+      version: ${APP_VERSION}
+      title: Product Service
+      description: Product Service API
+      contact:
+        name: NgoDat0103
+        url: https://github.com/NGODAT0103
+        email: 21521935@gm.uit.edu.vn

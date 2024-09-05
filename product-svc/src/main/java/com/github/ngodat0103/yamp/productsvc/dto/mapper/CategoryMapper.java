@@ -7,11 +7,14 @@ import org.mapstruct.Mapper;
 
 import java.util.UUID;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public interface CategoryMapper {
     Category mapToEntity(CategoryDto categoryDto);
-    default  Category mapToEntity(CategoryDto categoryDto, UUID createdBy){
-        return new Category(categoryDto,createdBy);
-    }
+   default Category mapToEntity(CategoryDto categoryDto, UUID createdBy){
+       Category category = new Category(createdBy);
+       category.setName(categoryDto.getName());
+       category.setParentCategoryUuid(categoryDto.getParentCategoryUuid());
+       return category;
+   }
     CategoryDto mapToDto(Category category);
 }

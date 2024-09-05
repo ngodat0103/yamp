@@ -1,0 +1,61 @@
+spring:
+  config:
+    activate:
+      on-profile: 'local-dev'
+  security:
+    oauth2:
+      client:
+        provider:
+          auth-service-external:
+            authorization-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/authorize
+            token-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/token
+            jwk-set-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/jwks
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://auth-svc:8001/api/v1/auth/oauth2/jwks
+          authority-prefix: "ROLE_"
+          authorities-claim-name: "role"
+
+  datasource:
+    username: product-svc-user
+    password: product-svc-user-password2
+    url: jdbc:postgresql://share-db:5432/product-svc-db
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+  cloud:
+    inetutils:
+      default-hostname: yamp-backend.local
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always
+
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.github.ngodat0103.yamp..productsvc.service: DEBUG
+    com.github.ngodat0103.yamp..productsvc.controller: DEBUG

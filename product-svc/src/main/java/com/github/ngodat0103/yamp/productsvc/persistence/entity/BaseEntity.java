@@ -1,9 +1,11 @@
 package com.github.ngodat0103.yamp.productsvc.persistence.entity;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 

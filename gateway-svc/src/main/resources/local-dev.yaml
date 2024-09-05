@@ -4,7 +4,7 @@ spring:
       on-profile: local-dev
   cloud:
     inetutils:
-      default-hostname: localhost
+      default-hostname: "yamp-backend.local"
 springdoc:
   api-docs:
     path: /api-docs
@@ -13,12 +13,16 @@ springdoc:
     enabled: true
     oauth:
       use-basic-authentication-with-access-code-grant: true
+      client-id: ${CLIENT_ID}
+      client-secret: ${CLIENT_SECRET}
     oauth2-redirect-url: http://${spring.cloud.inetutils.default-hostname}:${server.port}/webjars/swagger-ui/oauth2-redirect.html
     urls:
       - name: "auth-svc"
         url: "http://${spring.cloud.inetutils.default-hostname}:${server.port}/api/v1/auth/api-docs"
       - name: "user-svc"
         url: "http://${spring.cloud.inetutils.default-hostname}:${server.port}/api/v1/user/api-docs"
+      - name: "product-svc"
+        url: "http://${spring.cloud.inetutils.default-hostname}:${server.port}/api/v1/products/api-docs"
     use-root-path: true
 logging:
   level:

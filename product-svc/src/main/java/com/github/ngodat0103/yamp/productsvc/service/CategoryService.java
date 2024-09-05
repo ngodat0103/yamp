@@ -6,9 +6,9 @@ import java.util.UUID;
 
 public interface CategoryService {
     CategoryDto createCategory(CategoryDto categoryDto);
-    CategoryDto updateCategory(CategoryDto categoryDto);
+    CategoryDto updateCategory(UUID categoryUuid, CategoryDto categoryDto);
     void deleteCategory(UUID uuid);
-    CategoryDto getCategory(String categoryName);
+    CategoryDto getCategory(String categorySlugName);
     CategoryDto getCategory(UUID categoryUuid);
     Set<CategoryDto> getAllCategories();
 }

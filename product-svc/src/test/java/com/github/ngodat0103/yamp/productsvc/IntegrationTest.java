@@ -1,10 +1,14 @@
 package com.github.ngodat0103.yamp.productsvc;
 
 
-import org.junit.platform.suite.api.SelectPackages;
-import org.junit.platform.suite.api.Suite;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
-@Suite
-@SelectPackages({"com.github.ngodat0103.yamp.productsvc.integration"})
+@SpringBootTest
+@ActiveProfiles("integration-test")
 public class IntegrationTest {
+    @Test
+    void contextLoads() {
+    }
 }

@@ -1,5 +1,7 @@
 package com.github.ngodat0103.yamp.productsvc.persistence.entity;
+
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.UUID;
 

@@ -53,6 +53,7 @@ public class SecurityConfiguration {
 
     @Bean
     SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http, ReactiveOAuth2AuthorizedClientService reactiveOAuth2AuthorizedClientService){
+        http.csrf(ServerHttpSecurity.CsrfSpec::disable);
         ServerWebExchangeMatcher apiMatcher = new PathPatternParserServerWebExchangeMatcher("/api/v1/**");
         http.securityMatcher(apiMatcher);
         http.authorizeExchange(exchange ->exchange
@@ -67,6 +68,8 @@ public class SecurityConfiguration {
                         .pathMatchers("/api/v1/auth/accounts/roles").authenticated()
                         .pathMatchers(HttpMethod.POST,"/api/v1/auth/oauth2/authorize").permitAll()
                         .pathMatchers(HttpMethod.POST,"/api/v1/auth/oauth2/token").permitAll()
+
+                        .pathMatchers(HttpMethod.GET,"/api/v1/products/**").permitAll()
                         .anyExchange().permitAll()
         );
 //        http.oauth2Client(Customizer.withDefaults());

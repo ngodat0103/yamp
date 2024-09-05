@@ -1,11 +1,9 @@
 spring:
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
   config:
     activate:
-      on-profile: test
+      on-profile: unit-test
+  jpa:
+    show-sql: true
 logging:
   level:
     org.springframework.security: DEBUG

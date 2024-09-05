@@ -56,7 +56,7 @@ While the project is still evolving and currently lacks some business logic and 
 - **Monitoring**: Prometheus
 - **Visualization**: Grafana
 
-For more information about the Pipeline, please refer to the this [readme.md](../../.github/workflows/readme.md)
+For more information about the Pipeline, please refer to the this [readme.md](./workflows/readme.md)
 
 For more information about how I deploy this project, please refer to the [deployment repository](https://github.com/ngodat0103/yamp-deployment.git)
 

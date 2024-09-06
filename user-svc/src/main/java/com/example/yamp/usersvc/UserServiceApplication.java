@@ -2,16 +2,15 @@ package com.example.yamp.usersvc;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.crypto.encrypt.TextEncryptor;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
-@SpringBootApplication(exclude = {org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class})
+@SpringBootApplication
+@EnableRedisRepositories(basePackages = "com.example.yamp.usersvc.cache")
+@EnableJpaRepositories(basePackages = "com.example.yamp.usersvc.persistence.repository")
 public class UserServiceApplication {
-
-//fdsfsd
-
 	public static void main(String[] args) {
 	  ApplicationContext ctx =  SpringApplication.run(UserServiceApplication.class, args);
-
 	}
 
 }

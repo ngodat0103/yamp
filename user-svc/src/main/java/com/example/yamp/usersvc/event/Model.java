@@ -1,4 +1,4 @@
-package com.github.ngodat0103.yamp.authsvc.event;
+package com.example.yamp.usersvc.event;
 
 
 import java.time.LocalDateTime;
@@ -9,5 +9,4 @@ public record Model (Action action,
                      UUID uuid,
                      LocalDateTime createAt,
                      LocalDateTime lastModifiedAt){
-
 }

@@ -46,8 +46,6 @@ public class SecurityConfiguration {
         http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(requests -> requests.anyRequest().permitAll());
 
-
-
         http.anonymous(anonymous -> {
             String principal = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
             anonymous.principal(principal);

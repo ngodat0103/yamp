@@ -12,7 +12,7 @@ public interface AccountService {
 
 
     AccountDto updateAccount(UpdateAccountDto updateAccountDto) ;
-
+    AccountDto getAccount(UUID accountUuid) ;
     Set<AccountDto> getAccounts() ;
     Set<AccountDto> getAccountFilter(Set<String> roles, UUID accountUuid, String username) ;
 

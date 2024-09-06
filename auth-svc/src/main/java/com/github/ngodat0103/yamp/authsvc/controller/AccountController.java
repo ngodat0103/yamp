@@ -40,6 +40,14 @@ public class AccountController {
         return accountService.getAccounts();
     }
 
+    @GetMapping(path = "/{accountUuid}")
+    @PreAuthorize("hasAuthority('SCOPE_auth-service.read')")
+    public AccountDto getAccount(@PathVariable UUID accountUuid) {
+        log.debug("Controller getAccount method called");
+        return accountService.getAccount(accountUuid);
+
+    }
+
     @GetMapping(value = "/filter")
     public Set<AccountDto> getAccountsFilterByRoles(@RequestParam(required = false) Set<String> roles,
                                                     @RequestParam(required = false) UUID accountUuid,

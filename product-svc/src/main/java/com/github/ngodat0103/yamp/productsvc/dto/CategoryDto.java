@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.UUID;
 @Data
 @Builder
-public class CategoryDto {
+public class CategoryDto extends RepresentationModel<CategoryDto> {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID uuid;

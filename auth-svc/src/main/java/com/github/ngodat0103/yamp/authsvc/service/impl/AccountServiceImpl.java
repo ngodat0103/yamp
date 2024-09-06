@@ -2,6 +2,8 @@ package com.github.ngodat0103.yamp.authsvc.service.impl;
 import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
 import com.github.ngodat0103.yamp.authsvc.dto.UpdateAccountDto;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
+import com.github.ngodat0103.yamp.authsvc.event.Action;
+import com.github.ngodat0103.yamp.authsvc.event.Model;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Role;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
@@ -9,6 +11,7 @@ import com.github.ngodat0103.yamp.authsvc.persistence.repository.RoleRepository;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +24,18 @@ import static com.github.ngodat0103.yamp.authsvc.Util.*;
 @Slf4j
 public class AccountServiceImpl implements AccountService {
 
+
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    private final KafkaTemplate<String, Model> kafkaTemplate;
+    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, KafkaTemplate<String, Model> kafkaTemplate) {
         this.accountRepository = accountRepository;
         this.accountMapper = accountMapper;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
 
@@ -60,6 +66,8 @@ public class AccountServiceImpl implements AccountService {
         account.setCreateAt(currentTime);
         account.setLastModifiedAt(currentTime);
         Account savedAccount = accountRepository.save(account);
+
+
         return accountMapper.mapToDto(savedAccount);
     }
 
@@ -77,7 +85,18 @@ public class AccountServiceImpl implements AccountService {
 
         account.setLastModifiedAt(LocalDateTime.now());
         Account savedAccount = accountRepository.save(account);
+        Model model = new Model(Action.CREATE, savedAccount.getUuid(), savedAccount.getCreateAt(), savedAccount.getLastModifiedAt());
+        kafkaTemplate.send("account-update", model);
+
         return accountMapper.mapToDto(savedAccount);
+    }
+
+    @Override
+    public AccountDto getAccount(UUID accountUuid) {
+        log.debug("Getting account by accountUuid");
+        Account account = accountRepository.findById(accountUuid)
+                .orElseThrow(notFoundExceptionSupplier(log, "Account", "accountUuid", accountUuid));
+        return accountMapper.mapToDto(account);
     }
 
     @Override

@@ -81,7 +81,7 @@ public class SecurityConfiguration {
         http.anonymous(anonymous -> {
             String principal = "1a35d863-0cd9-4bc1-8cc4-f4cddca97720";
             anonymous.principal(principal);
-            anonymous.authorities("ROLE_ADMIN");
+            anonymous.authorities("ROLE_ADMIN","SCOPE_auth-service.read","SCOPE_auth-service.write");
         });
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();

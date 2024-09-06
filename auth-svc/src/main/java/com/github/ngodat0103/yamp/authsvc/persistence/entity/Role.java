@@ -12,15 +12,10 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-public class Role {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Setter(value = AccessLevel.PRIVATE)
-    private UUID roleUuid;
+public class Role  extends BaseEntity{
     @Column(nullable = false, unique = true)
     private String roleName;
     private String roleDescription;
-
 
     @OneToMany
     @JoinColumn(name = "roleUuid")

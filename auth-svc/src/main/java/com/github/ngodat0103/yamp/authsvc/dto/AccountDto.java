@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDateTime;
+
 
 @Data
 @AllArgsConstructor
@@ -16,8 +18,9 @@ public class AccountDto {
     @NotNull (message = "accountUuid is required")
     @Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
             message = "UUID has to be represented by standard 36-char representation")
-    private String accountUuid;
+    private String uuid;
     @NotNull (message = "Username is required")
+    @Length (min = 5, message = "Username must be at least 5 characters")
     private String username;
     @JsonProperty (access = JsonProperty.Access.WRITE_ONLY)
     @NotNull (message = "Password is required")
@@ -26,8 +29,12 @@ public class AccountDto {
     @NotNull (message = "Email is required")
     @Email ( message =  "Email is not valid")
     private String email;
-
-
     private String roleName;
 
+
+
+    @JsonProperty (access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime createAt;
+    @JsonProperty (access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime lastModifiedAt;
 }

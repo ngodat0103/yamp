@@ -7,8 +7,8 @@ spring:
       - "optional:local-dev.yaml"
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
-      - "optional:pre-proc.yaml"
-      - "optional:proc.yaml"
+      - "optional:pre-prod.yaml"
+      - "optional:prod.yaml"
   application:
     name: auth-svc
   data:

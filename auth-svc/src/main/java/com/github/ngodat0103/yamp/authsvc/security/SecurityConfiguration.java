@@ -1,13 +1,14 @@
 package com.github.ngodat0103.yamp.authsvc.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
@@ -19,10 +20,7 @@ import org.springframework.security.oauth2.server.resource.authentication.Delega
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandlerImpl;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +51,7 @@ public class SecurityConfiguration {
 
 
     @Bean
+    @Profile({"pre-prod","prod"})
     SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
@@ -72,6 +71,23 @@ public class SecurityConfiguration {
     }
 
 
+    @Bean
+    @Profile("local-dev") // I use this setting for developing only, does not use this in production
+    SecurityFilterChain apiFilterChain_dev(HttpSecurity http) throws Exception {
+        http.securityMatcher("/accounts/**","/roles/**","/ui-docs/**","/api-docs/**","/actuator/**");
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.cors(AbstractHttpConfigurer::disable);
+        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+        http.anonymous(anonymous -> {
+            String principal = "1a35d863-0cd9-4bc1-8cc4-f4cddca97720";
+            anonymous.principal(principal);
+            anonymous.authorities("ROLE_ADMIN");
+        });
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
+
+
 
 
     @Bean
@@ -81,10 +97,20 @@ public class SecurityConfiguration {
 
 
     @Bean
+    @Profile({"pre-prod","prod"})
     PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+
+
+
+    // I use this for easy development, do not use this in production
+    @Bean
+    @Profile("local-dev")
+    PasswordEncoder passwordEncoder_dev(){
         Map<String,PasswordEncoder> passwordEncoderMap = new HashMap<>();
         passwordEncoderMap.put("bcrypt",new BCryptPasswordEncoder());
-        passwordEncoderMap.put("noop", NoOpPasswordEncoder.getInstance()); // I use this for easy development
+        passwordEncoderMap.put("noop", NoOpPasswordEncoder.getInstance());
         return new DelegatingPasswordEncoder("bcrypt",passwordEncoderMap);
     }
 
@@ -95,8 +121,6 @@ public class SecurityConfiguration {
         converterForRoles.setAuthorityPrefix("ROLE_");
         converterForRoles.setAuthoritiesClaimName("role");
         JwtGrantedAuthoritiesConverter converterForScope = new JwtGrantedAuthoritiesConverter();
-
-
         DelegatingJwtGrantedAuthoritiesConverter delegatingJwtGrantedAuthoritiesConverter = new DelegatingJwtGrantedAuthoritiesConverter(converterForRoles,converterForScope);
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(delegatingJwtGrantedAuthoritiesConverter);

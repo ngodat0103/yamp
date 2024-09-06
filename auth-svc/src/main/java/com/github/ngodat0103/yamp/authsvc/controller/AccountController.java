@@ -1,5 +1,6 @@
 package com.github.ngodat0103.yamp.authsvc.controller;
 import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.UpdateAccountDto;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -44,6 +45,12 @@ public class AccountController {
                                                     @RequestParam(required = false) UUID accountUuid,
                                                     @RequestParam(required = false) String username) {
             return accountService.getAccountFilter(roles, accountUuid, username);
+    }
+
+
+    @PutMapping()
+    public AccountDto updateAccount(@RequestBody @Valid UpdateAccountDto updateAccountDto) {
+        return accountService.updateAccount(updateAccountDto);
     }
 
 

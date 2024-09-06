@@ -1,6 +1,6 @@
-package com.github.ngodat0103.yamp.productsvc;
+package com.github.ngodat0103.yamp.authsvc;
 
-import com.github.ngodat0103.yamp.productsvc.exception.NotFoundException;
+import com.github.ngodat0103.yamp.authsvc.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,8 +9,7 @@ import org.springframework.util.Assert;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class Util {
-
+public final class Util {
     private final static String TEMPLATE_NOT_FOUND = "%s with %s: %s not found";
     private final static String TEMPLATE_CONFLICT = "%s with %s: %s already exists";
 
@@ -42,7 +41,7 @@ public class Util {
         if(log.isTraceEnabled()){
             log.debug(message,notFoundException);
         }
-        else{
+        else if(log.isDebugEnabled()){
             log.debug(message);
         }
     }
@@ -57,6 +56,7 @@ public class Util {
             throw new IllegalArgumentException("Invalid UUID format", e);
         }
     }
+
 
 
 }

@@ -1,5 +1,5 @@
 package com.github.ngodat0103.yamp.authsvc.controller;
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.RegisterAccountDto;
 import com.github.ngodat0103.yamp.authsvc.dto.UpdateAccountDto;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,36 +28,36 @@ public class AccountController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AccountDto register(@Valid @RequestBody AccountDto accountDto){
+    public RegisterAccountDto register(@Valid @RequestBody RegisterAccountDto registerAccountDto){
         log.debug("Controller register method called");
-        return accountService.register(accountDto);
+        return accountService.register(registerAccountDto);
     }
 
 
     @GetMapping
-    public Set<AccountDto > getAccounts() {
+    public Set<RegisterAccountDto> getAccounts() {
         log.debug("Controller getAccounts method called");
         return accountService.getAccounts();
     }
 
     @GetMapping(path = "/{accountUuid}")
     @PreAuthorize("hasAuthority('SCOPE_auth-service.read')")
-    public AccountDto getAccount(@PathVariable UUID accountUuid) {
+    public RegisterAccountDto getAccount(@PathVariable UUID accountUuid) {
         log.debug("Controller getAccount method called");
         return accountService.getAccount(accountUuid);
 
     }
 
     @GetMapping(value = "/filter")
-    public Set<AccountDto> getAccountsFilterByRoles(@RequestParam(required = false) Set<String> roles,
-                                                    @RequestParam(required = false) UUID accountUuid,
-                                                    @RequestParam(required = false) String username) {
+    public Set<RegisterAccountDto> getAccountsFilterByRoles(@RequestParam(required = false) Set<String> roles,
+                                                            @RequestParam(required = false) UUID accountUuid,
+                                                            @RequestParam(required = false) String username) {
             return accountService.getAccountFilter(roles, accountUuid, username);
     }
 
 
     @PutMapping()
-    public AccountDto updateAccount(@RequestBody @Valid UpdateAccountDto updateAccountDto) {
+    public RegisterAccountDto updateAccount(@RequestBody @Valid UpdateAccountDto updateAccountDto) {
         return accountService.updateAccount(updateAccountDto);
     }
 

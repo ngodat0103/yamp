@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.RegisterAccountDto;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
@@ -35,17 +35,17 @@ public class ControllerTest {
     @Autowired
     AccountMapper accountMapper;
     private final ObjectMapper objectMapper =  JsonMapper.builder().disable(MapperFeature.USE_ANNOTATIONS).build();
-    AccountDto accountDtoRequest = AccountDto.builder()
+    RegisterAccountDto registerAccountDtoRequest = RegisterAccountDto.builder()
             .uuid(UUID.randomUUID().toString())
             .username("testUser"+new Random().nextInt())
             .password("testPassword")
             .email("test@gmail.com")
             .roleName("CUSTOMER")
             .build();
-    AccountDto accountDtoResponse = AccountDto.builder()
-            .username(accountDtoRequest.getUsername())
-            .email(accountDtoRequest.getEmail())
-            .uuid(accountDtoRequest.getUuid())
+    RegisterAccountDto registerAccountDtoResponse = RegisterAccountDto.builder()
+            .username(registerAccountDtoRequest.getUsername())
+            .email(registerAccountDtoRequest.getEmail())
+            .uuid(registerAccountDtoRequest.getUuid())
             .password(null)
             .roleName("CUSTOMER")
             .build();
@@ -68,11 +68,11 @@ public class ControllerTest {
         webTestClient.post()
                 .uri("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(accountDtoRequest))
+                .bodyValue(objectMapper.writeValueAsString(registerAccountDtoRequest))
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(AccountDto.class)
-                .isEqualTo(accountDtoResponse);
+                .expectBody(RegisterAccountDto.class)
+                .isEqualTo(registerAccountDtoResponse);
     }
 
     @Test
@@ -80,14 +80,14 @@ public class ControllerTest {
     @WithMockUser(username = "admin", authorities = {"SCOPE_auth-svc.write"})
     @Disabled("Temporarily disabled for not handling the security context")
     public void givenAccountDto_whenRegister_thenReturnConflictException() throws Exception {
-        Account account = accountMapper.mapToEntity(accountDtoRequest);
+        Account account = accountMapper.mapToEntity(registerAccountDtoRequest);
         accountRepository.save(account);
 
 
         webTestClient.post()
                 .uri("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(objectMapper.writeValueAsString(accountDtoRequest))
+                .bodyValue(objectMapper.writeValueAsString(registerAccountDtoRequest))
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT)
                 .expectBody()

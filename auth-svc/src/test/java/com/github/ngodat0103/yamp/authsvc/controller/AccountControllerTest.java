@@ -3,7 +3,7 @@ package com.github.ngodat0103.yamp.authsvc.controller;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.RegisterAccountDto;
 import com.github.ngodat0103.yamp.authsvc.exception.ConflictException;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
 import org.junit.jupiter.api.*;
@@ -36,7 +36,7 @@ class AccountControllerTest {
     @Autowired
     ObjectMapper objectMapper ;
 
-    AccountDto accountDto = AccountDto.builder()
+    RegisterAccountDto registerAccountDto = RegisterAccountDto.builder()
             .username("test")
             .password("password")
             .uuid(UUID.randomUUID().toString())
@@ -57,24 +57,24 @@ class AccountControllerTest {
 
     @Test
     void testRegisterAccountWhenNotFound() throws Exception {
-        when(accountService.register(any(AccountDto.class))).thenReturn(accountDto);
+        when(accountService.register(any(RegisterAccountDto.class))).thenReturn(registerAccountDto);
         mockMvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(accountDto)))
-                .andExpect(jsonPath("$.username").value(accountDto.getUsername()))
+                .content(objectMapper.writeValueAsString(registerAccountDto)))
+                .andExpect(jsonPath("$.username").value(registerAccountDto.getUsername()))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.email").value(accountDto.getEmail()))
+                .andExpect(jsonPath("$.email").value(registerAccountDto.getEmail()))
                 .andExpect(jsonPath("$.password").doesNotExist())
-                .andExpect(jsonPath("$.accountUuid").value(accountDto.getUuid()));
+                .andExpect(jsonPath("$.accountUuid").value(registerAccountDto.getUuid()));
     }
     @Test
     void testRegisterAccountWhenAccountUuidFound() throws Exception {
         doThrow(new ConflictException("AccountUuid is already exists!"))
                 .when(accountService)
-                .register(any(AccountDto.class));
+                .register(any(RegisterAccountDto.class));
         mockMvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(accountDto)))
+                .content(objectMapper.writeValueAsString(registerAccountDto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.title").value("Already exists"))
                 .andExpect(jsonPath("$.status").value(HttpStatus.CONFLICT.value()))
@@ -85,11 +85,11 @@ class AccountControllerTest {
     void testRegisterAccountWhenUsernameFound() throws Exception {
         doThrow(new ConflictException("Username is already exists!"))
                 .when(accountService)
-                .register(any(AccountDto.class));
+                .register(any(RegisterAccountDto.class));
 
         mockMvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(accountDto)))
+                .content(objectMapper.writeValueAsString(registerAccountDto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.title").value("Already exists"))
                 .andExpect(jsonPath("$.status").value(HttpStatus.CONFLICT.value()))
@@ -100,10 +100,10 @@ class AccountControllerTest {
     void testRegisterAccountWhenEmailFound() throws Exception {
         doThrow(new ConflictException("Email is already exists!"))
                 .when(accountService)
-                .register(any(AccountDto.class));
+                .register(any(RegisterAccountDto.class));
         mockMvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(accountDto)))
+                .content(objectMapper.writeValueAsString(registerAccountDto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.title").value("Already exists"))
                 .andExpect(jsonPath("$.status").value(HttpStatus.CONFLICT.value()))
@@ -113,10 +113,10 @@ class AccountControllerTest {
 
     @Test
     void testRegisterAccountWhenMissingField() throws Exception {
-        accountDto.setUuid(null);
+        registerAccountDto.setUuid(null);
         mockMvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(accountDto)))
+                .content(objectMapper.writeValueAsString(registerAccountDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(jsonPath("$.type").value("https://problems-registry.smartbear.com/missing-body-property"))
@@ -126,10 +126,10 @@ class AccountControllerTest {
     }
     @Test
     void testRegisterAccountWhenFieldNotValid() throws Exception {
-        accountDto.setEmail("example");
+        registerAccountDto.setEmail("example");
         mockMvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(accountDto)))
+                .content(objectMapper.writeValueAsString(registerAccountDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors").isArray())
 

@@ -1,5 +1,5 @@
 package com.github.ngodat0103.yamp.authsvc.service;
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.RegisterAccountDto;
 import com.github.ngodat0103.yamp.authsvc.dto.UpdateAccountDto;
 
 import java.util.Set;
@@ -8,12 +8,12 @@ import java.util.UUID;
 public interface AccountService {
 
 
-    AccountDto register(AccountDto accountDto) ;
+    RegisterAccountDto register(RegisterAccountDto registerAccountDto) ;
 
 
-    AccountDto updateAccount(UpdateAccountDto updateAccountDto) ;
-    AccountDto getAccount(UUID accountUuid) ;
-    Set<AccountDto> getAccounts() ;
-    Set<AccountDto> getAccountFilter(Set<String> roles, UUID accountUuid, String username) ;
+    RegisterAccountDto updateAccount(UpdateAccountDto updateAccountDto) ;
+    RegisterAccountDto getAccount(UUID accountUuid) ;
+    Set<RegisterAccountDto> getAccounts() ;
+    Set<RegisterAccountDto> getAccountFilter(Set<String> roles, UUID accountUuid, String username) ;
 
 }

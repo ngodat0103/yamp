@@ -1,9 +1,9 @@
 package com.github.ngodat0103.yamp.authsvc.service.impl;
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.RegisterAccountDto;
 import com.github.ngodat0103.yamp.authsvc.dto.UpdateAccountDto;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
-import com.github.ngodat0103.yamp.authsvc.event.Action;
-import com.github.ngodat0103.yamp.authsvc.event.Model;
+import com.github.ngodat0103.yamp.authsvc.dto.kafka.Action;
+import com.github.ngodat0103.yamp.authsvc.dto.kafka.UpdateAccountMessage;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Role;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
@@ -29,8 +29,8 @@ public class AccountServiceImpl implements AccountService {
     private final AccountMapper accountMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final KafkaTemplate<String, Model> kafkaTemplate;
-    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, KafkaTemplate<String, Model> kafkaTemplate) {
+    private final KafkaTemplate<UUID, UpdateAccountMessage> kafkaTemplate;
+    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, KafkaTemplate<UUID, UpdateAccountMessage> kafkaTemplate) {
         this.accountRepository = accountRepository;
         this.accountMapper = accountMapper;
         this.passwordEncoder = passwordEncoder;
@@ -41,8 +41,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     @Override
-    public AccountDto register(AccountDto accountDto) {
-        Account account = accountMapper.mapToEntity(accountDto);
+    public RegisterAccountDto register(RegisterAccountDto registerAccountDto) {
+        Account account = accountMapper.mapToEntity(registerAccountDto);
 
         if(accountRepository.existsById(account.getUuid()))
         {
@@ -57,7 +57,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setPassword(passwordEncoder.encode(account.getPassword()));
-        String roleName = accountDto.getRoleName();
+        String roleName = registerAccountDto.getRoleName();
         Role  role  = roleRepository.findRoleByRoleName(roleName)
                 .orElseThrow(notFoundExceptionSupplier(log, "Role", "roleName", roleName));
         account.setRole(role);
@@ -73,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountDto updateAccount(UpdateAccountDto updateAccountDto) {
+    public RegisterAccountDto updateAccount(UpdateAccountDto updateAccountDto) {
         log.debug("Getting accountUuid from SecurityContextHolder");
         UUID uuid = getAccountUuidFromAuthentication();
         Account account = accountRepository.findById(uuid)
@@ -85,14 +85,28 @@ public class AccountServiceImpl implements AccountService {
 
         account.setLastModifiedAt(LocalDateTime.now());
         Account savedAccount = accountRepository.save(account);
-        Model model = new Model(Action.CREATE, savedAccount.getUuid(), savedAccount.getCreateAt(), savedAccount.getLastModifiedAt());
-        kafkaTemplate.send("account-update", model);
+        UpdateAccountMessage updateAccountMessage = new UpdateAccountMessage(Action.UPDATE, savedAccount.getLastModifiedAt());
+
+
+   var future = kafkaTemplate.send("account-update",savedAccount.getUuid(), updateAccountMessage);
+   future.whenComplete((result, throwable) -> {
+         if(throwable!=null){
+              log.error("Error while sending message to kafka",throwable);
+         }
+         if (result!=null){
+             System.out.println(result.getRecordMetadata());
+             System.out.println("Offset: "+result.getRecordMetadata().offset());
+             System.out.println("Partition: "+result.getRecordMetadata().partition());
+             System.out.println(result.getProducerRecord());
+             log.info("Message sent to kafka");
+         }
+   } ) ;
 
         return accountMapper.mapToDto(savedAccount);
     }
 
     @Override
-    public AccountDto getAccount(UUID accountUuid) {
+    public RegisterAccountDto getAccount(UUID accountUuid) {
         log.debug("Getting account by accountUuid");
         Account account = accountRepository.findById(accountUuid)
                 .orElseThrow(notFoundExceptionSupplier(log, "Account", "accountUuid", accountUuid));
@@ -100,17 +114,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Set<AccountDto> getAccounts() {
+    public Set<RegisterAccountDto> getAccounts() {
         log.debug("Getting all accounts");
      return  accountRepository.findAll().stream().map(account -> {
-                    AccountDto accountDto = accountMapper.mapToDto(account);
-                    accountDto.setRoleName(account.getRole().getRoleName());
-                    return accountDto;
+                    RegisterAccountDto registerAccountDto = accountMapper.mapToDto(account);
+                    registerAccountDto.setRoleName(account.getRole().getRoleName());
+                    return registerAccountDto;
                 }).collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
-    public Set<AccountDto> getAccountFilter(Set<String> roles, UUID accountUuid, String username) {
+    public Set<RegisterAccountDto> getAccountFilter(Set<String> roles, UUID accountUuid, String username) {
         log.debug("Getting accounts with filter");
         if(accountUuid!=null){
             Account account = accountRepository.findById(accountUuid)

@@ -2,16 +2,22 @@ package com.example.yamp.usersvc.service.impl;
 import com.example.yamp.usersvc.dto.customer.AccountRegisterDto;
 import com.example.yamp.usersvc.dto.customer.CustomerDto;
 import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
+import com.example.yamp.usersvc.dto.kafka.AccountMessingDto;
+import com.example.yamp.usersvc.dto.kafka.Action;
 import com.example.yamp.usersvc.dto.mapper.CustomerMapper;
 import com.example.yamp.usersvc.persistence.entity.Account;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import com.example.yamp.usersvc.cache.AuthSvcRepository;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
 import com.example.yamp.usersvc.service.CustomerService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
@@ -30,6 +36,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final AuthSvcRepository authSvcRepository;
     private final CustomerMapper customerMapper;
     private final WebClient webClient;
+    private final ObjectMapper objectMapper =new ObjectMapper();
     private final static String ACCOUNT_PATH = "/accounts";
     private final static String DEFAULT_ROLE = "CUSTOMER";
 
@@ -121,6 +128,4 @@ public class CustomerServiceImpl implements CustomerService {
     private Account checkRedisCache(UUID customerUuid){
         return authSvcRepository.findById(customerUuid).orElse(null);
     }
-
-
 }

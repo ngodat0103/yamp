@@ -9,11 +9,9 @@ spring:
   kafka:
     consumer:
       bootstrap-servers: kafka-svc:9092
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: com.github.ngodat0103.yamp.authsvc.event
       group-id: user-svc
+      key-deserializer: org.apache.kafka.common.serialization.UUIDDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   cloud:
     inetutils:
       default-hostname: localhost
@@ -76,5 +74,6 @@ logging:
   level:
     com.example.userservice.controller: DEBUG
     com.example.userservice.service: DEBUG
+    com.example.yamp.usersvc.event: DEBUG
   pattern:
     level:  "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

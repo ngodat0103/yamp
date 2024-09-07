@@ -1,4 +1,4 @@
-package com.github.ngodat0103.yamp.authsvc.event;
+package com.example.yamp.usersvc.dto.kafka;
 
 public enum Action {
     CREATE, UPDATE, DELETE

@@ -20,7 +20,7 @@ import java.util.UUID;
 public class CustomerDto {
     @JsonIgnore
     private UUID accountUuid;
-    Account account;
+    AccountDto account;
     @NotNull(message = "First name should not be null")
     private String firstName;
     @NotNull(message = "Last name should not be null")

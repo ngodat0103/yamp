@@ -21,6 +21,7 @@ spring:
     password: product-svc-user-password2
     url: jdbc:postgresql://share-db:5432/product-svc-db
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
     properties:

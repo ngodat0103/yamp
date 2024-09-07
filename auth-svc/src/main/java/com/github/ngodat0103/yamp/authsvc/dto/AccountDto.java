@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RegisterAccountDto {
+public class AccountDto {
     @NotNull (message = "accountUuid is required")
     @Pattern(regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
             message = "UUID has to be represented by standard 36-char representation")
@@ -31,10 +31,8 @@ public class RegisterAccountDto {
     private String email;
     private String roleName;
 
-
-
-    @JsonProperty (access = JsonProperty.Access.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createAt;
-    @JsonProperty (access = JsonProperty.Access.READ_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime lastModifiedAt;
 }

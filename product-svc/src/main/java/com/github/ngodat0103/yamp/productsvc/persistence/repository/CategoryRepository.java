@@ -1,6 +1,7 @@
 package com.github.ngodat0103.yamp.productsvc.persistence.repository;
 
 import com.github.ngodat0103.yamp.productsvc.persistence.entity.Category;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +17,4 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
     Boolean existsByParentCategoryUuid(UUID parentCategoryUuid);
     Optional<Category> findCategoryBySlugName(String slugName);
 
-    Page<Category> findAll( Pageable pageable);
 }

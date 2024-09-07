@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
@@ -28,14 +29,14 @@ public class CategoryController {
     }
 
     @GetMapping(path = "/all")
-    public Set<CategoryDto> getCategory(PageRequest pageRequest){
-         return categoryService.getAllCategories();
+    public Set<CategoryDto> getCategory(@RequestParam(required = false,defaultValue = "0") int page, @RequestParam(required = false,defaultValue = "100")  int size){
+         return categoryService.getAllCategories(PageRequest.of(page,size));
     }
 
     @GetMapping(path = "/{slugName}")
     public CategoryDto getCategory(@PathVariable String slugName){
         Link link = Link.of("http://localhost:8080/categories/"+slugName,"update category");
-        return  categoryService.getCategory(slugName).add(link);
+        return  categoryService.getCategory(slugName);
     }
 
     @GetMapping

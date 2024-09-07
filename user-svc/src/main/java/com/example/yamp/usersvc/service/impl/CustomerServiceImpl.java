@@ -2,22 +2,17 @@ package com.example.yamp.usersvc.service.impl;
 import com.example.yamp.usersvc.dto.customer.AccountRegisterDto;
 import com.example.yamp.usersvc.dto.customer.CustomerDto;
 import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
-import com.example.yamp.usersvc.dto.kafka.AccountMessingDto;
-import com.example.yamp.usersvc.dto.kafka.Action;
 import com.example.yamp.usersvc.dto.mapper.CustomerMapper;
 import com.example.yamp.usersvc.persistence.entity.Account;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import com.example.yamp.usersvc.cache.AuthSvcRepository;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
 import com.example.yamp.usersvc.service.CustomerService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.http.MediaType;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
@@ -85,7 +80,7 @@ public class CustomerServiceImpl implements CustomerService {
         if(account !=null){
             log.debug("Cache hit,get account with {} from redis cache", customerUuid);
             CustomerDto customerDto = customerMapper.mapToDto(customer);
-            customerDto.setAccount(account);
+            customerDto.setAccount(customerMapper.mapToDto(account));
             return customerDto;
         }
 
@@ -102,7 +97,7 @@ public class CustomerServiceImpl implements CustomerService {
         assert account != null;
         authSvcRepository.save(account);
         CustomerDto customerDto = customerMapper.mapToDto(customer);
-        customerDto.setAccount(account);
+        customerDto.setAccount(customerMapper.mapToDto(account));
         log.debug("Fetching successful,Account with {} saved to redis cache", customerUuid);
         return customerDto;
     }

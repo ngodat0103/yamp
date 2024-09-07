@@ -10,8 +10,14 @@ import com.github.slugify.Slugify;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.commons.util.InetUtilsProperties;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.UriTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +34,9 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final Slugify slugify;
+    private final UriTemplate uriTemplate = UriTemplate.of("/api/v1/product/categories/{uuid}");
+
+
 
 
     @Override
@@ -95,21 +104,39 @@ public class CategoryServiceImpl implements CategoryService {
             log.debug(message);
             return new NotFoundException(message);
         });
-        return categoryMapper.mapToDto(category);
+        CategoryDto categoryDto = categoryMapper.mapToDto(category);
+        addLinks(categoryDto);
+        return categoryDto;
     }
 
     @Override
     public CategoryDto getCategory(UUID categoryUuid) {
         Category category = categoryRepository.findById(categoryUuid).orElseThrow(() -> new NotFoundException("Category not found"));
-        return categoryMapper.mapToDto(category);
+        CategoryDto categoryDto = categoryMapper.mapToDto(category);
+        addLinks(categoryDto);
+        return categoryDto;
     }
 
     @Override
-    public Set<CategoryDto> getAllCategories() {
-        List<Category> categories = categoryRepository.findAll();
+    public Set<CategoryDto> getAllCategories(PageRequest pageRequest) {
+
+        List<Category> categories = categoryRepository.findAll(pageRequest).getContent();
         log.debug("Get categories with {} elements", categories.size());
-        return categories.stream().map(categoryMapper::mapToDto).collect(Collectors.toSet());
+        return categories.stream().map(category -> {
+            CategoryDto categoryDto = categoryMapper.mapToDto(category);
+            addLinks(categoryDto);
+            return categoryDto;
+        }).collect(Collectors.toUnmodifiableSet());
     }
 
-
+    private void addLinks(CategoryDto categoryDto) {
+        Link updateLink = Link.of(uriTemplate.expand(categoryDto.getUuid()).toString(), "Update Category")
+                .withTitle("Update category")
+                .withType("application/json");
+        Link deleteLink = Link.of(uriTemplate.expand(categoryDto.getUuid()).toString(), "Delete Category")
+                .withTitle("Delete category")
+                .withType("application/json");
+        categoryDto.add(updateLink);
+        categoryDto.add(deleteLink);
+    }
 }

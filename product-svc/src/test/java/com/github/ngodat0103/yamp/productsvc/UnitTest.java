@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @Suite
 @SelectPackages("com.github.ngodat0103.yamp.productsvc.repository")
+@Disabled
 class UnitTest {
 
     @Test

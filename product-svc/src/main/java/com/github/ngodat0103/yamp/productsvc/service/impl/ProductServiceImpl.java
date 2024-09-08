@@ -111,11 +111,13 @@ public class ProductServiceImpl implements ProductService {
                    return productDto;
                })
                .collect(Collectors.toUnmodifiableSet());
+
+         int totalElements = (int) productRepository.count();
          return PageDto.<ProductDto>builder()
             .page(pageRequest.getPageNumber())
             .size(pageRequest.getPageSize())
-            .totalElements((int) productRepository.count())
-            .totalPages((int) Math.ceil((double) productRepository.count() / pageRequest.getPageSize()))
+            .totalElements(totalElements)
+            .totalPages((totalElements / pageRequest.getPageSize()))
             .data(productDtos)
             .build();
     }

@@ -7,12 +7,7 @@ import org.junit.platform.suite.api.Suite;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @Suite
-@SelectPackages("com.github.ngodat0103.yamp.productsvc.repository")
-@Disabled
+@SelectPackages("com.github.ngodat0103.yamp.productsvc.service")
 class UnitTest {
-
-    @Test
-    void contextLoads() {
-    }
 
 }

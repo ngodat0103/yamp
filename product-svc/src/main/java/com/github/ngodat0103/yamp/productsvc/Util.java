@@ -1,5 +1,6 @@
 package com.github.ngodat0103.yamp.productsvc;
 
+import com.github.ngodat0103.yamp.productsvc.exception.ConflictException;
 import com.github.ngodat0103.yamp.productsvc.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.springframework.security.core.Authentication;
@@ -10,7 +11,7 @@ import java.util.function.Supplier;
 
 public class Util {
     private final static String TEMPLATE_NOT_FOUND = "%s with %s: %s not found";
-    private final static String TEMPLATE_CONFLICT = "%s with %s: %s already exists";
+    private final static String TEMPLATE_CONFLICT = "%s with %s: \"%s\" already exists";
 
     public static void throwNotFoundException(Logger log, String entity, String attributeName, Object attributeValue) {
         String message = String.format(TEMPLATE_NOT_FOUND, entity,attributeName,attributeValue);
@@ -29,12 +30,12 @@ public class Util {
 
     public static void throwConflictException(Logger log, String entity, String attributeName, Object attributeValues) {
         String message = String.format(TEMPLATE_CONFLICT, entity,attributeName,attributeValues);
-        NotFoundException notFoundException = new NotFoundException(message);
+        ConflictException notFoundException = new ConflictException(message);
         logging(log,message,notFoundException);
         throw notFoundException;
     }
 
-    private static void  logging(Logger log, String message,NotFoundException notFoundException){
+    private static void  logging(Logger log, String message,Exception  notFoundException){
         if(log.isTraceEnabled()){
             log.debug(message,notFoundException);
         }

@@ -1,4 +1,5 @@
 package com.github.ngodat0103.yamp.productsvc.service.impl;
+import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.dto.mapper.ProductMapper;
 import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDto;
 import com.github.ngodat0103.yamp.productsvc.exception.NotFoundException;
@@ -10,6 +11,9 @@ import com.github.ngodat0103.yamp.productsvc.service.ProductService;
 import com.github.slugify.Slugify;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.UriTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
     private final  ProductRepository productRepository ;
     private final CategoryRepository categoryRepository;
     private final Slugify slugify;
+    private final UriTemplate uriTemplate = UriTemplate.of("/api/v1/product/products/{placeholder}");
     ProductMapper productMapper;
     @Override
     public ProductDto createProduct(ProductDto productDto) {
@@ -84,7 +89,10 @@ public class ProductServiceImpl implements ProductService {
             log.debug(message);
             return new NotFoundException(message);
         });
-        return productMapper.toProductDto(product);
+
+        ProductDto productDto = productMapper.toProductDto(product);
+        addLinks(productDto,productSlugName);
+        return productDto;
     }
 
     @Override
@@ -93,9 +101,39 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Set<ProductDto> getProducts() {
-       return  productRepository.findAll().stream()
-                .map(productMapper::toProductDto)
-                .collect(Collectors.toUnmodifiableSet());
+    public PageDto<ProductDto> getProducts(PageRequest pageRequest) {
+       Set<ProductDto> productDtos =  productRepository.findAll(pageRequest).stream()
+               .map(account -> {
+                   ProductDto productDto = productMapper.toProductDto(account);
+                   addLinks(productDto,account.getSlugName());
+                   return productDto;
+               })
+               .collect(Collectors.toUnmodifiableSet());
+         return PageDto.<ProductDto>builder()
+            .page(pageRequest.getPageNumber())
+            .size(pageRequest.getPageSize())
+            .totalElements((int) productRepository.count())
+            .totalPages((int) Math.ceil((double) productRepository.count() / pageRequest.getPageSize()))
+            .data(productDtos)
+            .build();
+    }
+    private void addLinks(ProductDto productDto, String slugName) {
+        Link updateLink = Link.of(uriTemplate.expand(productDto.getUuid()).toString(),"update")
+                .withTitle("Update product")
+                .withType("application/json");
+        Link deleteLink = Link.of(uriTemplate.expand(productDto.getUuid()).toString(),"delete")
+                .withTitle("Delete product")
+                .withType("application/json");
+        Link slugLink = Link.of(uriTemplate.expand(slugName).toString(),"slugName")
+                .withTitle("Get product by slugName")
+                .withType("application/json");
+        Link categoryLink = Link.of("/api/v1/category/categories/"+productDto.getCategorySlug(),"category")
+                .withTitle("Get category by slugName")
+                .withType("application/json");
+        Link uuidLink = Link.of(uriTemplate.expand(productDto.getUuid()).toString())
+                .withTitle("Get product by uuid")
+                .withSelfRel()
+                .withType("application/json");
+        productDto.add(categoryLink,uuidLink ,slugLink, updateLink,deleteLink);
     }
 }

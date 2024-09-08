@@ -1,5 +1,6 @@
 package com.github.ngodat0103.yamp.productsvc.service.impl;
 import com.github.ngodat0103.yamp.productsvc.dto.CategoryDto;
+import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.dto.mapper.CategoryMapper;
 import com.github.ngodat0103.yamp.productsvc.exception.ConflictException;
 import com.github.ngodat0103.yamp.productsvc.exception.NotFoundException;
@@ -34,7 +35,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final Slugify slugify;
-    private final UriTemplate uriTemplate = UriTemplate.of("/api/v1/product/categories/{uuid}");
+    private final UriTemplate uriTemplate = UriTemplate.of("/api/v1/product/categories/{placeholder}");
 
 
 
@@ -105,7 +106,7 @@ public class CategoryServiceImpl implements CategoryService {
             return new NotFoundException(message);
         });
         CategoryDto categoryDto = categoryMapper.mapToDto(category);
-        addLinks(categoryDto);
+        addLinks(categoryDto,categorySlugName);
         return categoryDto;
     }
 
@@ -113,30 +114,47 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto getCategory(UUID categoryUuid) {
         Category category = categoryRepository.findById(categoryUuid).orElseThrow(() -> new NotFoundException("Category not found"));
         CategoryDto categoryDto = categoryMapper.mapToDto(category);
-        addLinks(categoryDto);
+        addLinks(categoryDto,category.getSlugName());
         return categoryDto;
     }
 
     @Override
-    public Set<CategoryDto> getAllCategories(PageRequest pageRequest) {
+    public PageDto<CategoryDto> getAllCategories(PageRequest pageRequest) {
 
         List<Category> categories = categoryRepository.findAll(pageRequest).getContent();
         log.debug("Get categories with {} elements", categories.size());
-        return categories.stream().map(category -> {
+        Set<CategoryDto> categoryDtos =  categories.stream().map(category -> {
             CategoryDto categoryDto = categoryMapper.mapToDto(category);
-            addLinks(categoryDto);
+            addLinks(categoryDto,category.getSlugName());
             return categoryDto;
         }).collect(Collectors.toUnmodifiableSet());
+
+        return PageDto.<CategoryDto>builder()
+                .data(categoryDtos)
+                .page(pageRequest.getPageNumber())
+                .size(pageRequest.getPageSize())
+                .totalElements((int) categoryRepository.count())
+                .totalPages((int) Math.ceil((double) categoryRepository.count() / pageRequest.getPageSize()))
+                .build();
     }
 
-    private void addLinks(CategoryDto categoryDto) {
-        Link updateLink = Link.of(uriTemplate.expand(categoryDto.getUuid()).toString(), "Update Category")
-                .withTitle("Update category")
-                .withType("application/json");
-        Link deleteLink = Link.of(uriTemplate.expand(categoryDto.getUuid()).toString(), "Delete Category")
-                .withTitle("Delete category")
-                .withType("application/json");
-        categoryDto.add(updateLink);
-        categoryDto.add(deleteLink);
+    private void addLinks(CategoryDto categoryDto,String slugName) {
+            Link slugLink = Link.of(uriTemplate.expand(slugName).toString(), "SlugName")
+                    .withTitle("Get category by slugName")
+                    .withType("application/json");
+            Link updateLink = Link.of(uriTemplate.expand(categoryDto.getUuid()).toString(), "Update")
+                    .withTitle("Update category")
+                    .withType("application/json");
+            Link deleteLink = Link.of(uriTemplate.expand(categoryDto.getUuid()).toString(), "Delete")
+                    .withTitle("Delete category")
+                    .withType("application/json");
+            if(categoryDto.getParentCategoryUuid()!=null){
+                Link parentLink = Link.of(uriTemplate.expand(categoryDto.getParentCategoryUuid()).toString(), "Parent")
+                        .withTitle("Get parent category")
+                        .withType("application/json");
+                categoryDto.add(parentLink);
+            }
+           categoryDto.add(slugLink,updateLink,deleteLink);
+
     }
 }

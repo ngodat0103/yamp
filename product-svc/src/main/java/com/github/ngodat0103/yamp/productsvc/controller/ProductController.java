@@ -1,9 +1,11 @@
 package com.github.ngodat0103.yamp.productsvc.controller;
 
 
+import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDto;
 import com.github.ngodat0103.yamp.productsvc.service.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +24,9 @@ public class ProductController {
 
 
     @GetMapping(path = "/all")
-    public Set<ProductDto> getProducts(){
-        return productService.getProducts();
+    public PageDto<ProductDto> getProducts(@RequestParam(required = false,defaultValue = "0") int page,
+                                           @RequestParam(required = false,defaultValue = "100") int size){
+        return productService.getProducts(PageRequest.of(page,size));
     }
 
     @GetMapping(path = "/{slugName}")

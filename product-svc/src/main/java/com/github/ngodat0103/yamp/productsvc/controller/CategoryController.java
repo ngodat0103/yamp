@@ -1,6 +1,7 @@
 package com.github.ngodat0103.yamp.productsvc.controller;
 
 import com.github.ngodat0103.yamp.productsvc.dto.CategoryDto;
+import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.service.CategoryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -29,13 +30,13 @@ public class CategoryController {
     }
 
     @GetMapping(path = "/all")
-    public Set<CategoryDto> getCategory(@RequestParam(required = false,defaultValue = "0") int page, @RequestParam(required = false,defaultValue = "100")  int size){
+    public PageDto<CategoryDto> getCategory(@RequestParam(required = false,defaultValue = "0") int page,
+                                            @RequestParam(required = false,defaultValue = "100")  int size){
          return categoryService.getAllCategories(PageRequest.of(page,size));
     }
 
     @GetMapping(path = "/{slugName}")
     public CategoryDto getCategory(@PathVariable String slugName){
-        Link link = Link.of("http://localhost:8080/categories/"+slugName,"update category");
         return  categoryService.getCategory(slugName);
     }
 

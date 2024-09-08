@@ -15,6 +15,7 @@ public class Product  extends BaseEntity {
 
     @Column(unique = true)
     private String name;
+    @Column(length = 5000)
     private String description;
     private String imageUrl;
     @Column(unique = true)

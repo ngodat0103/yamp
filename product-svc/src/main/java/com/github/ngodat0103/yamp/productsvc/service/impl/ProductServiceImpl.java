@@ -31,6 +31,8 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final Slugify slugify;
     private final UriTemplate uriTemplate = UriTemplate.of("/api/v1/product/products/{placeholder}");
+    private final UriTemplate productQueryUriTemplate = UriTemplate.of("/api/v1/product/products{?uuid}");
+    private final UriTemplate uriTemplateCategory = UriTemplate.of("/api/v1/category/categories/{placeholder}");
     ProductMapper productMapper;
     @Override
     public ProductDto createProduct(ProductDto productDto) {
@@ -64,14 +66,11 @@ public class ProductServiceImpl implements ProductService {
         currentProduct.setDescription(productDto.getDescription());
         currentProduct.setSlugName(slugify.slugify(productDto.getName()));
 
-
         currentProduct.setLastModifiedBy(getAccountUuidFromAuthentication());
         currentProduct.setLastModifiedAt(LocalDateTime.now());
         currentProduct = productRepository.save(currentProduct);
 
         return productMapper.toProductDto(currentProduct);
-
-
     }
 
 
@@ -97,7 +96,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto getProduct(UUID productUuid) {
-        return null;
+        Product product = productRepository.findById(productUuid).orElseThrow(notFoundExceptionSupplier(log,"Product","uuid",productUuid));
+        ProductDto productDto = productMapper.toProductDto(product);
+        addLinks(productDto,product.getSlugName());
+        return productDto;
     }
 
     @Override
@@ -130,10 +132,10 @@ public class ProductServiceImpl implements ProductService {
         Link categoryLink = Link.of("/api/v1/category/categories/"+productDto.getCategorySlug(),"category")
                 .withTitle("Get category by slugName")
                 .withType("application/json");
-        Link uuidLink = Link.of(uriTemplate.expand(productDto.getUuid()).toString())
+
+       Link uuidLink = Link.of(productQueryUriTemplate.expand(productDto.getUuid()).toString(),"uuid")
                 .withTitle("Get product by uuid")
-                .withSelfRel()
                 .withType("application/json");
-        productDto.add(categoryLink,uuidLink ,slugLink, updateLink,deleteLink);
+        productDto.add(uuidLink ,slugLink, updateLink,deleteLink,categoryLink);
     }
 }

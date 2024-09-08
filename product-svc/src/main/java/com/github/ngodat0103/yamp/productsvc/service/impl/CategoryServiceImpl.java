@@ -38,8 +38,6 @@ public class CategoryServiceImpl implements CategoryService {
     private final UriTemplate uriTemplate = UriTemplate.of("/api/v1/product/categories/{placeholder}");
 
 
-
-
     @Override
     @Transactional
     public CategoryDto createCategory(CategoryDto categoryDto) {
@@ -128,13 +126,15 @@ public class CategoryServiceImpl implements CategoryService {
             addLinks(categoryDto,category.getSlugName());
             return categoryDto;
         }).collect(Collectors.toUnmodifiableSet());
+        int totalElements = (int) categoryRepository.count();
+
 
         return PageDto.<CategoryDto>builder()
                 .data(categoryDtos)
                 .page(pageRequest.getPageNumber())
                 .size(pageRequest.getPageSize())
-                .totalElements((int) categoryRepository.count())
-                .totalPages((int) Math.ceil((double) categoryRepository.count() / pageRequest.getPageSize()))
+                .totalElements(totalElements)
+                .totalPages((totalElements / pageRequest.getPageSize()))
                 .build();
     }
 

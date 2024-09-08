@@ -18,4 +18,5 @@ public class CategoryDto extends RepresentationModel<CategoryDto> {
     private String thumbnailUrl;
     @NotNull(message = "Category name is required")
     private String name;
+    private String slugName;
 }

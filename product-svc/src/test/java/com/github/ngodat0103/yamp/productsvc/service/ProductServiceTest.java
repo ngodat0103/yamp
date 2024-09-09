@@ -20,10 +20,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import java.util.Locale;
 import java.util.UUID;
-
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)

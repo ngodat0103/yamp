@@ -1,20 +1,17 @@
 package com.github.ngodat0103.yamp.productsvc.controller;
 
-import com.github.ngodat0103.yamp.productsvc.dto.CategoryDto;
+import com.github.ngodat0103.yamp.productsvc.dto.category.CategoryDtoRequest;
+import com.github.ngodat0103.yamp.productsvc.dto.category.CategoryDtoResponse;
 import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.service.CategoryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -30,18 +27,18 @@ public class CategoryController {
     }
 
     @GetMapping(path = "/all")
-    public PageDto<CategoryDto> getCategory(@RequestParam(required = false,defaultValue = "0") int page,
-                                            @RequestParam(required = false,defaultValue = "100")  int size){
+    public PageDto<CategoryDtoResponse> getCategory(@RequestParam(required = false,defaultValue = "0") int page,
+                                                    @RequestParam(required = false,defaultValue = "100")  int size){
          return categoryService.getAllCategories(PageRequest.of(page,size));
     }
 
     @GetMapping(path = "/{slugName}")
-    public CategoryDto getCategory(@PathVariable String slugName){
+    public CategoryDtoResponse getCategory(@PathVariable String slugName){
         return  categoryService.getCategory(slugName);
     }
 
     @GetMapping
-    public CategoryDto getCategoryByUuid(@RequestParam UUID categoryUuid){
+    public CategoryDtoResponse getCategoryByUuid(@RequestParam UUID categoryUuid){
         return categoryService.getCategory(categoryUuid);
     }
 
@@ -49,8 +46,8 @@ public class CategoryController {
     @PostMapping(consumes = "application/json",produces = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
     @SecurityRequirement(name = "oauth2")
-    public CategoryDto createCategory(@RequestBody @Valid CategoryDto categoryDto){
-        return categoryService.createCategory(categoryDto);
+    public CategoryDtoResponse createCategory(@RequestBody @Valid CategoryDtoRequest categoryDtoRequest){
+        return categoryService.createCategory(categoryDtoRequest);
     }
 
 
@@ -59,8 +56,8 @@ public class CategoryController {
     @PutMapping(consumes = "application/json",produces = "application/json",path = "/{categoryUuid}")
     @SecurityRequirement(name = "oauth2")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public CategoryDto updateCategory(@RequestBody @Valid CategoryDto categoryDto,@PathVariable UUID categoryUuid){
-        return categoryService.updateCategory(categoryUuid,categoryDto);
+    public CategoryDtoResponse updateCategory(@RequestBody @Valid CategoryDtoRequest categoryDtoRequest, @PathVariable UUID categoryUuid){
+        return categoryService.updateCategory(categoryUuid, categoryDtoRequest);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

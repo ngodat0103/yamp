@@ -49,12 +49,6 @@ class AccountControllerTest {
     }
 
 
-
-
-
-
-
-
     @Test
     void testRegisterAccountWhenNotFound() throws Exception {
         when(accountService.register(any(AccountDto.class))).thenReturn(accountDto);

@@ -51,7 +51,6 @@ public class SecurityConfiguration {
 
 
     @Bean
-    @Profile({"pre-prod","prod"})
     SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
@@ -71,21 +70,21 @@ public class SecurityConfiguration {
     }
 
 
-    @Bean
-    @Profile("local-dev") // I use this setting for developing only, does not use this in production
-    SecurityFilterChain apiFilterChain_dev(HttpSecurity http) throws Exception {
-        http.securityMatcher("/accounts/**","/roles/**","/ui-docs/**","/api-docs/**","/actuator/**");
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(AbstractHttpConfigurer::disable);
-        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
-        http.anonymous(anonymous -> {
-            String principal = "1a35d863-0cd9-4bc1-8cc4-f4cddca97720";
-            anonymous.principal(principal);
-            anonymous.authorities("ROLE_ADMIN","SCOPE_auth-service.read","SCOPE_auth-service.write");
-        });
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        return http.build();
-    }
+//    @Bean
+//    @Profile("local-dev") // I use this setting for developing only, does not use this in production
+//    SecurityFilterChain apiFilterChain_dev(HttpSecurity http) throws Exception {
+//        http.securityMatcher("/accounts/**","/roles/**","/ui-docs/**","/api-docs/**","/actuator/**");
+//        http.csrf(AbstractHttpConfigurer::disable);
+//        http.cors(AbstractHttpConfigurer::disable);
+//        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+//        http.anonymous(anonymous -> {
+//            String principal = "1a35d863-0cd9-4bc1-8cc4-f4cddca97720";
+//            anonymous.principal(principal);
+//            anonymous.authorities("ROLE_ADMIN","SCOPE_auth-service.read","SCOPE_auth-service.write");
+//        });
+//        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//        return http.build();
+//    }
 
 
 
@@ -99,7 +98,7 @@ public class SecurityConfiguration {
     @Bean
     @Profile({"pre-prod","prod"})
     PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
+        return new DelegatingPasswordEncoder("bcrypt",Map.of("bcrypt",new BCryptPasswordEncoder()));
     }
 
 

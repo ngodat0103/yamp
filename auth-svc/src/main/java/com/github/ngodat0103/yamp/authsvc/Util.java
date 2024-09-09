@@ -5,14 +5,16 @@ import org.slf4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
-
 import java.util.UUID;
 import java.util.function.Supplier;
 
 public final class Util {
-    private final static String TEMPLATE_NOT_FOUND = "%s with %s: %s not found";
-    private final static String TEMPLATE_CONFLICT = "%s with %s: %s already exists";
+    private static final String TEMPLATE_NOT_FOUND = "%s with %s: %s not found";
+    private static final String TEMPLATE_CONFLICT = "%s with %s: %s already exists";
 
+    public Util(){
+        throw new IllegalStateException("Utility class");
+    }
     public static void throwNotFoundException(Logger log, String entity, String attributeName, Object attributeValue) {
         String message = String.format(TEMPLATE_NOT_FOUND, entity,attributeName,attributeValue);
         NotFoundException notFoundException = new NotFoundException(message);
@@ -56,7 +58,5 @@ public final class Util {
             throw new IllegalArgumentException("Invalid UUID format", e);
         }
     }
-
-
 
 }

@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: proc
+      on-profile: prod
   cloud:
     inetutils:
       default-hostname: yamp-backend.ngodat0103.live

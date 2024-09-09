@@ -51,6 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
             }
         }
         Category category = categoryMapper.mapToEntity(categoryDtoRequest,createBy);
+        category.setName(categoryName);
         category.setSlugName(slugify.slugify(category.getName()));
         log.debug("Creating category: {}", category);
          category =   categoryRepository.save(category);

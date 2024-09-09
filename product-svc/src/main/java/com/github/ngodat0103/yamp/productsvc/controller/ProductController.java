@@ -2,15 +2,16 @@ package com.github.ngodat0103.yamp.productsvc.controller;
 
 
 import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
-import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDto;
+import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDtoRequest;
+import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDtoResponse;
 import com.github.ngodat0103.yamp.productsvc.service.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -24,18 +25,18 @@ public class ProductController {
 
 
     @GetMapping(path = "/all")
-    public PageDto<ProductDto> getProducts(@RequestParam(required = false,defaultValue = "0") int page,
-                                           @RequestParam(required = false,defaultValue = "100") int size){
+    public PageDto<ProductDtoResponse> getProducts(@RequestParam(required = false,defaultValue = "0") int page,
+                                                   @RequestParam(required = false,defaultValue = "100") int size){
         return productService.getProducts(PageRequest.of(page,size));
     }
 
     @GetMapping(path = "/{slugName}")
-    public ProductDto getProduct(@PathVariable String slugName){
+    public ProductDtoResponse getProduct(@PathVariable String slugName){
         return productService.getProduct(slugName);
     }
 
     @GetMapping
-    public ProductDto getProduct(@RequestParam UUID uuid){
+    public ProductDtoResponse getProduct(@RequestParam UUID uuid){
         return productService.getProduct(uuid);
     }
 
@@ -44,20 +45,23 @@ public class ProductController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
-    public ProductDto createProduct(@RequestBody @Valid ProductDto productDto){
-        return productService.createProduct(productDto);
+    @SecurityRequirement(name = "oauth2")
+    public ProductDtoResponse createProduct(@RequestBody @Valid ProductDtoRequest productDtoRequest){
+        return productService.createProduct(productDtoRequest);
     }
 
     @PutMapping(path = "/{productUuid}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PreAuthorize("hasRole('ADMIN')")
-    public ProductDto updateProduct(@PathVariable UUID productUuid, @RequestBody @Valid ProductDto productDto){
-        return productService.updateProduct(productUuid,productDto);
+    @SecurityRequirement(name = "oauth2")
+    public ProductDtoResponse updateProduct(@PathVariable UUID productUuid, @RequestBody @Valid ProductDtoRequest productDtoRequest){
+        return productService.updateProduct(productUuid, productDtoRequest);
     }
 
     @DeleteMapping(path = "/{productUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "oauth2")
     public void deleteProduct(@PathVariable UUID productUuid){
         productService.deleteProduct(productUuid);
     }

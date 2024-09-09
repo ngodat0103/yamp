@@ -1,7 +1,8 @@
 package com.github.ngodat0103.yamp.productsvc.service.impl;
 import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.dto.mapper.ProductMapper;
-import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDto;
+import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDtoRequest;
+import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDtoResponse;
 import com.github.ngodat0103.yamp.productsvc.exception.NotFoundException;
 import com.github.ngodat0103.yamp.productsvc.persistence.entity.Category;
 import com.github.ngodat0103.yamp.productsvc.persistence.entity.Product;
@@ -35,36 +36,36 @@ public class ProductServiceImpl implements ProductService {
     private final UriTemplate uriTemplateCategory = UriTemplate.of("/api/v1/category/categories/{placeholder}");
     ProductMapper productMapper;
     @Override
-    public ProductDto createProduct(ProductDto productDto) {
-        Category category = categoryRepository.findCategoryBySlugName(productDto.getCategorySlug())
-                .orElseThrow(notFoundExceptionSupplier(log,"Category","slugName",productDto.getCategorySlug()));
-        if(productRepository.existsByName(productDto.getName())){
-           throwConflictException(log,"Product","name",productDto.getName());
+    public ProductDtoResponse createProduct(ProductDtoRequest productDtoRequest) {
+        Category category = categoryRepository.findCategoryBySlugName(productDtoRequest.getCategorySlug())
+                .orElseThrow(notFoundExceptionSupplier(log,"Category","slugName", productDtoRequest.getCategorySlug()));
+        if(productRepository.existsByName(productDtoRequest.getName())){
+           throwConflictException(log,"Product","name", productDtoRequest.getName());
         }
 
-        if(productRepository.existsBySlugName(slugify.slugify(productDto.getName()))){
-            throwConflictException(log,"Product","slugName",slugify.slugify(productDto.getName()));
+        if(productRepository.existsBySlugName(slugify.slugify(productDtoRequest.getName()))){
+            throwConflictException(log,"Product","slugName",slugify.slugify(productDtoRequest.getName()));
         }
 
 
-        Product product = productMapper.toEntity(productDto,getAccountUuidFromAuthentication());
+        Product product = productMapper.toEntity(productDtoRequest,getAccountUuidFromAuthentication());
         product.setCategory(category);
-        product.setSlugName(slugify.slugify(productDto.getName()));
+        product.setSlugName(slugify.slugify(productDtoRequest.getName()));
         product = productRepository.save(product);
         return productMapper.toProductDto(product);
     }
 
     @Override
-    public ProductDto updateProduct(UUID productUuid, ProductDto productDto) {
+    public ProductDtoResponse updateProduct(UUID productUuid, ProductDtoRequest productDtoRequest) {
         Product currentProduct = productRepository.findById(productUuid)
                 .orElseThrow(notFoundExceptionSupplier(log,"Product","uuid",productUuid));
-        Category newCategory = categoryRepository.findCategoryBySlugName(productDto.getCategorySlug())
-                .orElseThrow(notFoundExceptionSupplier(log,"Category","slugName",productDto.getCategorySlug()));
+        Category newCategory = categoryRepository.findCategoryBySlugName(productDtoRequest.getCategorySlug())
+                .orElseThrow(notFoundExceptionSupplier(log,"Category","slugName", productDtoRequest.getCategorySlug()));
 
         currentProduct.setCategory(newCategory);
-        currentProduct.setName(productDto.getName());
-        currentProduct.setDescription(productDto.getDescription());
-        currentProduct.setSlugName(slugify.slugify(productDto.getName()));
+        currentProduct.setName(productDtoRequest.getName());
+        currentProduct.setDescription(productDtoRequest.getDescription());
+        currentProduct.setSlugName(slugify.slugify(productDtoRequest.getName()));
 
         currentProduct.setLastModifiedBy(getAccountUuidFromAuthentication());
         currentProduct.setLastModifiedAt(LocalDateTime.now());
@@ -82,62 +83,62 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto getProduct(String productSlugName) {
+    public ProductDtoResponse getProduct(String productSlugName) {
         Product product = productRepository.findBySlugName(productSlugName).orElseThrow(() -> {
             String message = "Product with slugName: "+ productSlugName+" not found";
             log.debug(message);
             return new NotFoundException(message);
         });
 
-        ProductDto productDto = productMapper.toProductDto(product);
-        addLinks(productDto,productSlugName);
-        return productDto;
+        ProductDtoResponse productDtoResponse = productMapper.toProductDto(product);
+        addLinks(productDtoResponse,productSlugName);
+        return productDtoResponse;
     }
 
     @Override
-    public ProductDto getProduct(UUID productUuid) {
+    public ProductDtoResponse getProduct(UUID productUuid) {
         Product product = productRepository.findById(productUuid).orElseThrow(notFoundExceptionSupplier(log,"Product","uuid",productUuid));
-        ProductDto productDto = productMapper.toProductDto(product);
-        addLinks(productDto,product.getSlugName());
-        return productDto;
+        ProductDtoResponse productDtoResponse = productMapper.toProductDto(product);
+        addLinks(productDtoResponse,product.getSlugName());
+        return productDtoResponse;
     }
 
     @Override
-    public PageDto<ProductDto> getProducts(PageRequest pageRequest) {
-       Set<ProductDto> productDtos =  productRepository.findAll(pageRequest).stream()
+    public PageDto<ProductDtoResponse> getProducts(PageRequest pageRequest) {
+       Set<ProductDtoResponse> productDtoResponses =  productRepository.findAll(pageRequest).stream()
                .map(account -> {
-                   ProductDto productDto = productMapper.toProductDto(account);
-                   addLinks(productDto,account.getSlugName());
-                   return productDto;
+                   ProductDtoResponse productDtoResponse = productMapper.toProductDto(account);
+                   addLinks(productDtoResponse,account.getSlugName());
+                   return productDtoResponse;
                })
                .collect(Collectors.toUnmodifiableSet());
 
          int totalElements = (int) productRepository.count();
-         return PageDto.<ProductDto>builder()
+         return PageDto.<ProductDtoResponse>builder()
             .page(pageRequest.getPageNumber())
             .size(pageRequest.getPageSize())
             .totalElements(totalElements)
             .totalPages((totalElements / pageRequest.getPageSize()))
-            .data(productDtos)
+            .data(productDtoResponses)
             .build();
     }
-    private void addLinks(ProductDto productDto, String slugName) {
-        Link updateLink = Link.of(uriTemplate.expand(productDto.getUuid()).toString(),"update")
+    private void addLinks(ProductDtoResponse productDtoResponse, String slugName) {
+        Link updateLink = Link.of(uriTemplate.expand(productDtoResponse.getUuid()).toString(),"update")
                 .withTitle("Update product")
                 .withType("application/json");
-        Link deleteLink = Link.of(uriTemplate.expand(productDto.getUuid()).toString(),"delete")
+        Link deleteLink = Link.of(uriTemplate.expand(productDtoResponse.getUuid()).toString(),"delete")
                 .withTitle("Delete product")
                 .withType("application/json");
         Link slugLink = Link.of(uriTemplate.expand(slugName).toString(),"slugName")
                 .withTitle("Get product by slugName")
                 .withType("application/json");
-        Link categoryLink = Link.of("/api/v1/category/categories/"+productDto.getCategorySlug(),"category")
+        Link categoryLink = Link.of("/api/v1/category/categories/"+ productDtoResponse.getCategorySlug(),"category")
                 .withTitle("Get category by slugName")
                 .withType("application/json");
 
-       Link uuidLink = Link.of(productQueryUriTemplate.expand(productDto.getUuid()).toString(),"uuid")
+       Link uuidLink = Link.of(productQueryUriTemplate.expand(productDtoResponse.getUuid()).toString(),"uuid")
                 .withTitle("Get product by uuid")
                 .withType("application/json");
-        productDto.add(uuidLink ,slugLink, updateLink,deleteLink,categoryLink);
+        productDtoResponse.add(uuidLink ,slugLink, updateLink,deleteLink,categoryLink);
     }
 }

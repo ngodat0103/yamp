@@ -3,7 +3,8 @@ import com.github.ngodat0103.yamp.productsvc.CustomerTestWithMockUser;
 import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.dto.mapper.ProductMapper;
 import com.github.ngodat0103.yamp.productsvc.dto.mapper.ProductMapperImpl;
-import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDto;
+import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDtoRequest;
+import com.github.ngodat0103.yamp.productsvc.dto.product.ProductDtoResponse;
 import com.github.ngodat0103.yamp.productsvc.exception.ConflictException;
 import com.github.ngodat0103.yamp.productsvc.exception.NotFoundException;
 import com.github.ngodat0103.yamp.productsvc.persistence.entity.Category;
@@ -31,7 +32,11 @@ public class ProductServiceTest {
     private ProductService productService;
     private ProductRepository productRepository;
     private CategoryRepository categoryRepository;
-    private ProductDto productDto;
+    private ProductDtoRequest productDtoRequest = ProductDtoRequest.builder()
+            .name("Product test")
+            .description("Description test")
+            .categorySlug("category-test")
+            .build();
     private Product product;
     private Category category;
 
@@ -50,12 +55,11 @@ public class ProductServiceTest {
         category.setUuid(UUID.randomUUID());
         category.setName("Category test");
         category.setSlugName("category-test");
-        this.product = new Product();
-        product.setUuid(UUID.randomUUID());
-        product.setName("Product test");
-        product.setSlugName("product-test");
-        product.setCategory(category);
-        this.productDto = productMapper.toProductDto(product);
+        this.product = productMapper.toEntity(productDtoRequest, UUID.randomUUID());
+        this.product.setUuid(UUID.randomUUID());
+        this.product.setSlugName("product-test");
+        this.product.setCategory(category);
+
     }
 
     @Test
@@ -63,10 +67,10 @@ public class ProductServiceTest {
     @Disabled("This test is disabled because it is not relevant to the current implementation")
     public void givenNoAuthentication_whenCreateProduct_thenThrowIllegalArgumentException() {
         Exception exceptionForCreate = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            productService.createProduct(productDto);
+            productService.createProduct(productDtoRequest);
         });
         Exception exceptionForUpdate = Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            productService.updateProduct(UUID.randomUUID(), productDto);
+            productService.updateProduct(UUID.randomUUID(), productDtoRequest);
         });
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Authentication object is required", exceptionForCreate.getMessage()),
@@ -77,37 +81,37 @@ public class ProductServiceTest {
     @CustomerTestWithMockUser
     @DisplayName("Given a ProductDto, when creating a product, then throw ConflictException if the product name already exists")
     public void givenProductDto_whenCreateProduct_thenThrowConflictException() {
-        given(productRepository.existsByName(productDto.getName())).willReturn(true);
-        given(categoryRepository.findCategoryBySlugName(productDto.getCategorySlug())).willReturn(java.util.Optional.of(category));
+        given(productRepository.existsByName(productDtoRequest.getName())).willReturn(true);
+        given(categoryRepository.findCategoryBySlugName(productDtoRequest.getCategorySlug())).willReturn(java.util.Optional.of(category));
         Exception exception = Assertions.assertThrows(ConflictException.class, () -> {
-            productService.createProduct(productDto);
+            productService.createProduct(productDtoRequest);
         });
-        String expectedMessage = String.format("Product with name: \"%s\" already exists", productDto.getName());
+        String expectedMessage = String.format("Product with name: \"%s\" already exists", productDtoRequest.getName());
         Assertions.assertEquals(expectedMessage, exception.getMessage());
-        then(productRepository).should().existsByName(productDto.getName());
+        then(productRepository).should().existsByName(productDtoRequest.getName());
     }
 
     @CustomerTestWithMockUser
     @DisplayName("Given a ProductDto, when creating a product, then throw NotFoundException if the category does not exist")
     public void givenProductDto_whenCreateProduct_thenThrowNotFoundException() {
-        given(categoryRepository.findCategoryBySlugName(productDto.getCategorySlug())).willReturn(java.util.Optional.empty());
+        given(categoryRepository.findCategoryBySlugName(productDtoRequest.getCategorySlug())).willReturn(java.util.Optional.empty());
         Exception exception = Assertions.assertThrows(NotFoundException.class, () -> {
-            productService.createProduct(productDto);
+            productService.createProduct(productDtoRequest);
         });
-        Assertions.assertEquals("Category with slugName: " + productDto.getCategorySlug() + " not found", exception.getMessage());
-        then(categoryRepository).should().findCategoryBySlugName(productDto.getCategorySlug());
+        Assertions.assertEquals("Category with slugName: " + productDtoRequest.getCategorySlug() + " not found", exception.getMessage());
+        then(categoryRepository).should().findCategoryBySlugName(productDtoRequest.getCategorySlug());
     }
 
     @CustomerTestWithMockUser
     @DisplayName("Given a ProductDto, when creating a product, then return a ProductDto")
     public void givenProductDto_whenCreateProduct_thenReturnProductDto() {
-        given(productRepository.existsByName(productDto.getName())).willReturn(false);
-        given(categoryRepository.findCategoryBySlugName(productDto.getCategorySlug())).willReturn(java.util.Optional.of(category));
+        given(productRepository.existsByName(this.productDtoRequest.getName())).willReturn(false);
+        given(categoryRepository.findCategoryBySlugName(this.productDtoRequest.getCategorySlug())).willReturn(java.util.Optional.of(category));
         given(productRepository.save(any(Product.class))).willReturn(product);
-        ProductDto productDto = productService.createProduct(this.productDto);
-        Assertions.assertNotNull(productDto);
-        then(productRepository).should().existsByName(productDto.getName());
-        then(categoryRepository).should().findCategoryBySlugName(productDto.getCategorySlug());
+        ProductDtoResponse productDtoResponse = productService.createProduct(this.productDtoRequest);
+        Assertions.assertNotNull(productDtoResponse);
+        then(productRepository).should().existsByName(productDtoResponse.getName());
+        then(categoryRepository).should().findCategoryBySlugName(productDtoResponse.getCategorySlug());
         then(productRepository).should().save(any(Product.class));
     }
 
@@ -116,7 +120,7 @@ public class ProductServiceTest {
     public void givenProductDto_whenUpdateProduct_thenThrowNotFoundException() {
         given(productRepository.findById(product.getUuid())).willReturn(java.util.Optional.empty());
         Exception exception = Assertions.assertThrows(NotFoundException.class, () -> {
-            productService.updateProduct(product.getUuid(), productDto);
+            productService.updateProduct(product.getUuid(), productDtoRequest);
         });
         Assertions.assertEquals("Product with uuid: " + product.getUuid() + " not found", exception.getMessage());
     }
@@ -125,23 +129,23 @@ public class ProductServiceTest {
     @DisplayName("Given a ProductDto, when updating a product, then throw NotFoundException if the category does not exist")
     public void givenProductDto_whenUpdateProduct_thenThrowNotFoundExceptionIfCategoryNotExists() {
         given(productRepository.findById(product.getUuid())).willReturn(java.util.Optional.of(product));
-        given(categoryRepository.findCategoryBySlugName(productDto.getCategorySlug())).willReturn(java.util.Optional.empty());
+        given(categoryRepository.findCategoryBySlugName(productDtoRequest.getCategorySlug())).willReturn(java.util.Optional.empty());
         Exception exception = Assertions.assertThrows(NotFoundException.class, () -> {
-            productService.updateProduct(product.getUuid(), productDto);
+            productService.updateProduct(product.getUuid(), productDtoRequest);
         });
-        Assertions.assertEquals("Category with slugName: " + productDto.getCategorySlug() + " not found", exception.getMessage());
+        Assertions.assertEquals("Category with slugName: " + productDtoRequest.getCategorySlug() + " not found", exception.getMessage());
     }
 
     @CustomerTestWithMockUser
     @DisplayName("Given a ProductDto, when updating a product, then return a ProductDto")
     public void givenProductDto_whenUpdateProduct_thenReturnProductDto() {
         given(productRepository.findById(product.getUuid())).willReturn(java.util.Optional.of(product));
-        given(categoryRepository.findCategoryBySlugName(productDto.getCategorySlug())).willReturn(java.util.Optional.of(category));
+        given(categoryRepository.findCategoryBySlugName(this.productDtoRequest.getCategorySlug())).willReturn(java.util.Optional.of(category));
         given(productRepository.save(any(Product.class))).willReturn(product);
-        ProductDto productDto = productService.updateProduct(product.getUuid(), this.productDto);
-        Assertions.assertNotNull(productDto);
+        ProductDtoResponse productDtoResponse = productService.updateProduct(product.getUuid(), this.productDtoRequest);
+        Assertions.assertNotNull(productDtoResponse);
         then(productRepository).should().findById(product.getUuid());
-        then(categoryRepository).should().findCategoryBySlugName(productDto.getCategorySlug());
+        then(categoryRepository).should().findCategoryBySlugName(productDtoResponse.getCategorySlug());
         then(productRepository).should().save(any(Product.class));
     }
 
@@ -176,8 +180,8 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Given slugName, when get product by slugName, then return a ProductDto")
     public void givenProductSlug_whenGetProductBySlug_thenReturnProductDto() {
-        given(productRepository.findBySlugName(productDto.getSlugName())).willReturn(java.util.Optional.of(product));
-        ProductDto productDtoResponse = productService.getProduct(product.getSlugName());
+        given(productRepository.findBySlugName(product.getSlugName())).willReturn(java.util.Optional.of(product));
+        ProductDtoResponse productDtoResponse = productService.getProduct(product.getSlugName());
         Assertions.assertNotNull(productDtoResponse);
         Assertions.assertEquals(product.getName(), productDtoResponse.getName());
         Assertions.assertEquals(product.getUuid().toString(), productDtoResponse.getUuid());
@@ -200,12 +204,12 @@ public class ProductServiceTest {
     @DisplayName("Given product UUID, when get product by UUID, then return a ProductDto")
     public void givenProductUuid_whenGetProductByUuid_thenReturnProductDto() {
         given(productRepository.findById(product.getUuid())).willReturn(java.util.Optional.of(product));
-        ProductDto productDto = productService.getProduct(product.getUuid());
-        Assertions.assertNotNull(productDto);
-        Assertions.assertEquals(product.getName(), productDto.getName());
-        Assertions.assertEquals(product.getUuid().toString(), productDto.getUuid());
-        Assertions.assertEquals(product.getCategory().getSlugName(), productDto.getCategorySlug());
-        Assertions.assertEquals(product.getSlugName(), productDto.getSlugName());
+        ProductDtoResponse productDtoResponse = productService.getProduct(product.getUuid());
+        Assertions.assertNotNull(productDtoResponse);
+        Assertions.assertEquals(product.getName(), productDtoResponse.getName());
+        Assertions.assertEquals(product.getUuid().toString(), productDtoResponse.getUuid());
+        Assertions.assertEquals(product.getCategory().getSlugName(), productDtoResponse.getCategorySlug());
+        Assertions.assertEquals(product.getSlugName(), productDtoResponse.getSlugName());
         then(productRepository).should().findById(product.getUuid());
     }
 
@@ -218,7 +222,7 @@ public class ProductServiceTest {
         given(productRepository.findAll(pageRequest)).willReturn(pageImpl);
         given(productRepository.count()).willReturn(1L);
 
-        PageDto<ProductDto> pageDto = productService.getProducts(PageRequest.of(0, 100));
+        PageDto<ProductDtoResponse> pageDto = productService.getProducts(PageRequest.of(0, 100));
         Assertions.assertNotNull(pageDto);
         Assertions.assertEquals(pageRequest.getPageNumber(), pageDto.getPage());
         Assertions.assertEquals(pageRequest.getPageSize(), pageDto.getSize());

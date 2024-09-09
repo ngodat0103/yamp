@@ -31,8 +31,4 @@ public class AccountDto {
     private String email;
     private String roleName;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private LocalDateTime createAt;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private LocalDateTime lastModifiedAt;
 }

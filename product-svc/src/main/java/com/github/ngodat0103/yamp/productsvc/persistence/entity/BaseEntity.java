@@ -30,7 +30,6 @@ public class BaseEntity {
 
 
     public BaseEntity(UUID createdBy) {
-        assert createdBy!=null;
         this.createdBy = createdBy;
         this.lastModifiedBy = createdBy;
         this.createdAt = LocalDateTime.now();

@@ -1,9 +1,5 @@
 spring:
-  kafka:
-    bootstrap-servers: [kafka-svc:9092]
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.UUIDSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
   cloud:
     inetutils:
       default-hostname: "yamp-backend.local"

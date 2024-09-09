@@ -1,4 +1,9 @@
 spring:
+  kafka:
+    bootstrap-servers: [ kafka-svc:9092 ]
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.UUIDSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   profiles:
     default: local-dev
   config:
@@ -11,6 +16,8 @@ spring:
       - "optional:prod.yaml"
   application:
     name: auth-svc
+  jpa:
+    open-in-view: false
   data:
     redis:
       url: redis://redis-svc:6379
@@ -43,7 +50,6 @@ springdoc:
 logging:
   level:
     com.github.ngodat0103.yamp.authsvc.service: DEBUG
-    com.github.ngodat0103.yamp.authsvc.controller: DEBUG
   pattern:
     level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 management:

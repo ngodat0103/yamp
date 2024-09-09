@@ -1,7 +1,7 @@
 spring:
   cloud:
     inetutils:
-      default-hostname: yamp-backend.ngodat0103.live
+      default-hostname: yamp-staging.ngodat0103.live
   config:
     activate:
       on-profile: pre-prod
@@ -17,9 +17,9 @@ spring:
       client:
         provider:
           auth-service-external:
-            authorization-uri: http://${spring.cloud.inetutils.default-hostname}/api/v1/auth/oauth2/authorize
-            token-uri: http://${spring.cloud.inetutils.default-hostname}/api/v1/auth/oauth2/token
-            jwk-set-uri: http://${spring.cloud.inetutils.default-hostname}/api/v1/auth/oauth2/jwks
+            authorization-uri: https://${spring.cloud.inetutils.default-hostname}/api/v1/auth/oauth2/authorize
+            token-uri: https://${spring.cloud.inetutils.default-hostname}/api/v1/auth/oauth2/token
+            jwk-set-uri: https://${spring.cloud.inetutils.default-hostname}/api/v1/auth/oauth2/jwks
       authorizationserver:
-        issuer: http://${spring.cloud.inetutils.default-hostname}/api/v1/auth
+        issuer: https://${spring.cloud.inetutils.default-hostname}/api/v1/auth
 

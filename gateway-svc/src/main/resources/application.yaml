@@ -14,8 +14,8 @@ spring:
       - "optional:unit-test.yaml"
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
-      - "optional:pre-proc.yaml"
-      - "optional:proc.yaml "
+      - "optional:pre-prod.yaml"
+      - "optional:proc.yaml"
   application:
     name: gateway-svc
   security:
@@ -52,7 +52,7 @@ spring:
         - id: product-svc
           uri: http://product-svc:8003
           predicates:
-            - Path=/api/v1/products/**
+            - Path=/api/v1/product/**
 #          filters:
 #            - name: RequestRateLimiter
 #              args:

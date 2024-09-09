@@ -41,6 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void register(CustomerRegisterDto customerRegisterDto) {
         Customer customer = customerMapper.mapToEntity(customerRegisterDto);
+
         customer = customerRepository.save(customer);
         AccountRegisterDto accountRegisterDtoRequest = customerMapper.maptoAccountRegisterDto(customerRegisterDto);
         accountRegisterDtoRequest.setPassword(customerRegisterDto.getPassword());

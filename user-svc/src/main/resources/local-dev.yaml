@@ -14,7 +14,7 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   cloud:
     inetutils:
-      default-hostname: localhost
+      default-hostname: yamp-backend.local
 
   security:
     oauth2:
@@ -43,10 +43,6 @@ spring:
     username: 'user-svc-user'
     password: '{cipher}0579337b871cd41ba98c4875971fa8eca89a6a6902e15b6cf75f711c299912285e825d81331fa61ec4317b6306c3b29d'
     driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto:  update
-    show-sql: true
 
 
 management:

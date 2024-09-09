@@ -10,8 +10,12 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 public class Util {
-    private final static String TEMPLATE_NOT_FOUND = "%s with %s: %s not found";
-    private final static String TEMPLATE_CONFLICT = "%s with %s: \"%s\" already exists";
+    private static final String TEMPLATE_NOT_FOUND = "%s with %s: %s not found";
+    private static final String TEMPLATE_CONFLICT = "%s with %s: \"%s\" already exists";
+
+    public Util() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static void throwNotFoundException(Logger log, String entity, String attributeName, Object attributeValue) {
         String message = String.format(TEMPLATE_NOT_FOUND, entity,attributeName,attributeValue);

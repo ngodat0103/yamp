@@ -3,7 +3,7 @@ package com.github.ngodat0103.yamp.productsvc.dto.product;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -12,7 +12,8 @@ import java.util.UUID;
 
 @Builder
 @Getter
-public class ProductDto extends RepresentationModel<ProductDto> {
+@EqualsAndHashCode(callSuper = true)
+public class ProductDtoResponse extends RepresentationModel<ProductDtoResponse> {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String uuid;

@@ -11,8 +11,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Component
 public class AuthSvcWebClient {
   public static final String AUTH_SVC_BASE = "http://auth-svc:8001/api/v1/auth";
-
-  //todo: Will implement using redis cache for further optimization
     @Bean
     WebClient webClient(OAuth2AuthorizedClientManager authorizedClientManager) {
       ServletOAuth2AuthorizedClientExchangeFilterFunction exchangeFilterFunction = new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);

@@ -10,11 +10,29 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
+
+
+    @Bean
+    SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher(new AntPathRequestMatcher("/actuator/**"));
+        http.authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/actuator/prometheus").permitAll()
+                        .requestMatchers("/actuator/health/readiness").permitAll()
+                        .requestMatchers("/actuator/health/liveness").permitAll()
+                        .anyRequest().hasAnyRole("ACTUATOR","ADMIN")
+                );
+        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.csrf(AbstractHttpConfigurer::disable);
+        return http.build();
+    }
+
     @Bean
 //    @Profile({"pre-prod","prod"})
     SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
@@ -22,6 +40,7 @@ public class SecurityConfiguration {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(requests -> requests
                 .requestMatchers(HttpMethod.GET,"/ui-docs/**","/api-docs/**","/swagger-ui/**").permitAll()
+                .requestMatchers(HttpMethod.POST,"/actuator/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/products/**").permitAll()
                 .anyRequest().authenticated()

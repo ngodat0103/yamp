@@ -35,9 +35,10 @@ public class ControllerTest {
     @Autowired
     AccountMapper accountMapper;
     private final ObjectMapper objectMapper =  JsonMapper.builder().disable(MapperFeature.USE_ANNOTATIONS).build();
+    private final Random random = new Random();
     AccountDto accountDtoRequest = AccountDto.builder()
             .uuid(UUID.randomUUID().toString())
-            .username("testUser"+new Random().nextInt())
+            .username("testUser"+random.nextInt())
             .password("testPassword")
             .email("test@gmail.com")
             .roleName("CUSTOMER")

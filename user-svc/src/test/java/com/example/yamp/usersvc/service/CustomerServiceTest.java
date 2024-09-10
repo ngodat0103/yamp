@@ -71,9 +71,6 @@ public class CustomerServiceTest {
 
     }
 
-
-
-
     @Test
     @DisplayName("Register a new customer")
     void givenRegisterDto_whenRegister_thenReturnSuccessfulCustomer() throws IOException, InterruptedException {

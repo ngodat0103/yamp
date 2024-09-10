@@ -21,6 +21,7 @@ jobs:
           scheme: semver
           increment: patch
   gateway-svc-build-push:
+    if: github.event.release == 'preleased'
     needs: [get-current-version]
     name: "Build and push gateway-svc"
     uses: ./.github/workflows/cd-workflow-call.yaml
@@ -31,6 +32,7 @@ jobs:
       VERSION: ${{ needs.get-current-version.outputs.version }}
   auth-svc-build-push:
     needs: [ get-current-version ]
+    if: github.event.release == 'preleased'
     name: "Build and push auth-svc"
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
@@ -40,6 +42,7 @@ jobs:
       VERSION: ${{ needs.get-current-version.outputs.version }}
   user-svc-build-push:
     name: "Build and push user-svc"
+    if: github.event.release == 'preleased'
     needs: [ get-current-version ]
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
@@ -50,6 +53,7 @@ jobs:
 
   product-svc-build-push:
     name: "Build and push product-svc"
+    if: github.event.release == 'preleased'
     needs: [ get-current-version ]
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
@@ -57,7 +61,6 @@ jobs:
       SERVICE_NAME: product-svc
       SERVICE_PORT: 8003
       VERSION: ${{ needs.get-current-version.outputs.version }}
-
   update-deployment-repo:
     needs: [gateway-svc-build-push, auth-svc-build-push, user-svc-build-push,product-svc-build-push, get-current-version]
     if: github.event.release == 'released'

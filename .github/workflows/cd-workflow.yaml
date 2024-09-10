@@ -1,7 +1,7 @@
 name: Deployment workflow
 on:
   release:
-    types: [created,prereleased,released]
+    types: [prereleased,released]
 jobs:
   get-current-version:
     name: Get current tag version
@@ -21,7 +21,7 @@ jobs:
           scheme: semver
           increment: patch
   gateway-svc-build-push:
-    if: github.event.release == 'preleased'
+    if: github.event.release == 'prereleased'
     needs: [get-current-version]
     name: "Build and push gateway-svc"
     uses: ./.github/workflows/cd-workflow-call.yaml
@@ -32,7 +32,7 @@ jobs:
       VERSION: ${{ needs.get-current-version.outputs.version }}
   auth-svc-build-push:
     needs: [ get-current-version ]
-    if: github.event.release == 'preleased'
+    if: github.event.release == 'prereleased'
     name: "Build and push auth-svc"
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
@@ -42,7 +42,7 @@ jobs:
       VERSION: ${{ needs.get-current-version.outputs.version }}
   user-svc-build-push:
     name: "Build and push user-svc"
-    if: github.event.release == 'preleased'
+    if: github.event.release == 'prereleased'
     needs: [ get-current-version ]
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
@@ -53,7 +53,7 @@ jobs:
 
   product-svc-build-push:
     name: "Build and push product-svc"
-    if: github.event.release == 'preleased'
+    if: github.event.release == 'prereleased'
     needs: [ get-current-version ]
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit

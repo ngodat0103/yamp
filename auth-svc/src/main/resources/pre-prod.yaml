@@ -5,8 +5,12 @@ spring:
   config:
     activate:
       on-profile: pre-prod
+  data:
+    redis:
+      url: redis://redis-svc-master:6379
+      client-name: auth-svc
   datasource:
-    url: jdbc:postgresql://share-db:5432/auth-svc-db
+    url: jdbc:postgresql://share-db-postgresql:5432/auth-svc-db
   jpa:
     hibernate:
       ddl-auto: update

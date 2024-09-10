@@ -1,15 +1,16 @@
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: pre-prod
   cloud:
     inetutils:
-      default-hostname: yamp-backend.ngodat0103.live
+      default-hostname: yamp-staging.ngodat0103.live
   data:
     redis:
       url: redis://redis-svc-master:6379
+      client-name: product-svc
   datasource:
-    url: jdbc:postgresql://share-db-postgresql:5432/user-svc-db
+    url: jdbc:postgresql://share-db-postgresql:5432/product-svc-db
   jpa:
     hibernate:
       ddl-auto:  update
@@ -26,12 +27,3 @@ spring:
             authorization-uri: https://${spring.cloud.inetutils.default-hostname}/api/v1/auth/oauth2/authorize
             token-uri: https://${spring.cloud.inetutils.default-hostname}/api/v1/auth/oauth2/token
             jwk-set-uri: https://${spring.cloud.inetutils.default-hostname}/api/v1/auth/oauth2/jwks
-        registration:
-          user-service:
-            client-id: ${CLIENT_ID}
-            client-secret: ${CLIENT_SECRET}
-            scope: auth-service.write
-            provider: auth-service-internal
-            client-name: User Service
-            client-authentication-method: client_secret_basic
-            authorization-grant-type: client_credentials

@@ -1,13 +1,16 @@
 spring:
   config:
     activate:
-      on-profile: pre-proc
+      on-profile: pre-prod
   cloud:
     inetutils:
-      default-hostname: yamp-backend.ngodat0103.live
+      default-hostname: yamp-staging.ngodat0103.live
+  data:
+    redis:
+      url: redis://redis-svc-master:6379
+      client-name: user-svc
   datasource:
-    url: jdbc:postgresql://share-db:5432/user-svc-db
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://share-db-postgresql:5432/user-svc-db
   jpa:
     hibernate:
       ddl-auto:  update

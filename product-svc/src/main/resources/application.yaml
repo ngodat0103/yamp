@@ -6,6 +6,8 @@ spring:
       - 'optional:local-dev.yaml'
       - 'optional:unit-test.yaml'
       - "optional:integration-test.yaml"
+      - "optional:pre-prod.yaml"
+      - "optional:prod.yaml"
   application:
     name: product-svc
 server:
@@ -28,3 +30,27 @@ springdoc:
         name: NgoDat0103
         url: https://github.com/NGODAT0103
         email: 21521935@gm.uit.edu.vn
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always
+logging:
+  level:
+    org.springframework.security: DEBUG
+    com.github.ngodat0103.yamp..productsvc.service: DEBUG
+    com.github.ngodat0103.yamp..productsvc.controller: DEBUG

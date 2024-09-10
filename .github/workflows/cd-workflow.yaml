@@ -62,7 +62,7 @@ jobs:
       SERVICE_PORT: 8003
       VERSION: ${{ needs.get-current-version.outputs.version }}
   update-deployment-repo:
-    needs: [gateway-svc-build-push, auth-svc-build-push, user-svc-build-push,product-svc-build-push, get-current-version]
+    needs: [get-current-version]
     if: github.event.action == 'released'
     name: "Updating deployment repo and create pull request"
     environment: staging

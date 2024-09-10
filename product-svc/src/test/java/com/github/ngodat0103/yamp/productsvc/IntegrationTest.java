@@ -19,7 +19,7 @@ import java.util.Set;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration-test")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
-public class IntegrationTest {
+class IntegrationTest {
 
     private final CategoryDtoRequest categoryDtoRequest = CategoryDtoRequest.builder()
             .name("Test Category")
@@ -63,7 +63,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given already have category when post category then return exception")
     @Order(2)
-    public void givenAlreadyHaveCategory_whenPostCategory_thenReturnException(){
+    void givenAlreadyHaveCategory_whenPostCategory_thenReturnException(){
         var responseEntity =  testRestTemplate.postForEntity("/categories", categoryDtoRequest, ProblemDetail.class);
         var problemDetail = responseEntity.getBody();
         Assertions.assertNotNull(responseEntity);
@@ -80,7 +80,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given nothing when get categories then return categories")
     @Order(3)
-    public void givenNothing_whenGetCategories_thenReturnCategories(){
+    void givenNothing_whenGetCategories_thenReturnCategories(){
         var parameter = new ParameterizedTypeReference<PageDto<CategoryDtoResponse>>() {};
         var responseEntity =  this.testRestTemplate.exchange("/categories/all", HttpMethod.GET, null, parameter);
         var body = responseEntity.getBody();

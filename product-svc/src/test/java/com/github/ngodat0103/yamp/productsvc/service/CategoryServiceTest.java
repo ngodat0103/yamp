@@ -30,7 +30,7 @@ import static org.mockito.BDDMockito.*;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("unit-test")
 @Disabled("Unit test still in progress")
-public class CategoryServiceTest {
+class CategoryServiceTest {
     private  CategoryService categoryService;
     private  CategoryRepository categoryRepository;
     private CategoryDtoRequest categoryDtoRequest;
@@ -64,7 +64,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Call service but not contain Authentication object")
-    public void givenNoAuthentication_whenCreateCategory_thenThrowIllegalArgumentException() {
+    void givenNoAuthentication_whenCreateCategory_thenThrowIllegalArgumentException() {
        Exception exceptionForCreate =    Assertions.assertThrows(IllegalArgumentException.class, () -> {
             categoryService.createCategory(categoryDtoRequest);
         });
@@ -151,7 +151,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Given a category UUID, when deleting a category, then throw NotFoundException if the category does not exist")
-    public void givenCategoryUuid_whenDeleteCategory_thenThrowNotFoundException() {
+    void givenCategoryUuid_whenDeleteCategory_thenThrowNotFoundException() {
         given(categoryRepository.existsById(category.getUuid())).willReturn(false);
         Exception exception = Assertions.assertThrows(NotFoundException.class, () -> {
             categoryService.deleteCategory(category.getUuid());
@@ -161,7 +161,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Given a category UUID, when deleting a category, then delete the category")
-    public void givenCategoryUuid_whenDeleteCategory_thenDeleteCategory() {
+    void givenCategoryUuid_whenDeleteCategory_thenDeleteCategory() {
         given(categoryRepository.existsById(category.getUuid())).willReturn(true);
         categoryService.deleteCategory(category.getUuid());
         then(categoryRepository).should().deleteById(category.getUuid());
@@ -169,7 +169,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Given categorySlug, when get category by slugName, then throw NotFoundException if the category does not exist")
-    public void givenCategorySlug_whenGetCategoryBySlug_thenThrowNotFoundException() {
+    void givenCategorySlug_whenGetCategoryBySlug_thenThrowNotFoundException() {
         given(categoryRepository.findCategoryBySlugName(category.getName())).willReturn(java.util.Optional.empty());
         Exception exception = Assertions.assertThrows(NotFoundException.class, () -> {
             categoryService.getCategory(category.getName());
@@ -180,7 +180,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Given slugName, when get category by slugName, then return a CategoryDto")
-    public void givenCategoryUuid_whenGetCategoryBySlug_thenReturnCategoryDto() {
+    void givenCategoryUuid_whenGetCategoryBySlug_thenReturnCategoryDto() {
         String slugName = category.getSlugName();
         given(categoryRepository.findCategoryBySlugName(slugName)).willReturn(java.util.Optional.of(category));
         CategoryDtoResponse dtpResponse = categoryService.getCategory(slugName);
@@ -195,7 +195,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Given category UUID, when get category by UUID, then throw NotFoundException if the category does not exist")
-    public void givenCategoryUuid_whenGetCategoryByUuid_thenThrowNotFoundException() {
+    void givenCategoryUuid_whenGetCategoryByUuid_thenThrowNotFoundException() {
         given(categoryRepository.findById(category.getUuid())).willReturn(java.util.Optional.empty());
         Exception exception = Assertions.assertThrows(NotFoundException.class, () -> {
             categoryService.getCategory(category.getUuid());
@@ -205,7 +205,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Given category UUID, when get category by UUID, then return a CategoryDto")
-    public void givenCategoryUuid_whenGetCategoryByUuid_thenReturnCategoryDto() {
+    void givenCategoryUuid_whenGetCategoryByUuid_thenReturnCategoryDto() {
         given(categoryRepository.findById(category.getUuid())).willReturn(java.util.Optional.of(category));
         CategoryDtoResponse dtpResponse = categoryService.getCategory(category.getUuid());
         Assertions.assertNotNull(dtpResponse);
@@ -219,7 +219,7 @@ public class CategoryServiceTest {
 
     @Test
     @DisplayName("Given nothing, when get all categories, then return a list of CategoryDto")
-    public void givenNothing_whenGetAllCategories_thenReturnListOfCategoryDto() {
+    void givenNothing_whenGetAllCategories_thenReturnListOfCategoryDto() {
         PageRequest pageRequest = PageRequest.of(0, 100);
         PageImpl<Category> pageImpl = new PageImpl<>(java.util.List.of(category), pageRequest, 1);
 

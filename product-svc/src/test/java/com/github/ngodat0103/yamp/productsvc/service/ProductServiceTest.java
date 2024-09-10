@@ -28,7 +28,7 @@ import static org.mockito.BDDMockito.*;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("unit-test")
-public class ProductServiceTest {
+class ProductServiceTest {
     private ProductService productService;
     private ProductRepository productRepository;
     private CategoryRepository categoryRepository;
@@ -65,7 +65,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("Call service but not contain Authentication object")
     @Disabled("This test is disabled because it is not relevant to the current implementation")
-    public void givenNoAuthentication_whenCreateProduct_thenThrowIllegalArgumentException() {
+    void givenNoAuthentication_whenCreateProduct_thenThrowIllegalArgumentException() {
         Exception exceptionForCreate = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             productService.createProduct(productDtoRequest);
         });
@@ -151,7 +151,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Given a product UUID, when deleting a product, then throw NotFoundException if the product does not exist")
-    public void givenProductUuid_whenDeleteProduct_thenThrowNotFoundException() {
+    void givenProductUuid_whenDeleteProduct_thenThrowNotFoundException() {
         given(productRepository.findById(product.getUuid())).willReturn(java.util.Optional.empty());
         Exception exception = Assertions.assertThrows(NotFoundException.class, () -> {
             productService.deleteProduct(product.getUuid());
@@ -161,7 +161,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Given a product UUID, when deleting a product, then delete the product")
-    public void givenProductUuid_whenDeleteProduct_thenDeleteProduct() {
+    void givenProductUuid_whenDeleteProduct_thenDeleteProduct() {
         given(productRepository.findById(product.getUuid())).willReturn(java.util.Optional.of(product));
         productService.deleteProduct(product.getUuid());
         then(productRepository).should().delete(product);
@@ -169,7 +169,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Given productSlug, when get product by slugName, then throw NotFoundException if the product does not exist")
-    public void givenProductSlug_whenGetProductBySlug_thenThrowNotFoundException() {
+    void givenProductSlug_whenGetProductBySlug_thenThrowNotFoundException() {
         given(productRepository.findBySlugName(product.getSlugName())).willReturn(java.util.Optional.empty());
         Exception exception = Assertions.assertThrows(NotFoundException.class, () -> {
             productService.getProduct(product.getSlugName());
@@ -179,7 +179,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Given slugName, when get product by slugName, then return a ProductDto")
-    public void givenProductSlug_whenGetProductBySlug_thenReturnProductDto() {
+    void givenProductSlug_whenGetProductBySlug_thenReturnProductDto() {
         given(productRepository.findBySlugName(product.getSlugName())).willReturn(java.util.Optional.of(product));
         ProductDtoResponse productDtoResponse = productService.getProduct(product.getSlugName());
         Assertions.assertNotNull(productDtoResponse);
@@ -192,7 +192,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Given product UUID, when get product by UUID, then throw NotFoundException if the product does not exist")
-    public void givenProductUuid_whenGetProductByUuid_thenThrowNotFoundException() {
+    void givenProductUuid_whenGetProductByUuid_thenThrowNotFoundException() {
         given(productRepository.findById(product.getUuid())).willReturn(java.util.Optional.empty());
         Exception exception = Assertions.assertThrows(NotFoundException.class, () -> {
             productService.getProduct(product.getUuid());
@@ -202,7 +202,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Given product UUID, when get product by UUID, then return a ProductDto")
-    public void givenProductUuid_whenGetProductByUuid_thenReturnProductDto() {
+    void givenProductUuid_whenGetProductByUuid_thenReturnProductDto() {
         given(productRepository.findById(product.getUuid())).willReturn(java.util.Optional.of(product));
         ProductDtoResponse productDtoResponse = productService.getProduct(product.getUuid());
         Assertions.assertNotNull(productDtoResponse);
@@ -215,7 +215,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Given nothing, when get all products, then return a list of ProductDto")
-    public void givenNothing_whenGetAllProducts_thenReturnListOfProductDto() {
+    void givenNothing_whenGetAllProducts_thenReturnListOfProductDto() {
         PageRequest pageRequest = PageRequest.of(0, 100);
         PageImpl<Product> pageImpl = new PageImpl<>(java.util.List.of(product), pageRequest, 1);
 

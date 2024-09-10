@@ -1,6 +1,5 @@
 spring:
   profiles:
-    active: local-dev
     default: local-dev
   data:
     redis:
@@ -15,7 +14,7 @@ spring:
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
       - "optional:pre-prod.yaml"
-      - "optional:proc.yaml"
+      - "optional:prod.yaml"
   application:
     name: gateway-svc
   security:

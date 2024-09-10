@@ -5,6 +5,10 @@ spring:
   cloud:
     inetutils:
       default-hostname: yamp-backend.ngodat0103.live
+  data:
+    redis:
+      url: redis://redis-svc-master:6379
+      client-name: gateway-svc
 springdoc:
   api-docs:
     path: /api-docs

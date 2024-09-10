@@ -7,8 +7,9 @@ spring:
       - "optional:unit-test.yaml"
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
-      - "optional:pre-proc.yaml"
-      - "optional:proc.yaml"
+      - "optional:pre-prod.yaml"
+      - "optional:prod.yaml"
+
   application:
     name: user-svc
   security:

@@ -5,6 +5,10 @@ spring:
   cloud:
     inetutils:
       default-hostname: yamp-staging.ngodat0103.live
+  data:
+    redis:
+      url: redis://redis-svc-master:6379
+      client-name: gateway-svc
 springdoc:
   api-docs:
     path: /api-docs
@@ -18,7 +22,9 @@ springdoc:
     oauth2-redirect-url: https://${spring.cloud.inetutils.default-hostname}/webjars/swagger-ui/oauth2-redirect.html
     urls:
       - name: "auth-svc"
-        url: "https://${spring.cloud.inetutils.default-hostname}:${server.port}/api/v1/auth/api-docs"
+        url: "https://${spring.cloud.inetutils.default-hostname}/api/v1/auth/api-docs"
       - name: "user-svc"
-        url: "https://${spring.cloud.inetutils.default-hostname}:${server.port}/api/v1/user/api-docs"
+        url: "https://${spring.cloud.inetutils.default-hostname}/api/v1/user/api-docs"
+      - name: "product-svc"
+        url: "https://${spring.cloud.inetutils.default-hostname}/api/v1/product/api-docs"
     use-root-path: true

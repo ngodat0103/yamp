@@ -1,7 +1,7 @@
 name: Deployment workflow
 on:
   release:
-    types: [created]
+    types: [created,prereleased,released]
 jobs:
   get-current-version:
     name: Get current tag version
@@ -20,26 +20,26 @@ jobs:
           release_branch: release
           scheme: semver
           increment: patch
-  gateway-svc-deployment:
+  gateway-svc-build-push:
     needs: [get-current-version]
-    name: "Deploying gateway-svc"
+    name: "Build and push gateway-svc"
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
     with:
       SERVICE_NAME: gateway-svc
       SERVICE_PORT: 8000
       VERSION: ${{ needs.get-current-version.outputs.version }}
-  auth-svc-deployment:
+  auth-svc-build-push:
     needs: [ get-current-version ]
-    name: "Deploying auth-svc"
+    name: "Build and push auth-svc"
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
     with:
       SERVICE_NAME: auth-svc
       SERVICE_PORT: 8001
       VERSION: ${{ needs.get-current-version.outputs.version }}
-  user-svc-deployment:
-    name: "Deploying user-svc"
+  user-svc-build-push:
+    name: "Build and push user-svc"
     needs: [ get-current-version ]
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
@@ -47,8 +47,20 @@ jobs:
       SERVICE_NAME: user-svc
       SERVICE_PORT: 8002
       VERSION: ${{ needs.get-current-version.outputs.version }}
+
+  product-svc-build-push:
+    name: "Build and push product-svc"
+    needs: [ get-current-version ]
+    uses: ./.github/workflows/cd-workflow-call.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: product-svc
+      SERVICE_PORT: 8003
+      VERSION: ${{ needs.get-current-version.outputs.version }}
+
   update-deployment-repo:
-    needs: [gateway-svc-deployment, auth-svc-deployment, user-svc-deployment, get-current-version]
+    needs: [gateway-svc-build-push, auth-svc-build-push, user-svc-build-push,product-svc-build-push, get-current-version]
+    if: github.event_name == 'release'
     name: "Updating deployment repo and create pull request"
     environment: staging
     env:

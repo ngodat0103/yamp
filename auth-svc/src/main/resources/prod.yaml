@@ -11,6 +11,8 @@ spring:
       client-name: auth-svc
   datasource:
     url: jdbc:postgresql://share-db-postgresql:5432/auth-svc-db
+  kafka:
+    bootstrap-servers: [ kafka-svc-controller-headless:9092 ]
   jpa:
     hibernate:
       ddl-auto: update

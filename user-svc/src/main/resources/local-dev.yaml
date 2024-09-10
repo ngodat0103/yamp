@@ -7,11 +7,7 @@ spring:
       database: 2
       client-name: user-svc
   kafka:
-    consumer:
-      bootstrap-servers: kafka-svc:9092
-      group-id: user-svc
-      key-deserializer: org.apache.kafka.common.serialization.UUIDDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    bootstrap-servers: [ kafka-svc:9092 ]
   cloud:
     inetutils:
       default-hostname: yamp-backend.local

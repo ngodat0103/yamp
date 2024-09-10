@@ -9,6 +9,8 @@ spring:
     redis:
       url: redis://redis-svc-master:6379
       client-name: auth-svc
+  kafka:
+    bootstrap-servers: [ kafka-svc-controller-headless:9092 ]
   datasource:
     url: jdbc:postgresql://share-db-postgresql:5432/auth-svc-db
   jpa:

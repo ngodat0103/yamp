@@ -1,5 +1,6 @@
 package com.github.ngodat0103.yamp.authsvc.controller;
 import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.UpdateAccountDto;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -34,9 +35,17 @@ public class AccountController {
 
 
     @GetMapping
-    public Set<AccountDto > getAccounts() {
+    public Set<AccountDto> getAccounts() {
         log.debug("Controller getAccounts method called");
         return accountService.getAccounts();
+    }
+
+    @GetMapping(path = "/{accountUuid}")
+    @PreAuthorize("hasAuthority('SCOPE_auth-service.read')")
+    public AccountDto getAccount(@PathVariable UUID accountUuid) {
+        log.debug("Controller getAccount method called");
+        return accountService.getAccount(accountUuid);
+
     }
 
     @GetMapping(value = "/filter")
@@ -44,6 +53,12 @@ public class AccountController {
                                                     @RequestParam(required = false) UUID accountUuid,
                                                     @RequestParam(required = false) String username) {
             return accountService.getAccountFilter(roles, accountUuid, username);
+    }
+
+
+    @PutMapping()
+    public AccountDto updateAccount(@RequestBody @Valid UpdateAccountDto updateAccountDto) {
+        return accountService.updateAccount(updateAccountDto);
     }
 
 

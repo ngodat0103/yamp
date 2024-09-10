@@ -39,7 +39,7 @@ class AccountControllerTest {
     AccountDto accountDto = AccountDto.builder()
             .username("test")
             .password("password")
-            .accountUuid(UUID.randomUUID().toString())
+            .uuid(UUID.randomUUID().toString())
             .email("example@gmail.com")
             .build();
 
@@ -47,12 +47,6 @@ class AccountControllerTest {
     void setUp() {
       objectMapper = JsonMapper.builder().disable(MapperFeature.USE_ANNOTATIONS).build();
     }
-
-
-
-
-
-
 
 
     @Test
@@ -65,7 +59,7 @@ class AccountControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value(accountDto.getEmail()))
                 .andExpect(jsonPath("$.password").doesNotExist())
-                .andExpect(jsonPath("$.accountUuid").value(accountDto.getAccountUuid()));
+                .andExpect(jsonPath("$.accountUuid").value(accountDto.getUuid()));
     }
     @Test
     void testRegisterAccountWhenAccountUuidFound() throws Exception {
@@ -113,7 +107,7 @@ class AccountControllerTest {
 
     @Test
     void testRegisterAccountWhenMissingField() throws Exception {
-        accountDto.setAccountUuid(null);
+        accountDto.setUuid(null);
         mockMvc.perform(post("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(accountDto)))

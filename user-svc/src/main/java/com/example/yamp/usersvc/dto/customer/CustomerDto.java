@@ -1,6 +1,7 @@
 package com.example.yamp.usersvc.dto.customer;
 
 import com.example.yamp.usersvc.dto.address.AddressDto;
+import com.example.yamp.usersvc.persistence.entity.Account;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;

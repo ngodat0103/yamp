@@ -1,11 +1,9 @@
 package com.example.yamp.usersvc.dto.customer;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Getter
-@AllArgsConstructor
-public class AccountDto {
-    private String username;
-    private String email;
-}
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+public record AccountDto (UUID uuid,String username,String email)
+{}

@@ -1,7 +1,21 @@
 spring:
+  data:
+    redis:
+      client-type: lettuce
+      host: redis-svc
+      port: 6379
+      database: 2
+      client-name: user-svc
+  kafka:
+    consumer:
+      bootstrap-servers: kafka-svc:9092
+      group-id: user-svc
+      key-deserializer: org.apache.kafka.common.serialization.UUIDDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   cloud:
     inetutils:
-      default-hostname: localhost
+      default-hostname: yamp-backend.local
+
   security:
     oauth2:
       client:
@@ -16,7 +30,7 @@ spring:
           user-service:
             client-id: user-service
             client-secret: "{cipher}e256a67c78a19d92012597e4883a0f2c26b8919abe197a6e070dae506935262d3ae6bc840d9697adb7e038cd36751954"
-            scope: auth-service.write
+            scope: auth-service.write,auth-service.read
             provider: auth-service-internal
             client-name: User Service
             client-authentication-method: client_secret_basic
@@ -29,13 +43,6 @@ spring:
     username: 'user-svc-user'
     password: '{cipher}0579337b871cd41ba98c4875971fa8eca89a6a6902e15b6cf75f711c299912285e825d81331fa61ec4317b6306c3b29d'
     driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto:  update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
 
 
 management:
@@ -57,11 +64,12 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
 logging:
   level:
-    org.springframework.security: DEBUG
-    com.example.userservice.security: DEBUG
-    com.example.userservice.exception: ERROR
+    com.example.userservice.controller: DEBUG
     com.example.userservice.service: DEBUG
+    com.example.yamp.usersvc.event: DEBUG
   pattern:
     level:  "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

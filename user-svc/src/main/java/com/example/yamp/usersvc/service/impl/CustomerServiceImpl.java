@@ -1,23 +1,19 @@
 package com.example.yamp.usersvc.service.impl;
-import com.example.yamp.usersvc.dto.customer.AccountDto;
 import com.example.yamp.usersvc.dto.customer.AccountRegisterDto;
 import com.example.yamp.usersvc.dto.customer.CustomerDto;
 import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
 import com.example.yamp.usersvc.dto.mapper.CustomerMapper;
+import com.example.yamp.usersvc.persistence.entity.Account;
 import com.example.yamp.usersvc.persistence.entity.Customer;
+import com.example.yamp.usersvc.cache.AuthSvcRepository;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
 import com.example.yamp.usersvc.service.CustomerService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -25,16 +21,17 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static com.example.yamp.usersvc.exception.Util.customerNotFoundExceptionSupplier;
-
+import static com.example.yamp.usersvc.Util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CustomerServiceImpl implements CustomerService {
     private final  CustomerRepository  customerRepository;
+    private final AuthSvcRepository authSvcRepository;
     private final CustomerMapper customerMapper;
     private final WebClient webClient;
+    private final ObjectMapper objectMapper =new ObjectMapper();
     private final static String ACCOUNT_PATH = "/accounts";
     private final static String DEFAULT_ROLE = "CUSTOMER";
 
@@ -44,6 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void register(CustomerRegisterDto customerRegisterDto) {
         Customer customer = customerMapper.mapToEntity(customerRegisterDto);
+
         customer = customerRepository.save(customer);
         AccountRegisterDto accountRegisterDtoRequest = customerMapper.maptoAccountRegisterDto(customerRegisterDto);
         accountRegisterDtoRequest.setPassword(customerRegisterDto.getPassword());
@@ -75,24 +73,34 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDto getCustomer() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Assert.notNull(authentication,"Authentication cannot be null");
-        if(authentication instanceof JwtAuthenticationToken jwtAuthenticationToken){
-            Jwt jwt = jwtAuthenticationToken.getToken();
-            UUID customerUuid = UUID.fromString(jwt.getSubject());
-            Customer customer = customerRepository.findById(customerUuid)
-                    .orElseThrow(customerNotFoundExceptionSupplier(log,customerUuid));
+        UUID customerUuid = getUuidFromAuthentication();
+        Customer customer = customerRepository.findCustomerByCustomerUuid(customerUuid)
+                .orElseThrow(notFoundExceptionSupplier(log, "Customer", "customerUuid", customerUuid));
+
+        Account account = checkRedisCache(customerUuid);
+        if(account !=null){
+            log.debug("Cache hit,get account with {} from redis cache", customerUuid);
             CustomerDto customerDto = customerMapper.mapToDto(customer);
-            String username = jwt.getClaimAsString("username");
-            String email = jwt.getClaimAsString("email");
-            AccountDto accountDto = new AccountDto(username,email);
-            customerDto.setAccount(accountDto);
+            customerDto.setAccount(customerMapper.mapToDto(account));
             return customerDto;
         }
-        else {
-            throw new RuntimeException("Authentication object is not JwtAuthenticationToken,code logic is buggy");
-        }
 
+
+        log.debug("Cache miss, get account with {} by invoking auth-svc endpoint", customerUuid);
+        account = webClient.get()
+                .uri(ACCOUNT_PATH + "/" + customerUuid)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(Account.class)
+                .doOnError(getOnError(customerUuid))
+                .block();
+
+        assert account != null;
+        authSvcRepository.save(account);
+        CustomerDto customerDto = customerMapper.mapToDto(customer);
+        customerDto.setAccount(customerMapper.mapToDto(account));
+        log.debug("Fetching successful,Account with {} saved to redis cache", customerUuid);
+        return customerDto;
     }
 
 
@@ -113,4 +121,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
 
+    private Account checkRedisCache(UUID customerUuid){
+        return authSvcRepository.findById(customerUuid).orElse(null);
+    }
 }

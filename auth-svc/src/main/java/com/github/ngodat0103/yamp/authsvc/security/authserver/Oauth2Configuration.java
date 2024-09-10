@@ -50,8 +50,6 @@ public class Oauth2Configuration {
                 context.getClaims().claims(claims -> {
                     Account account = accountRepository.findById(uuid).orElseThrow();
                     claims.put("role", account.getRole().getRoleName());
-                    claims.put("username", account.getUsername());
-                    claims.put("email", account.getEmail());
                 });
             }
         };

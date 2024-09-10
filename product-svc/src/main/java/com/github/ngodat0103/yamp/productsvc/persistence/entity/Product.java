@@ -5,32 +5,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
-public class Product  extends BaseEntity{
+public class Product  extends BaseEntity {
+
+    @Column(unique = true)
     private String name;
+    @Column(length = 5000)
     private String description;
-    private String productImage;
-    private UUID categoryUuid;
+    private String imageUrl;
+    @Column(unique = true)
+    private String slugName;
 
-
-    @OneToOne
-    @JoinColumn(name = "categoryUuid", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_uuid")
     private Category category;
-    @OneToMany(mappedBy = "product",fetch = FetchType.EAGER)
-    private Set<ProductImage> productImageSet;
-    @OneToOne(mappedBy = "product" ,fetch = FetchType.EAGER)
-    private ProductItem productItem;
 
 
-
-
-
-
+    public Product(UUID createBy) {
+        super(createBy);
+    }
 
 }

@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.validation.method.MethodValidationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
@@ -61,6 +62,4 @@ public class GlobalExceptionHandler  {
         problemDetails.setProperties(Collections.singletonMap("errors",errors));
         return problemDetails;
     }
-
-
 }

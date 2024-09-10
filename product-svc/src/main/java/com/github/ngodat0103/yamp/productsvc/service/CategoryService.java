@@ -1,14 +1,16 @@
 package com.github.ngodat0103.yamp.productsvc.service;
-import com.github.ngodat0103.yamp.productsvc.dto.CategoryDto;
+import com.github.ngodat0103.yamp.productsvc.dto.category.CategoryDtoRequest;
+import com.github.ngodat0103.yamp.productsvc.dto.category.CategoryDtoResponse;
+import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
+import org.springframework.data.domain.PageRequest;
 
-import java.util.Set;
 import java.util.UUID;
 
 public interface CategoryService {
-    CategoryDto createCategory(CategoryDto categoryDto);
-    CategoryDto updateCategory(CategoryDto categoryDto);
+    CategoryDtoResponse createCategory(CategoryDtoRequest categoryDtoRequest);
+    CategoryDtoResponse updateCategory(UUID categoryUuid, CategoryDtoRequest categoryDtoRequest);
     void deleteCategory(UUID uuid);
-    CategoryDto getCategory(String categoryName);
-    CategoryDto getCategory(UUID categoryUuid);
-    Set<CategoryDto> getAllCategories();
+    CategoryDtoResponse getCategory(String categorySlugName);
+    CategoryDtoResponse getCategory(UUID categoryUuid);
+    PageDto<CategoryDtoResponse> getAllCategories(PageRequest pageRequest);
 }

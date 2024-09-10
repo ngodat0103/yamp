@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,9 +35,10 @@ public class ControllerTest {
     @Autowired
     AccountMapper accountMapper;
     private final ObjectMapper objectMapper =  JsonMapper.builder().disable(MapperFeature.USE_ANNOTATIONS).build();
+    private final Random random = new Random();
     AccountDto accountDtoRequest = AccountDto.builder()
-            .accountUuid(UUID.randomUUID().toString())
-            .username("testUser"+new Random().nextInt())
+            .uuid(UUID.randomUUID().toString())
+            .username("testUser"+random.nextInt())
             .password("testPassword")
             .email("test@gmail.com")
             .roleName("CUSTOMER")
@@ -47,7 +46,7 @@ public class ControllerTest {
     AccountDto accountDtoResponse = AccountDto.builder()
             .username(accountDtoRequest.getUsername())
             .email(accountDtoRequest.getEmail())
-            .accountUuid(accountDtoRequest.getAccountUuid())
+            .uuid(accountDtoRequest.getUuid())
             .password(null)
             .roleName("CUSTOMER")
             .build();

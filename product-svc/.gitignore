@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+/.env
+/src/main/resources/init/.idea/
+/src/main/resources/init/venv/

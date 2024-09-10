@@ -12,9 +12,7 @@ import java.util.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Account {
-    @Id
-    private UUID accountUuid;
+public class Account extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false, unique = true)
@@ -26,10 +24,9 @@ public class Account {
     @JoinColumn(name = "roleUuid")
     private Role role;
 
-    public Account(UUID accountUuid ,String email,String username, String password){
+    public Account(String email,String username, String password){
         this.username = username;
         this.password = password;
-        this.accountUuid = accountUuid;
         this.email = email;
     }
 

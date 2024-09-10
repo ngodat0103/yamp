@@ -19,6 +19,7 @@ public class ProductItem extends BaseEntity {
     int SKU;
     int quantity;
     double price;
+    String productImage;
 
     @JoinColumn(name = "productUuid", insertable = false, updatable = false)
     @OneToOne

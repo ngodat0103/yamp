@@ -14,8 +14,8 @@ spring:
       - "optional:unit-test.yaml"
       - "optional:demo.yaml"
       - "optional:integration-test.yaml"
-      - "optional:pre-proc.yaml"
-      - "optional:proc.yaml "
+      - "optional:pre-prod.yaml"
+      - "optional:proc.yaml"
   application:
     name: gateway-svc
   security:
@@ -28,6 +28,14 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: grafana
+          uri: http://grafana.monitoring.svc.cluster.local:3000
+          predicates:
+              - Path=/grafana/**
+          filters:
+            - name: SetRequestHostHeader
+              args:
+                host: localhost:8000
         - id: auth-svc
           uri: http://auth-svc:8001
           predicates:
@@ -41,6 +49,10 @@ spring:
           uri: http://user-svc:8002
           predicates:
             - Path=/api/v1/user/**
+        - id: product-svc
+          uri: http://product-svc:8003
+          predicates:
+            - Path=/api/v1/product/**
 #          filters:
 #            - name: RequestRateLimiter
 #              args:
@@ -62,9 +74,6 @@ spring:
 logging:
   pattern:
     level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
-  level:
-    com.github.ngodat0103.yamp.gateway: DEBUG
-    org.springframework.security: DEBUG
 server:
   port: 8000
 management:

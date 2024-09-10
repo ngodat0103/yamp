@@ -21,7 +21,7 @@ jobs:
           scheme: semver
           increment: patch
   gateway-svc-build-push:
-    if: github.event.release == 'prereleased'
+    if: github.event.action == 'prereleased'
     needs: [get-current-version]
     name: "Build and push gateway-svc"
     uses: ./.github/workflows/cd-workflow-call.yaml
@@ -32,7 +32,7 @@ jobs:
       VERSION: ${{ needs.get-current-version.outputs.version }}
   auth-svc-build-push:
     needs: [ get-current-version ]
-    if: github.event.release == 'prereleased'
+    if: github.event.action == 'prereleased'
     name: "Build and push auth-svc"
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
@@ -42,7 +42,7 @@ jobs:
       VERSION: ${{ needs.get-current-version.outputs.version }}
   user-svc-build-push:
     name: "Build and push user-svc"
-    if: github.event.release == 'prereleased'
+    if: github.event.action == 'prereleased'
     needs: [ get-current-version ]
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
@@ -53,7 +53,7 @@ jobs:
 
   product-svc-build-push:
     name: "Build and push product-svc"
-    if: github.event.release == 'prereleased'
+    if: github.event.action == 'prereleased'
     needs: [ get-current-version ]
     uses: ./.github/workflows/cd-workflow-call.yaml
     secrets: inherit
@@ -63,7 +63,7 @@ jobs:
       VERSION: ${{ needs.get-current-version.outputs.version }}
   update-deployment-repo:
     needs: [gateway-svc-build-push, auth-svc-build-push, user-svc-build-push,product-svc-build-push, get-current-version]
-    if: github.event.release == 'released'
+    if: github.event.action == 'released'
     name: "Updating deployment repo and create pull request"
     environment: staging
     env:

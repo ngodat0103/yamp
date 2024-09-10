@@ -22,7 +22,7 @@ import java.util.UUID;
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class CategoryRepositoryTest {
+class CategoryRepositoryTest {
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -44,7 +44,7 @@ public class CategoryRepositoryTest {
 
     @DisplayName("Test save category")
     @Test
-    public void givenCategoryObject_whenSave_thenReturnSavedEmployee(){
+    void givenCategoryObject_whenSave_thenReturnSavedEmployee(){
         Category category = new Category(categoryDto,createBy);
         Category savedCategory = categoryRepository.save(category);
         Assertions.assertThat(savedCategory).isNotNull();
@@ -55,7 +55,7 @@ public class CategoryRepositoryTest {
 
     @DisplayName("Test get all categories")
     @Test
-    public void givenCategoryList_whenFindAll_thenReturnAllCategories(){
+    void givenCategoryList_whenFindAll_thenReturnAllCategories(){
         Category category1 = new Category(categoryDto,createBy);
         categoryDto.setName("Giay dep 2");
         Category category2 = new Category(categoryDto,createBy);
@@ -70,7 +70,7 @@ public class CategoryRepositoryTest {
 
     @DisplayName("Test remove category")
     @Test
-    public void givenCategoryUuid_whenDelete_thenRemoveCategory(){
+    void givenCategoryUuid_whenDelete_thenRemoveCategory(){
         var category = new Category(categoryDto,createBy);
         var savedCategory = categoryRepository.save(category);
         UUID categoryUuid = savedCategory.getUuid();
@@ -82,7 +82,7 @@ public class CategoryRepositoryTest {
 
     @DisplayName("Test update category")
     @Test
-    public void givenCategoryDto_whenUpdate_thenUpdateCategory(){
+    void givenCategoryDto_whenUpdate_thenUpdateCategory(){
         var category = new Category(categoryDto,createBy);
         categoryRepository.save(category);
 

@@ -11,12 +11,12 @@ import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @ActiveProfiles("unit-test")
-public class CustomerRepositoryTest {
+class CustomerRepositoryTest {
     @Autowired
     private CustomerRepository customerRepository;
 
     @Test
-    public void givenCustomer_whenSave_thenReturnSavedCustomer(){
+    void givenCustomer_whenSave_thenReturnSavedCustomer(){
         Customer customer = new Customer();
         customer.setFirstName("John");
         customer.setLastName("Doe");

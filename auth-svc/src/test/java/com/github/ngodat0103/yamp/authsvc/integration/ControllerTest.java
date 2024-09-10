@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.containsString;
 @SpringBootTest (webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration-test")
 @Transactional
-public class ControllerTest {
+class ControllerTest {
     @Autowired
     WebTestClient webTestClient;
     @Autowired
@@ -57,7 +57,7 @@ public class ControllerTest {
 
     @Test
     @DisplayName("context loads")
-    public void contextLoads() {
+    void contextLoads() {
     }
 
 
@@ -66,7 +66,7 @@ public class ControllerTest {
     @DisplayName("Register account")
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Disabled("Temporarily disabled for not handling the security context")
-    public void givenAccountDto_whenRegister_thenReturnAccountDto() throws Exception {
+    void givenAccountDto_whenRegister_thenReturnAccountDto() throws Exception {
         webTestClient.post()
                 .uri("/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +81,7 @@ public class ControllerTest {
     @DisplayName("Register Account but conflict")
     @WithMockUser(username = "admin", authorities = {"SCOPE_auth-svc.write"})
     @Disabled("Temporarily disabled for not handling the security context")
-    public void givenAccountDto_whenRegister_thenReturnConflictException() throws Exception {
+    void givenAccountDto_whenRegister_thenReturnConflictException() throws Exception {
         Account account = accountMapper.mapToEntity(accountDtoRequest);
         accountRepository.save(account);
 

@@ -54,7 +54,7 @@ class AddressRepositoryTest {
 
     @Test
     @DisplayName("Create Address")
-    public void givenAddress_whenCreateAddress_thenReturnSavedAddress(){
+    void givenAddress_whenCreateAddress_thenReturnSavedAddress(){
         Address savedAddress = addressRepository.save(address);
         then(savedAddress.getUuid()).isNotNull();
         then(savedAddress.getCustomerUuid()).isEqualTo(address.getCustomerUuid());

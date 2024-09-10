@@ -37,7 +37,7 @@ import static org.mockito.BDDMockito.*;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("unit-test")
-public class CustomerServiceTest {
+class CustomerServiceTest {
     private CustomerService customerService;
     private CustomerRepository customerRepository ;
     private final CustomerMapper customerMapper = new CustomerMapperImpl();
@@ -110,7 +110,7 @@ public class CustomerServiceTest {
 
     @Test
     @DisplayName("Register a new customer but conflict at auth-service")
-    public void givenConflictRegisterAccountDto_whenRegister_thenThrowWebClientResponseException() throws IOException {
+    void givenConflictRegisterAccountDto_whenRegister_thenThrowWebClientResponseException() throws IOException {
         InputStream inputStream =  classLoader.getResourceAsStream("mockresponse/accountRegisterReturnConflict.json");
         assert inputStream != null;
         mockWebServer.enqueue( new MockResponse()

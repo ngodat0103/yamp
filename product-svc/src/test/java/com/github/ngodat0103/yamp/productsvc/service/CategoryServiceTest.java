@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
-public class CategoryServiceTest {
+class CategoryServiceTest {
     private CategoryRepository categoryRepository;
     private CategoryService categoryService;
     private static final String accountUuid = "24df6a88-85cf-44e2-89a1-f32588c708e7";
@@ -45,7 +45,7 @@ public class CategoryServiceTest {
     @Test
     @DisplayName("Test create category")
     @WithMockUser(username = accountUuid, roles = "ADMIN")
-    public void givenNotConflict_whenCreateCategory_thenReturnCategoryDto(){
+    void givenNotConflict_whenCreateCategory_thenReturnCategoryDto(){
         Category category = new Category(categoryDto, UUID.fromString(accountUuid));
         given(categoryRepository.existsByName(categoryDto.getName())).willReturn(false);
         given(categoryRepository.save(any())).willReturn(category);
@@ -57,7 +57,7 @@ public class CategoryServiceTest {
     @Test
     @DisplayName("Test create category given conflict")
     @WithMockUser(username = accountUuid, roles = "ADMIN")
-    public void givenConflict_whenCreateCategory_thenThrowException(){
+    void givenConflict_whenCreateCategory_thenThrowException(){
 
 
         given(categoryRepository.existsByName(categoryDto.getName())).willReturn(true);

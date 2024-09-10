@@ -9,10 +9,10 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("integration-test")
 @Transactional
-public class ControllerTest {
+class ControllerTest {
     // todo: add later
 
     @Test
-    public void contextLoad() {
+    void contextLoad() {
     }
 }

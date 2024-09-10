@@ -18,14 +18,14 @@ import java.util.UUID;
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("unit_test")
-public class AccountRepositoryTest {
+class AccountRepositoryTest {
 
     @Autowired
    private AccountRepository accountRepository;
 
     @Test
     @DisplayName("Test Create account when not conflict")
-    public void givenAccount_whenSave_returnSavedAccount(){
+    void givenAccount_whenSave_returnSavedAccount(){
         Account account = new Account();
         account.setAccountUuid(UUID.randomUUID());
         account.setEmail("example@gmail.com");

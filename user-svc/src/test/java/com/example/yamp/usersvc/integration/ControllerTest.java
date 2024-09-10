@@ -24,18 +24,18 @@ import java.io.IOException;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration-test")
 @Transactional
-public class ControllerTest {
+class ControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
     @Test
-    public void contextLoad() {
+    void contextLoad() {
     }
 
     @Test
     @Order(1)
     @DisplayName("Test register account")
-    public void testRegisterAccount() throws IOException {
+    void testRegisterAccount() throws IOException {
         ClassPathResource resource = new ClassPathResource("integration/register-body.json");
         webTestClient.post()
                 .uri("/register")
@@ -49,7 +49,7 @@ public class ControllerTest {
     @Test
     @Order(2)
     @DisplayName("Test get account but not include jwt token")
-    public void testGetAccountWithoutJwtToken() {
+    void testGetAccountWithoutJwtToken() {
         webTestClient.get()
                 .uri("/get-me")
                 .exchange()

@@ -50,6 +50,8 @@ management:
     health:
       show-details: always
 logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
   level:
     org.springframework.security: DEBUG
     com.github.ngodat0103.yamp..productsvc.service: DEBUG

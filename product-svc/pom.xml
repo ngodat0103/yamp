@@ -104,6 +104,12 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.javaagent</groupId>
+            <artifactId>opentelemetry-javaagent</artifactId>
+            <version>1.33.5</version>
+            <scope>runtime</scope>
+        </dependency>
 
 
 

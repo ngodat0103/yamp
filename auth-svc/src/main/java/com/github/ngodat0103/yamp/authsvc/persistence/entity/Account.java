@@ -1,12 +1,10 @@
 package com.github.ngodat0103.yamp.authsvc.persistence.entity;
-
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.*;
 
 @Entity
 @Getter
@@ -20,14 +18,22 @@ public class Account extends BaseEntity {
     @Column (nullable=false)
     private String password;
 
-    @ManyToOne
-    @JoinColumn(name = "roleUuid")
+    @JsonIgnore
+    private boolean enabled = true;
+    @JsonIgnore
+    private boolean accountNonExpired = true;
+    @JsonIgnore
+    private boolean accountNonLocked = true;
+    @JsonIgnore
+    private boolean credentialsNonExpired = true;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_uuid")
     private Role role;
 
-    public Account(String email,String username, String password){
+    public Account(String email,String username, String password) {
         this.username = username;
         this.password = password;
         this.email = email;
     }
-
 }

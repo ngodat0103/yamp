@@ -9,9 +9,11 @@ import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountReposito
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.RoleRepository;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.session.data.redis.RedisSessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +23,7 @@ import static com.github.ngodat0103.yamp.authsvc.Util.*;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
 
@@ -29,15 +32,6 @@ public class AccountServiceImpl implements AccountService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final KafkaTemplate<UUID, Action> kafkaTemplate;
-    public AccountServiceImpl(AccountRepository accountRepository, AccountMapper accountMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, KafkaTemplate<UUID, Action> kafkaTemplate) {
-        this.accountRepository = accountRepository;
-        this.accountMapper = accountMapper;
-        this.passwordEncoder = passwordEncoder;
-        this.roleRepository = roleRepository;
-        this.kafkaTemplate = kafkaTemplate;
-    }
-
-
     @Transactional
     @Override
     public AccountDto register(AccountDto accountDto) {
@@ -56,7 +50,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setPassword(passwordEncoder.encode(account.getPassword()));
-        String roleName = accountDto.getRoleName();
+        String roleName = accountDto.getRoleName().toUpperCase();
         Role  role  = roleRepository.findRoleByRoleName(roleName)
                 .orElseThrow(notFoundExceptionSupplier(log, "Role", "roleName", roleName));
         account.setRole(role);
@@ -74,13 +68,14 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public AccountDto updateAccount(UpdateAccountDto updateAccountDto) {
         log.debug("Getting accountUuid from SecurityContextHolder");
+        String roleName = updateAccountDto.getRoleName().toUpperCase();
         UUID uuid = getAccountUuidFromAuthentication();
         Account account = accountRepository.findById(uuid)
                 .orElseThrow(notFoundExceptionSupplier(log, "Account", "accountUuid", uuid));
         account.setEmail(updateAccountDto.getEmail());
         account.setUsername(updateAccountDto.getUsername());
-        account.setRole(roleRepository.findRoleByRoleName(updateAccountDto.getRoleName().toUpperCase())
-                .orElseThrow(notFoundExceptionSupplier(log, "Role", "roleName", updateAccountDto.getRoleName())));
+        account.setRole(roleRepository.findRoleByRoleName(roleName)
+                .orElseThrow(notFoundExceptionSupplier(log, "Role", "roleName", roleName)));
 
         account.setLastModifiedAt(LocalDateTime.now());
         Account savedAccount = accountRepository.save(account);

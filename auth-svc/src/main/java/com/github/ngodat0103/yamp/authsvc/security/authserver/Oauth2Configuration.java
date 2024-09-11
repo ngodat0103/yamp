@@ -1,6 +1,5 @@
 package com.github.ngodat0103.yamp.authsvc.security.authserver;
 
-import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -48,8 +47,8 @@ public class Oauth2Configuration {
                     return;
                 }
                 context.getClaims().claims(claims -> {
-                    Account account = accountRepository.findById(uuid).orElseThrow();
-                    claims.put("role", account.getRole().getRoleName());
+                    accountRepository.findById(uuid).
+                            ifPresent(account -> claims.put("role", account.getRole().getRoleName()));
                 });
             }
         };

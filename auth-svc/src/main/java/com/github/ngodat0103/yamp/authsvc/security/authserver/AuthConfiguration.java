@@ -8,8 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.authentication.CachingUserDetailsService;
-import org.springframework.security.core.userdetails.UserCache;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
@@ -24,19 +23,13 @@ public class AuthConfiguration {
     RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate){
         return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
-
     @Bean
     OAuth2AuthorizationService authorizationService(JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository){
         return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
     }
-
-
     @Bean
-    CachingUserDetailsService cachingUserDetailsService(AccountRepository accountRepository, UserCache userCache){
-        UserDetailServiceImpl userDetailService = new UserDetailServiceImpl(accountRepository);
-        CachingUserDetailsService cachingUserDetailsService = new CachingUserDetailsService(userDetailService);
-        cachingUserDetailsService.setUserCache(userCache);
-        return cachingUserDetailsService;
+    UserDetailsService userDetailService(AccountRepository accountRepository){
+        return new UserDetailServiceImpl(accountRepository);
     }
 
 }

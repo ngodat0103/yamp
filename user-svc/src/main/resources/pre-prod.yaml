@@ -33,7 +33,7 @@ spring:
           user-service:
             client-id: ${CLIENT_ID}
             client-secret: ${CLIENT_SECRET}
-            scope: auth-service.write
+            scope: auth-service.write,auth-service.read
             provider: auth-service-internal
             client-name: User Service
             client-authentication-method: client_secret_basic

@@ -19,8 +19,8 @@ spring:
     open-in-view: false
   data:
     redis:
-      url: redis://redis-svc:6379
       client-name: auth-svc
+      client-type: lettuce
   security:
     oauth2:
       resourceserver:

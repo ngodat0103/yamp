@@ -127,7 +127,6 @@ public class AccountServiceImpl implements AccountService {
                   .flatMap(Set::stream)
                   .map(accountMapper::mapToDto)
                   .collect(Collectors.toUnmodifiableSet());
-
         }
     }
 

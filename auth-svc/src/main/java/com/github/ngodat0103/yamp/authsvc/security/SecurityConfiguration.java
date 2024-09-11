@@ -70,24 +70,21 @@ public class SecurityConfiguration {
     }
 
 
-//    @Bean
-//    @Profile("local-dev") // I use this setting for developing only, does not use this in production
-//    SecurityFilterChain apiFilterChain_dev(HttpSecurity http) throws Exception {
-//        http.securityMatcher("/accounts/**","/roles/**","/ui-docs/**","/api-docs/**","/actuator/**");
-//        http.csrf(AbstractHttpConfigurer::disable);
-//        http.cors(AbstractHttpConfigurer::disable);
-//        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
-//        http.anonymous(anonymous -> {
-//            String principal = "1a35d863-0cd9-4bc1-8cc4-f4cddca97720";
-//            anonymous.principal(principal);
-//            anonymous.authorities("ROLE_ADMIN","SCOPE_auth-service.read","SCOPE_auth-service.write");
-//        });
-//        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//        return http.build();
-//    }
-
-
-
+    @Bean
+    @Profile({"local-dev","integration-test"}) // I use this setting for testing and developing only, does not use this in production
+    SecurityFilterChain apiFilterChain_dev(HttpSecurity http) throws Exception {
+        http.securityMatcher("/accounts/**","/roles/**","/ui-docs/**","/api-docs/**","/actuator/**");
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.cors(AbstractHttpConfigurer::disable);
+        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+        http.anonymous(anonymous -> {
+            String principal = "1a35d863-0cd9-4bc1-8cc4-f4cddca97720";
+            anonymous.principal(principal);
+            anonymous.authorities("ROLE_ADMIN","SCOPE_auth-service.read","SCOPE_auth-service.write");
+        });
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
 
     @Bean
     AuthorizationServerSettings authorizationServerSettings(){
@@ -105,7 +102,7 @@ public class SecurityConfiguration {
 
     // I use this for easy development, do not use this in production
     @Bean
-    @Profile("local-dev")
+    @Profile({"local-dev","integration-test"})
     PasswordEncoder passwordEncoder_dev(){
         Map<String,PasswordEncoder> passwordEncoderMap = new HashMap<>();
         passwordEncoderMap.put("bcrypt",new BCryptPasswordEncoder());

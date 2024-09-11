@@ -8,7 +8,6 @@ import com.example.yamp.usersvc.persistence.entity.Customer;
 import com.example.yamp.usersvc.cache.AuthSvcRepository;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
 import com.example.yamp.usersvc.service.CustomerService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +30,8 @@ public class CustomerServiceImpl implements CustomerService {
     private final AuthSvcRepository authSvcRepository;
     private final CustomerMapper customerMapper;
     private final WebClient webClient;
-    private final ObjectMapper objectMapper =new ObjectMapper();
     private final static String ACCOUNT_PATH = "/accounts";
     private final static String DEFAULT_ROLE = "CUSTOMER";
-
-
 
     @Transactional
     @Override
@@ -45,7 +41,7 @@ public class CustomerServiceImpl implements CustomerService {
         customer = customerRepository.save(customer);
         AccountRegisterDto accountRegisterDtoRequest = customerMapper.maptoAccountRegisterDto(customerRegisterDto);
         accountRegisterDtoRequest.setPassword(customerRegisterDto.getPassword());
-        accountRegisterDtoRequest.setAccountUuid(customer.getCustomerUuid());
+        accountRegisterDtoRequest.setUuid(customer.getCustomerUuid());
         accountRegisterDtoRequest.setRoleName(DEFAULT_ROLE);
         log.debug("New customerUuid {} saved but not commit, wait for auth-svc response", customer.getCustomerUuid());
         webClient.post()
@@ -56,17 +52,6 @@ public class CustomerServiceImpl implements CustomerService {
                 .retrieve()
                 .bodyToMono(AccountRegisterDto.class)
                 .doOnError(getOnError(customer.getCustomerUuid()))
-                .doOnSuccess(
-                        accountRegisterDtoResponse -> {
-                            accountRegisterDtoRequest.setPassword(null);
-                            if(accountRegisterDtoResponse.equals(accountRegisterDtoRequest)){
-                                log.debug("Account created successfully: {}", accountRegisterDtoResponse.getAccountUuid());
-                            }
-                            else {
-                                throw new RuntimeException("Inconsistent account data,code bug " + accountRegisterDtoResponse +"!=" + accountRegisterDtoRequest);
-                            }
-                        }
-                )
                 .block();
     }
 

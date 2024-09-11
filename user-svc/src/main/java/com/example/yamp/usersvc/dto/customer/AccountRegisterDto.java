@@ -7,7 +7,7 @@ import java.util.UUID;
 @Data
 
 public class AccountRegisterDto {
-    private UUID accountUuid;
+    private UUID uuid;
     private String username;
     private String email;
     private String password;

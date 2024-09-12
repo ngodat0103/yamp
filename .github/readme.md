@@ -23,7 +23,8 @@ YAMP - Yet Another Microservice Project
 
 While the project is still evolving and currently lacks some business logic and features, I am committed to continuously adding more functionalities in the future.
 
-# Architecture
+# Current Architecture
+![Architecture](../draft/output/microservices-architecture.png)
 
 # Tech stack
 ## **Java Backend**: Spring Framework
@@ -36,8 +37,8 @@ While the project is still evolving and currently lacks some business logic and 
 - [x] **Distributed session management**: Spring Session and Redis
 - [x] **Distributed caching**: Redis
 
-## **Monitoring and Observability**: Using Spring Boot Actuator, Prometheus and Grafana
-- [x] **Metrics**: Using Micrometer
+## **Monitoring and Observability**: 
+- [x] **Metrics exporter**: Micrometer cooperating with Actuator
 - [x] **Distributed tracing**: OpenTelemetry,Tempo and Grafana
 - **I'm current working on these features**
     - [ ] **Distributed logging aggregation**: Loki and Alloy
@@ -48,7 +49,6 @@ While the project is still evolving and currently lacks some business logic and 
 # Devops tools
 - **CI/CD**:
     - CI: Github Actions
-    - CD: ArgoCD
 - **Containerization**: Docker
 - **Orchestration**: Kubernetes
 - **Delivery tool for deploying application on Kubernetes**: ArgoCD,Helm chart

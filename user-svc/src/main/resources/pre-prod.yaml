@@ -12,7 +12,7 @@ spring:
   datasource:
     url: jdbc:postgresql://share-db-postgresql:5432/user-svc-db
   kafka:
-    bootstrap-servers: [ kafka-svc:9092 ]
+    bootstrap-servers: kafka-svc.staging-infra-yamp.cluster.local:9092
   jpa:
     hibernate:
       ddl-auto:  update

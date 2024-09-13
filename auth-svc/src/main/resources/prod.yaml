@@ -4,7 +4,7 @@ spring:
       default-hostname: yamp-backend.ngodat0103.live
   config:
     activate:
-      on-profile: proc
+      on-profile: prod
   data:
     redis:
       url: redis://redis-svc-master:6379

@@ -15,16 +15,8 @@ public class ProductConfiguration {
        private UUID productVariationOptionUUid;
     }
 
-    @EmbeddedId
-    private CompositePK id;
 
 
-    @ManyToOne
-    @JoinColumn(name = "productItemUuid", insertable = false, updatable = false)
-    private ProductItem productItem;
 
-    @ManyToOne
-    @JoinColumn(name = "productVariationOptionUUid", insertable = false, updatable = false)
-    private ProductVariationOption productVariationOption;
 
 }

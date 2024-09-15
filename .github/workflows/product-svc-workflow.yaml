@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - "features/**"
+      - "fix/**"
     paths:
       - "product-svc/**"
   pull_request:

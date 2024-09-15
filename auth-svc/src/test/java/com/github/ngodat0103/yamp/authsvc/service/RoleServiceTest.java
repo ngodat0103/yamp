@@ -29,7 +29,7 @@ import static com.github.ngodat0103.yamp.authsvc.Util.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("unit-test")
-public class RoleServiceTest {
+class RoleServiceTest {
     RoleRepository roleRepository;
     RoleService roleService;
     private RoleMapper roleMapper;
@@ -49,7 +49,7 @@ public class RoleServiceTest {
     }
     @Test
     @DisplayName("Given already have Role when add Role then return Conflict")
-    public void givenRole_whenAddRole_thenReturnConflict() {
+    void givenRole_whenAddRole_thenReturnConflict() {
         given(roleRepository.existsByRoleName(roleNameUpperCase)).willReturn(true);
         Assertions.assertThatThrownBy(() -> roleService.addRole(roleDto))
                 .isInstanceOf(ConflictException.class)
@@ -57,14 +57,14 @@ public class RoleServiceTest {
     }
     @Test
     @DisplayName("Given Role when add Role then saved Role")
-    public void givenNothing_whenAddRole_thenSaveRole() {
+    void givenNothing_whenAddRole_thenSaveRole() {
         given(roleRepository.existsByRoleName(roleNameUpperCase)).willReturn( false);
         roleService.addRole(roleDto);
         verify(roleRepository).save(any());
     }
     @Test
     @DisplayName("Given roles when get Roles then return Role")
-    public void givenRole_whenGetRole_thenReturnRole() {
+    void givenRole_whenGetRole_thenReturnRole() {
         Role role = roleMapper.mapToEntity(roleDto);
         role.setUuid(UUID.randomUUID());
         given(roleRepository.findAll()).willReturn(List.of(role));
@@ -80,7 +80,7 @@ public class RoleServiceTest {
     }
     @Test
     @DisplayName("Given nothing when get Roles then return NotFoundException")
-    public void givenRole_whenDeleteRole_thenReturnConflict() {
+    void givenRole_whenDeleteRole_thenReturnConflict() {
         UUID uuid = UUID.randomUUID();
         given(roleRepository.findById(uuid)).willReturn( Optional.empty());
         Assertions.assertThatThrownBy(() -> roleService.deleteRole(uuid))
@@ -89,7 +89,7 @@ public class RoleServiceTest {
     }
     @Test
     @DisplayName("Given Role when delete Role then delete Role")
-    public void givenRole_whenDeleteRole_thenDeleteRole() {
+    void givenRole_whenDeleteRole_thenDeleteRole() {
         Role role = roleMapper.mapToEntity(roleDto);
         role.setUuid(UUID.randomUUID());
         given(roleRepository.findById(role.getUuid())).willReturn(Optional.of(role));

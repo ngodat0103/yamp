@@ -7,10 +7,9 @@ on:
   pull_request:
     branches:
       - "feature/**"
-      - "Fix**"
+      - "fix/**"
     paths:
       - "auth-svc/**"
-
 jobs:
   push:
     name: auth-svc-push

@@ -19,7 +19,6 @@ public class ProductSvcApplication {
                 .lowerCase(true)
                 .build();
     }
-
     public static void main(String[] args) {
         SpringApplication.run(ProductSvcApplication.class, args);
     }

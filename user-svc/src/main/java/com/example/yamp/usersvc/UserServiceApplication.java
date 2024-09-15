@@ -9,6 +9,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 @EnableJpaRepositories(basePackages = "com.example.yamp.usersvc.persistence.repository")
 public class UserServiceApplication {
 	public static void main(String[] args) {
+
 		SpringApplication.run(UserServiceApplication.class, args);
 	}
 

@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - "features/**"
-      - "Fix**"
+      - "fix/**"
     paths:
       - "gateway-svc/**"
 jobs:

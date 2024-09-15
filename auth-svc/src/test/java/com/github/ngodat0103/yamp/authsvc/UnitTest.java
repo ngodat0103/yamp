@@ -6,8 +6,6 @@ import org.junit.platform.suite.api.SelectPackages;
 import org.junit.platform.suite.api.Suite;
 
 @Suite
-@Disabled
-@SelectPackages({"com.github.ngodat0103.yamp.authsvc.repository",
-        "com.github.ngodat0103.yamp.authsvc.service","com.github.ngodat0103.yamp.authsvc.controller"})
+@SelectPackages({"com.github.ngodat0103.yamp.authsvc.repository", "com.github.ngodat0103.yamp.authsvc.service"})
 public class UnitTest {
 }

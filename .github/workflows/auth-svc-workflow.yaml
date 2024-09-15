@@ -2,14 +2,16 @@ on:
   push:
     branches:
       - "feature/**"
+      - "fix/**"
     paths:
       - "auth-svc/**"
-  pull_request:
+  pull_request_target:
+    types: [opened,reopened]
     branches:
       - "feature/**"
+      - "fix/**"
     paths:
       - "auth-svc/**"
-
 jobs:
   push:
     name: auth-svc-push

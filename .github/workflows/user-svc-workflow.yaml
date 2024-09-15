@@ -2,11 +2,14 @@ on:
   push:
     branches:
       - "features/**"
+      - "fix/**"
     paths:
       - "user-svc/**"
-  pull_request:
+  pull_request_target:
+    types: [ opened,reopened ]
     branches:
-      - "features/**"
+      - "feature/**"
+      - "fix/**"
     paths:
       - "user-svc/**"
 jobs:

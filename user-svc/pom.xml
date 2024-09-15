@@ -165,11 +165,6 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-stream-binder-kafka</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka-test</artifactId>
-            <scope>test</scope>
-        </dependency>
 
 
     </dependencies>
@@ -185,12 +180,12 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>6.1.12</version>
+                <version>6.1.13</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>6.1.12</version>
+                <version>6.1.13</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>

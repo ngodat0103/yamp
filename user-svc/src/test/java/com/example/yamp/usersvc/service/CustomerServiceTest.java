@@ -88,7 +88,7 @@ public class CustomerServiceTest {
         JsonContent<Object> body = jsonTester.from(recordedRequest.getBody().readUtf8());
         Assertions.assertThat(body).extractingJsonPathValue("$.username").isEqualTo(username);
         Assertions.assertThat(body).extractingJsonPathValue("$.email").isEqualTo(email);
-        Assertions.assertThat(body).extractingJsonPathStringValue("$.accountUuid").isNotEmpty();
+        Assertions.assertThat(body).extractingJsonPathStringValue("$.uuid").isNotEmpty();
     }
 
     @Test

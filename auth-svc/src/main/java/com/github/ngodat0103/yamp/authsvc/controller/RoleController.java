@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
+import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -32,10 +33,10 @@ public class RoleController {
         roleService.addRole(roleDto);
     }
 
-    @DeleteMapping()
+    @DeleteMapping(path = "/{uuid}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void deleteRole(String roleName){
+    public void deleteRole(@PathVariable UUID uuid){
         log.debug("Controller updateRole method called");
-        roleService.deleteRole(roleName);
+        roleService.deleteRole(uuid);
     }
 }

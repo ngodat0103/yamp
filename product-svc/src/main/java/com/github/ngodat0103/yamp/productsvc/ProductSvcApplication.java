@@ -13,14 +13,13 @@ public class ProductSvcApplication {
     @Bean
     Slugify slugify(){
         Locale locale = new Locale("vi", "VN");
+
         return Slugify.builder()
                 .locale(locale)
                 .lowerCase(true)
                 .build();
     }
-
     public static void main(String[] args) {
         SpringApplication.run(ProductSvcApplication.class, args);
     }
-
 }

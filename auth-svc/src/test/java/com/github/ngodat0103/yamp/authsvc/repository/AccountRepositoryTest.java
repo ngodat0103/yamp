@@ -27,7 +27,6 @@ public class AccountRepositoryTest {
     @DisplayName("Test Create account when not conflict")
     public void givenAccount_whenSave_returnSavedAccount(){
         Account account = new Account();
-        account.setUuid(UUID.randomUUID());
         account.setEmail("example@gmail.com");
         account.setUsername("testUser");
         account.setPassword("bestPassword");
@@ -37,8 +36,9 @@ public class AccountRepositoryTest {
         Assertions.assertThat(saveAccount.getUuid()).isNotNull();
         System.out.println(saveAccount.getUuid());
         Assertions.assertThat(saveAccount.getPassword()).isEqualTo(account.getPassword());
-        Assertions.assertThat(saveAccount.getUuid()).isEqualTo(account.getUuid());
         Assertions.assertThat(saveAccount.getUsername()).isEqualTo(account.getUsername());
+        Assertions.assertThat(saveAccount.getEmail()).isEqualTo(account.getEmail());
+        Assertions.assertThat(saveAccount.getPassword()).isNotNull();
 
 
     }

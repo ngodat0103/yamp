@@ -3,13 +3,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.postgresql.util.PSQLException;
 import org.springframework.http.*;
-import org.springframework.validation.method.MethodValidationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.*;
-
 
 @RestControllerAdvice
 @Slf4j
@@ -61,5 +60,23 @@ public class GlobalExceptionHandler  {
         });
         problemDetails.setProperties(Collections.singletonMap("errors",errors));
         return problemDetails;
+    }
+
+    @ExceptionHandler(PSQLException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ProblemDetail handlePSQLException( PSQLException e, HttpServletRequest request) {
+        String detail = Objects.requireNonNull(e.getServerErrorMessage()).getDetail();
+        assert detail != null;
+        if(detail.contains("referenced")){
+            ProblemDetail problemDetails = ProblemDetail.forStatus(HttpStatus.UNPROCESSABLE_ENTITY);
+            problemDetails.setDetail(detail.replace("table","entity"));
+            problemDetails.setType(URI.create("https://problems-registry.smartbear.com/business-rule-violation"));
+            problemDetails.setTitle("Business Rule Violation");
+            problemDetails.setInstance(URI.create(request.getServletPath()));
+            return problemDetails;
+        }
+        else {
+            throw new RuntimeException(e);
+        }
     }
 }

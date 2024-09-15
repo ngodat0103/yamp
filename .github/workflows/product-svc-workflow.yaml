@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - "features/**"
+      - "Fix**"
     paths:
       - "product-svc/**"
 jobs:

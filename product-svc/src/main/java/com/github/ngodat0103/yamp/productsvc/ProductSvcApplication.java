@@ -13,6 +13,7 @@ public class ProductSvcApplication {
     @Bean
     Slugify slugify(){
         Locale locale = new Locale("vi", "VN");
+
         return Slugify.builder()
                 .locale(locale)
                 .lowerCase(true)

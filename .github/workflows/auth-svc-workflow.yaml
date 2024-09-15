@@ -5,7 +5,8 @@ on:
       - "fix/**"
     paths:
       - "auth-svc/**"
-  pull_request:
+  pull_request_target:
+    types: [opened,reopened]
     branches:
       - "feature/**"
       - "fix/**"

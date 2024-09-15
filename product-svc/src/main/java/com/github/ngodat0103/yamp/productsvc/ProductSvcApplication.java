@@ -22,5 +22,4 @@ public class ProductSvcApplication {
     public static void main(String[] args) {
         SpringApplication.run(ProductSvcApplication.class, args);
     }
-
 }

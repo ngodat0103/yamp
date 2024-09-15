@@ -4,9 +4,10 @@ on:
       - "features/**"
     paths:
       - "gateway-svc/**"
-  pull_request:
+  pull_request_target:
+    types: [ opened,reopened ]
     branches:
-      - "features/**"
+      - "feature/**"
       - "fix/**"
     paths:
       - "gateway-svc/**"

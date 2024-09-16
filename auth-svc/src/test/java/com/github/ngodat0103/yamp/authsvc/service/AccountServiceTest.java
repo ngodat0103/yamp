@@ -1,6 +1,7 @@
 package com.github.ngodat0103.yamp.authsvc.service;
 
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRequestDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountResponseDto;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapperImpl;
 import com.github.ngodat0103.yamp.authsvc.exception.ConflictException;
@@ -38,7 +39,8 @@ class AccountServiceTest {
 
     private AccountServiceImpl accountService;
 
-    private AccountDto accountDto;
+    private AccountRequestDto accountRequestDtoMock;
+    private AccountResponseDto accountResponseDtoMock;
     private Account account;
     private Role role;
 
@@ -49,16 +51,22 @@ class AccountServiceTest {
         this.accountRepository = Mockito.mock(AccountRepository.class);
         AccountMapper accountMapper = new AccountMapperImpl();
         this.accountService = new AccountServiceImpl(accountRepository, accountMapper, passwordEncoder, roleRepository, kafkaTemplate);
-        this.accountDto = AccountDto.builder()
+        this.accountRequestDtoMock = AccountRequestDto.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username("test")
                 .password("password")
                 .email("example@gmail.com")
                 .roleName("CUSTOMER")
                 .build();
-        this.account = accountMapper.mapToEntity(accountDto);
+        this.accountResponseDtoMock = AccountResponseDto.builder()
+                .uuid(accountRequestDtoMock.getUuid())
+                .username(accountRequestDtoMock.getUsername())
+                .email(accountRequestDtoMock.getEmail())
+                .roleName(accountRequestDtoMock.getRoleName())
+                .build();
+        this.account = accountMapper.mapToEntity(accountRequestDtoMock);
         this.role = new Role();
-        role.setRoleName(accountDto.getRoleName());
+        role.setRoleName(accountRequestDtoMock.getRoleName());
         role.setUuid(UUID.randomUUID());
         role.setCreateAt(LocalDateTime.now());
         role.setLastModifiedAt(LocalDateTime.now());
@@ -68,7 +76,7 @@ class AccountServiceTest {
     @DisplayName("Given already existing account with UUID, when register, then throw ConflictException")
     void givenUuidAlreadyExist_whenRegister_thenThrowConflictException() {
         given(accountRepository.existsById(account.getUuid())).willReturn(true);
-        Assertions.assertThatThrownBy(() -> accountService.register(accountDto))
+        Assertions.assertThatThrownBy(() -> accountService.register(accountRequestDtoMock))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining(String.format(TEMPLATE_CONFLICT, "Account", "accountUuid", account.getUuid()));
     }
@@ -78,7 +86,7 @@ class AccountServiceTest {
     void giveAccountUsernameExists_whenRegister_thenThrowConflict() {
         given(accountRepository.existsById(account.getUuid())).willReturn(false);
         given(accountRepository.existsByUsername(account.getUsername())).willReturn(true);
-        Assertions.assertThatThrownBy(() -> accountService.register(accountDto))
+        Assertions.assertThatThrownBy(() -> accountService.register(accountRequestDtoMock))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining(String.format(TEMPLATE_CONFLICT, "Account", "username", account.getUsername()));
     }
@@ -88,7 +96,7 @@ class AccountServiceTest {
         given(accountRepository.existsById(account.getUuid())).willReturn(false);
         given(accountRepository.existsByUsername(account.getUsername())).willReturn(false);
         given(accountRepository.existsByEmail(account.getEmail())).willReturn(true);
-        Assertions.assertThatThrownBy(() -> accountService.register(accountDto))
+        Assertions.assertThatThrownBy(() -> accountService.register(accountRequestDtoMock))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining(String.format(TEMPLATE_CONFLICT, "Account", "email", account.getEmail()));
     }
@@ -98,10 +106,10 @@ class AccountServiceTest {
         given(accountRepository.existsById(account.getUuid())).willReturn(false);
         given(accountRepository.existsByUsername(account.getUsername())).willReturn(false);
         given(accountRepository.existsByEmail(account.getEmail())).willReturn(false);
-        given(roleRepository.findRoleByRoleName(accountDto.getRoleName())).willReturn(java.util.Optional.empty());
-        Assertions.assertThatThrownBy(() -> accountService.register(accountDto))
+        given(roleRepository.findRoleByRoleName(accountRequestDtoMock.getRoleName())).willReturn(java.util.Optional.empty());
+        Assertions.assertThatThrownBy(() -> accountService.register(accountRequestDtoMock))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining(String.format(TEMPLATE_NOT_FOUND, "Role", "roleName", accountDto.getRoleName()));
+                .hasMessageContaining(String.format(TEMPLATE_NOT_FOUND, "Role", "roleName", accountRequestDtoMock.getRoleName()));
     }
 
     @Test
@@ -120,9 +128,9 @@ class AccountServiceTest {
         accountResponse.setCreateAt(LocalDateTime.now());
         accountResponse.setLastModifiedAt(LocalDateTime.now());
         given(accountRepository.save(any(Account.class))).willReturn(accountResponse);
-        AccountDto result = accountService.register(accountDto);
+        AccountResponseDto result = accountService.register(accountRequestDtoMock);
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result).isEqualTo(accountDto);
+        Assertions.assertThat(result).isEqualTo(accountResponseDtoMock);
         verify(accountRepository).save(any(Account.class));
     }
 

@@ -1,13 +1,15 @@
-package com.github.ngodat0103.yamp.authsvc.dto;
+package com.github.ngodat0103.yamp.authsvc.dto.account;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
 
 @Data
 @Builder
+@EqualsAndHashCode
 public class UpdateAccountDto {
     @Length(min = 5,message = "Username must be at least 5 characters")
     @NotNull

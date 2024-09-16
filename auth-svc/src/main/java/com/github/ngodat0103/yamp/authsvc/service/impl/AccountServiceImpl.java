@@ -1,6 +1,7 @@
 package com.github.ngodat0103.yamp.authsvc.service.impl;
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
-import com.github.ngodat0103.yamp.authsvc.dto.UpdateAccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRequestDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.UpdateAccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountResponseDto;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
 import com.github.ngodat0103.yamp.authsvc.dto.kafka.Action;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
@@ -13,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.session.data.redis.RedisSessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -34,8 +34,8 @@ public class AccountServiceImpl implements AccountService {
     private final KafkaTemplate<UUID, Action> kafkaTemplate;
     @Transactional
     @Override
-    public AccountDto register(AccountDto accountDto) {
-        Account account = accountMapper.mapToEntity(accountDto);
+    public AccountResponseDto register(AccountRequestDto accountRequestDto) {
+        Account account = accountMapper.mapToEntity(accountRequestDto);
 
         if(accountRepository.existsById(account.getUuid()))
         {
@@ -50,7 +50,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setPassword(passwordEncoder.encode(account.getPassword()));
-        String roleName = accountDto.getRoleName().toUpperCase();
+        String roleName = accountRequestDto.getRoleName().toUpperCase();
         Role  role  = roleRepository.findRoleByRoleName(roleName)
                 .orElseThrow(notFoundExceptionSupplier(log, "Role", "roleName", roleName));
         account.setRole(role);
@@ -66,7 +66,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountDto updateAccount(UpdateAccountDto updateAccountDto) {
+    public AccountResponseDto updateAccount(UpdateAccountDto updateAccountDto) {
         log.debug("Getting accountUuid from SecurityContextHolder");
         String roleName = updateAccountDto.getRoleName().toUpperCase();
         UUID uuid = getAccountUuidFromAuthentication();
@@ -85,7 +85,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDto getAccount(UUID accountUuid) {
+    public AccountResponseDto getAccount(UUID accountUuid) {
         log.debug("Getting account by accountUuid");
         Account account = accountRepository.findById(accountUuid)
                 .orElseThrow(notFoundExceptionSupplier(log, "Account", "accountUuid", accountUuid));
@@ -93,17 +93,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Set<AccountDto> getAccounts() {
+    public Set<AccountResponseDto> getAccounts() {
         log.debug("Getting all accounts");
-     return  accountRepository.findAll().stream().map(account -> {
-                    AccountDto accountDto = accountMapper.mapToDto(account);
-                    accountDto.setRoleName(account.getRole().getRoleName());
-                    return accountDto;
-                }).collect(Collectors.toUnmodifiableSet());
+     return  accountRepository.findAll().stream().map(accountMapper::mapToDto).collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
-    public Set<AccountDto> getAccountFilter(Set<String> roles, UUID accountUuid, String username) {
+    public Set<AccountResponseDto> getAccountFilter(Set<String> roles, UUID accountUuid, String username) {
         log.debug("Getting accounts with filter");
         if(accountUuid!=null){
             Account account = accountRepository.findById(accountUuid)

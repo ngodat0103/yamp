@@ -1,54 +1,47 @@
 package com.github.ngodat0103.yamp.authsvc;
 
 
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRequestDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountResponseDto;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
+import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
 import org.junit.jupiter.api.*;
-import org.junit.platform.suite.api.SelectPackages;
-import org.junit.platform.suite.api.Suite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ProblemDetail;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("integration-test")
-@Disabled("This test is disabled because it is not yet implemented")
 public class IntegrationTest {
     @Autowired
     private TestRestTemplate testRestTemplate;
     @Autowired
     AccountMapper accountMapper;
     private final Random random = new Random();
-
+    @Autowired
+    private AccountRepository accountRepository;
 
     private final String TEMPLATE_DETAIL = "%s with %s: %s already exists";
-    AccountDto accountDtoRequest = AccountDto.builder()
+    private final AccountRequestDto accountRequestDtoMock = AccountRequestDto.builder()
             .uuid(UUID.randomUUID().toString())
             .username("testUser"+random.nextInt())
             .password("testPassword")
             .email("test@gmail.com")
             .roleName("CUSTOMER")
             .build();
-    AccountDto accountDtoResponse = AccountDto.builder()
-            .username(accountDtoRequest.getUsername())
-            .email(accountDtoRequest.getEmail())
-            .uuid(accountDtoRequest.getUuid())
-            .password(null)
-            .roleName("CUSTOMER")
+    private final AccountResponseDto accountResponseDtoMock = AccountResponseDto.builder()
+            .username(accountRequestDtoMock.getUsername())
+            .email(accountRequestDtoMock.getEmail())
+            .uuid(accountRequestDtoMock.getUuid())
+            .roleName(accountRequestDtoMock.getRoleName())
             .build();
 
     @BeforeEach
@@ -68,21 +61,26 @@ public class IntegrationTest {
     }
 
     @Test
-    @DisplayName("Given nothing when create account then return accountDto with 201")
+    @DisplayName("Given nothing when create account then return accountDto with 404")
     @Order(2)
-    public void givenNothing_whenCreateAccount_thenReturnAccountDtoWith201() {
-        var responseEntity =  testRestTemplate.postForEntity("/accounts", accountDtoRequest, AccountDto.class);
-        Assertions.assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-        var body = responseEntity.getBody();
-        Assertions.assertNotNull(body);
-        Assertions.assertEquals(accountDtoResponse, body);
+    public void givenNothing_whenCreateAccount_thenReturnAccountDtoWith404() {
+        var responseEntity =  testRestTemplate.postForEntity("/accounts", accountRequestDtoMock, ProblemDetail.class);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), bodyResponse.getStatus());
+        Assertions.assertEquals("https://problems-registry.smartbear.com/not-found", bodyResponse.getType().toString());
+        Assertions.assertEquals("Not found", bodyResponse.getTitle());
+        Assertions.assertEquals("Role with roleName: CUSTOMER not found", bodyResponse.getDetail());
+        Assertions.assertEquals("/accounts", Objects.requireNonNull(bodyResponse.getInstance()).toString());
     }
 
     @Test
     @DisplayName("Given username already exists when create account then return ProblemDetail with status 409")
     @Order(3)
+    @Disabled("This test is disabled because it is not yet implemented")
     public void given_UsernameExists_whenCreateAccount_thenReturnProblemDetailWithStatus409() throws Exception {
-        var responseBody = testRestTemplate.postForEntity("/accounts", accountDtoRequest, ProblemDetail.class);
+        var responseBody = testRestTemplate.postForEntity("/accounts", accountRequestDtoMock, ProblemDetail.class);
         Assertions.assertEquals(HttpStatus.CONFLICT, responseBody.getStatusCode());
         var body = responseBody.getBody();
         Assertions.assertNotNull(body);
@@ -90,6 +88,6 @@ public class IntegrationTest {
         Assertions.assertEquals(body.getType().toString(),"https://problems-registry.smartbear.com/already-exists");
         Assertions.assertEquals(body.getTitle(),"Already exists");
         Assertions.assertEquals(body.getStatus(),HttpStatus.CONFLICT.value());
-        Assertions.assertEquals(body.getDetail(), String.format(TEMPLATE_DETAIL, "Account", "username", accountDtoRequest.getUsername()));
+        Assertions.assertEquals(body.getDetail(), String.format(TEMPLATE_DETAIL, "Account", "username", accountRequestDtoMock.getUsername()));
     }
 }

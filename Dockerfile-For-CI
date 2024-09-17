@@ -20,13 +20,13 @@ ENV PATH="$JAVA_HOME/bin:$PATH"
 COPY --from=builder /jre $JAVA_HOME
 ARG SERVICE_PORT
 WORKDIR /opt/app
-COPY --from=layers /layers/dependencies/ ./
-COPY --from=layers /layers/spring-boot-loader/ ./
-COPY --from=layers /layers/snapshot-dependencies/ ./
-COPY --from=layers /layers/application/ ./
-#RUN useradd -r -s /usr/sbin/nologin -d /opt/app app && \ # this command increase the image size by 129.84MB, I don't know why
-#    chown -R app:app /opt/app
+RUN useradd -m -s /bin/bash app
 USER app
+COPY --from=layers --chown=app:app --chmod=500 /layers/dependencies/ ./
+COPY --from=layers --chown=app:app --chmod=500 /layers/spring-boot-loader/ ./
+COPY --from=layers --chown=app:app --chmod=500 /layers/snapshot-dependencies/ ./
+COPY --from=layers --chown=app:app --chmod=500 /layers/application/ ./
+
 EXPOSE ${SERVICE_PORT}
 LABEL org.opencontainers.image.source=https://github.com/ngodat0103/yamp
 LABEL  org.opencontainers.image.description="YAMP - Yet Another Microservice Project"

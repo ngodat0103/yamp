@@ -39,7 +39,7 @@ public class AccountServiceImpl implements AccountService {
 
         if(accountRepository.existsById(account.getUuid()))
         {
-           throwConflictException(log,"Account","accountUuid",account.getUuid());
+           throwConflictException(log,"Account","uuid",account.getUuid());
         }
         if(accountRepository.existsByUsername(account.getUsername()))
         {

@@ -42,13 +42,15 @@ public class RoleServiceImpl  implements RoleService {
         if(roleRepository.existsByRoleName(role.getRoleName())){
             throwConflictException(log,"Role","roleName",role.getRoleName());
         }
-        roleRepository.save(roleMapper.mapToEntity(roleDto));
+        role.setCreateAt(LocalDateTime.now());
+        role.setLastModifiedAt(LocalDateTime.now());
+        roleRepository.save(role);
         log.debug("Role added: {}", roleDto.getRoleName());
     }
 
     @Override
     public void updateRole(UUID uuid, RoleDto roleDto) {
-        Role role = roleRepository.findById(uuid).orElseThrow(Util.notFoundExceptionSupplier(log,"Role","roleName",roleDto.getRoleName()));
+        Role role = roleRepository.findById(uuid).orElseThrow(Util.notFoundExceptionSupplier(log,"Role","roleName", roleDto.getRoleName()));
         log.debug("Updating role: {}", roleDto.getRoleName());
         role.setRoleName(roleDto.getRoleName());
         role.setRoleDescription(roleDto.getRoleDescription());

@@ -19,7 +19,7 @@ import java.util.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("integration-test")
-public class IntegrationTest {
+class IntegrationTest {
     @Autowired
     private TestRestTemplate testRestTemplate;
     @Autowired
@@ -70,7 +70,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given nothing when create account then return accountDto with 404")
     @Order(2)
-    public void givenNothing_whenCreateAccount_thenReturnAccountDtoWith404() {
+    void givenNothing_whenCreateAccount_thenReturnAccountDtoWith404() {
         var responseEntity =  testRestTemplate.postForEntity("/accounts", accountRequestDtoMock, ProblemDetail.class);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         var bodyResponse = responseEntity.getBody();
@@ -85,7 +85,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given nothing when create Role then return roleDto with 201")
     @Order(3)
-    public void givenNothing_whenCreateRole_thenReturn201() {
+    void givenNothing_whenCreateRole_thenReturn201() {
         var responseBody = testRestTemplate.postForEntity("/roles",this.roleDto, RoleDto.class);
         Assertions.assertEquals(HttpStatus.CREATED, responseBody.getStatusCode());
         var bodyResponse = responseBody.getBody();
@@ -94,7 +94,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given already has role, when create new Role then return 409")
     @Order(4)
-    public void givenAlreadyHasRole_whenCreateNewRole_thenReturn409() {
+    void givenAlreadyHasRole_whenCreateNewRole_thenReturn409() {
         var responseEntity =  testRestTemplate.postForEntity("/roles", this.roleDto, ProblemDetail.class);
         Assertions.assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
         var bodyResponse = responseEntity.getBody();
@@ -110,7 +110,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given already has role CUSTOMER when create account then return accountDto with 201")
     @Order(5)
-    public void givenHasCustomerRole_whenCreateAccount_thenReturn201() {
+    void givenHasCustomerRole_whenCreateAccount_thenReturn201() {
         var responseBody = testRestTemplate.postForEntity("/accounts", accountRequestDtoMock, AccountResponseDto.class);
         Assertions.assertEquals(HttpStatus.CREATED, responseBody.getStatusCode());
         var bodyResponse = responseBody.getBody();
@@ -123,7 +123,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given uuid already exists when create new account then return 409")
     @Order(6)
-    public void givenAlreadyHasUuid_whenCreateNewAccount_thenReturn409() {
+    void givenAlreadyHasUuid_whenCreateNewAccount_thenReturn409() {
         var responseEntity = this.testRestTemplate.postForEntity("/accounts", accountRequestDtoMock, ProblemDetail.class);
         Assertions.assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
         var bodyResponse = responseEntity.getBody();
@@ -138,7 +138,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given username already exists when create new account then return 409")
     @Order(7)
-    public void givenUsernameAlreadyExist_whenCreateAccount_thenReturn409() {
+    void givenUsernameAlreadyExist_whenCreateAccount_thenReturn409() {
         this.accountRequestDtoMock = AccountRequestDto.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username(accountRequestDtoMock.getUsername())
@@ -159,7 +159,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given email already exists when create new account then return 409")
     @Order(8)
-    public void givenAlreadyHasEmail_whenCreateNewAccount_thenReturn409() {
+    void givenAlreadyHasEmail_whenCreateNewAccount_thenReturn409() {
         var accountRequestDto = AccountRequestDto.builder()
                 .uuid(UUID.randomUUID().toString())
                 .username("testUser2" + random.nextInt())
@@ -180,7 +180,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given has account when get accounts then return accountDto with 200")
     @Order(9)
-    public void givenHasAccount_whenGetAccount_thenReturnAccountDtoWith200() {
+    void givenHasAccount_whenGetAccount_thenReturnAccountDtoWith200() {
         ParameterizedTypeReference<Set<AccountResponseDto>> parameterizedTypeReference = new ParameterizedTypeReference<>() {};
         var responseEntity = testRestTemplate.exchange("/accounts", HttpMethod.GET, null, parameterizedTypeReference);
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -197,7 +197,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given has account when get account by uuid then return accountDto with 200")
     @Order(10)
-    public void givenHasAccount_whenGetAccountByUuid_thenReturnAccountDtoWith200() {
+    void givenHasAccount_whenGetAccountByUuid_thenReturnAccountDtoWith200() {
         URI uri = URI.create("/accounts/" + accountRequestDtoMock.getUuid());
         var responseEntity = testRestTemplate.getForEntity(uri, AccountResponseDto.class);
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -211,7 +211,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given has account when get account by uuid then return accountDto with 404")
     @Order(11)
-    public void givenHasAccount_whenGetAccountByUuid_thenReturnAccountDtoWith404() {
+    void givenHasAccount_whenGetAccountByUuid_thenReturnAccountDtoWith404() {
         URI uri = URI.create("/accounts/" + UUID.randomUUID());
         var responseEntity = testRestTemplate.getForEntity(uri, ProblemDetail.class);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -226,7 +226,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given role when get roles then return roleDto with 200")
     @Order(12)
-    public void givenRole_whenGetRoles_thenReturnRoleDtoWith200() {
+    void givenRole_whenGetRoles_thenReturnRoleDtoWith200() {
         ParameterizedTypeReference<Set<RoleDto>> parameterizedTypeReference = new ParameterizedTypeReference<>() {};
         var responseEntity = testRestTemplate.exchange("/roles", HttpMethod.GET, null, parameterizedTypeReference);
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -242,7 +242,7 @@ public class IntegrationTest {
     @DisplayName("Given roleuuid not exist when get role by uuid then return problemDetail with 404")
     @Order(13)
     @Disabled("This logic is not implemented yet")
-    public void givenUUidNotExist_whenGetRoleByUuid_thenReturnProblemDetailWith404() {
+    void givenUUidNotExist_whenGetRoleByUuid_thenReturnProblemDetailWith404() {
         URI uri = URI.create("/roles/"+ UUID.randomUUID());
         var responseEntity = testRestTemplate.getForEntity(uri, ProblemDetail.class);
         Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
@@ -257,7 +257,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given role exist when get roles then  with 200")
     @Order(14)
-    public void givenRoleExist_whenGetRoles_thenReturn200() {
+    void givenRoleExist_whenGetRoles_thenReturn200() {
         ParameterizedTypeReference<Set<RoleDto>> parameterizedTypeReference = new ParameterizedTypeReference<>() {};
         var responseEntity = testRestTemplate.exchange("/roles", HttpMethod.GET, null, parameterizedTypeReference);
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -272,7 +272,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given role exist when delete role then return 422 because of role is in use")
     @Order(15)
-    public void givenRoleExist_whenDeleteRole_thenReturn422() {
+    void givenRoleExist_whenDeleteRole_thenReturn422() {
         Role role = roleRepository.findRoleByRoleName(this.roleDto.getRoleName().toUpperCase()).orElse(null);
         assert role != null;
         URI uri = URI.create("/roles/" + role.getUuid());
@@ -290,7 +290,7 @@ public class IntegrationTest {
     @Test
     @DisplayName("Given role exist when delete role then return 204")
     @Order(16)
-    public void givenRoleExist_whenDeleteRole_thenReturn204() {
+    void givenRoleExist_whenDeleteRole_thenReturn204() {
         accountRepository.deleteAll();
         Role role = roleRepository.findRoleByRoleName(this.roleDto.getRoleName().toUpperCase()).orElse(null);
         assert role != null;

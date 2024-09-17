@@ -10,7 +10,7 @@ public interface RoleService {
 
     Set<RoleDto> getRole();
     void addRole(RoleDto roleDto);
-    void updateRole(UUID uuid,RoleDto roleDto);
+    void updateRole(UUID uuid, RoleDto roleDto);
     void deleteRole(UUID uuid);
 
 }

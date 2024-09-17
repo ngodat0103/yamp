@@ -16,7 +16,6 @@ public class Customer  {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID customerUuid;
-
     @Column(nullable = false)
     private String firstName;
     @Column(nullable = false)
@@ -25,9 +24,6 @@ public class Customer  {
     private String phoneNumber;
     private LocalDateTime createAtDate = LocalDateTime.now();
     private LocalDateTime lastModifiedDate = LocalDateTime.now();
-
-
-
     @OneToMany(mappedBy = "customer")
     private Set<Address> addresses;
     @OneToMany (mappedBy = "customer")

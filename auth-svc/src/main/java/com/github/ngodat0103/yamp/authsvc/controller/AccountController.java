@@ -1,6 +1,7 @@
 package com.github.ngodat0103.yamp.authsvc.controller;
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
-import com.github.ngodat0103.yamp.authsvc.dto.UpdateAccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRequestDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.UpdateAccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountResponseDto;
 import com.github.ngodat0103.yamp.authsvc.service.AccountService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -10,9 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.Set;
 import java.util.UUID;
-
-
-
 
 @Slf4j
 @RequestMapping(value = "/accounts",produces = "application/json")
@@ -28,36 +26,36 @@ public class AccountController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AccountDto register(@Valid @RequestBody AccountDto accountDto){
+    public AccountResponseDto register(@Valid @RequestBody AccountRequestDto accountRequestDto){
         log.debug("Controller register method called");
-        return accountService.register(accountDto);
+        return accountService.register(accountRequestDto);
     }
 
 
     @GetMapping
-    public Set<AccountDto> getAccounts() {
+    public Set<AccountResponseDto> getAccounts() {
         log.debug("Controller getAccounts method called");
         return accountService.getAccounts();
     }
 
     @GetMapping(path = "/{accountUuid}")
     @PreAuthorize("hasAuthority('SCOPE_auth-service.read')")
-    public AccountDto getAccount(@PathVariable UUID accountUuid) {
+    public AccountResponseDto getAccount(@PathVariable UUID accountUuid) {
         log.debug("Controller getAccount method called");
         return accountService.getAccount(accountUuid);
 
     }
 
     @GetMapping(value = "/filter")
-    public Set<AccountDto> getAccountsFilterByRoles(@RequestParam(required = false) Set<String> roles,
-                                                    @RequestParam(required = false) UUID accountUuid,
-                                                    @RequestParam(required = false) String username) {
+    public Set<AccountResponseDto> getAccountsFilterByRoles(@RequestParam(required = false) Set<String> roles,
+                                                           @RequestParam(required = false) UUID accountUuid,
+                                                           @RequestParam(required = false) String username) {
             return accountService.getAccountFilter(roles, accountUuid, username);
     }
 
 
     @PutMapping()
-    public AccountDto updateAccount(@RequestBody @Valid UpdateAccountDto updateAccountDto) {
+    public AccountResponseDto updateAccount(@RequestBody @Valid UpdateAccountDto updateAccountDto) {
         return accountService.updateAccount(updateAccountDto);
     }
 

@@ -1,54 +1,54 @@
 package com.github.ngodat0103.yamp.authsvc;
-
-
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.github.ngodat0103.yamp.authsvc.dto.AccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.RoleDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRequestDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountResponseDto;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.Role;
+import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
+import com.github.ngodat0103.yamp.authsvc.persistence.repository.RoleRepository;
 import org.junit.jupiter.api.*;
-import org.junit.platform.suite.api.SelectPackages;
-import org.junit.platform.suite.api.Suite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ProblemDetail;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.Collections;
-import java.util.Random;
-import java.util.UUID;
+import java.net.URI;
+import java.util.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("integration-test")
-@Disabled("This test is disabled because it is not yet implemented")
-public class IntegrationTest {
+class IntegrationTest {
     @Autowired
     private TestRestTemplate testRestTemplate;
     @Autowired
     AccountMapper accountMapper;
+    @Autowired
+    RoleRepository roleRepository;
+    @Autowired
+    AccountRepository accountRepository;
     private final Random random = new Random();
-
-
-    private final String TEMPLATE_DETAIL = "%s with %s: %s already exists";
-    AccountDto accountDtoRequest = AccountDto.builder()
-            .uuid(UUID.randomUUID().toString())
-            .username("testUser"+random.nextInt())
+    private final String ALREADY_EXIST_TEMPLATE = "%s with %s: %s already exists";
+    private AccountRequestDto accountRequestDtoMock = AccountRequestDto.builder()
+            .uuid("39594a45-5a18-4f72-83e0-79d6964ff4f7")
+            .username("testUser")
             .password("testPassword")
             .email("test@gmail.com")
             .roleName("CUSTOMER")
             .build();
-    AccountDto accountDtoResponse = AccountDto.builder()
-            .username(accountDtoRequest.getUsername())
-            .email(accountDtoRequest.getEmail())
-            .uuid(accountDtoRequest.getUuid())
-            .password(null)
-            .roleName("CUSTOMER")
+    private final AccountResponseDto accountResponseDtoMock = AccountResponseDto.builder()
+            .username(accountRequestDtoMock.getUsername())
+            .email(accountRequestDtoMock.getEmail())
+            .uuid(accountRequestDtoMock.getUuid())
+            .roleName(accountRequestDtoMock.getRoleName())
+            .build();
+
+
+    private final RoleDto roleDto = RoleDto.builder()
+            .uuid(null)
+            .roleName("customer")
+            .roleDescription("Customer")
             .build();
 
     @BeforeEach
@@ -68,28 +68,234 @@ public class IntegrationTest {
     }
 
     @Test
-    @DisplayName("Given nothing when create account then return accountDto with 201")
+    @DisplayName("Given nothing when create account then return accountDto with 404")
     @Order(2)
-    public void givenNothing_whenCreateAccount_thenReturnAccountDtoWith201() {
-        var responseEntity =  testRestTemplate.postForEntity("/accounts", accountDtoRequest, AccountDto.class);
-        Assertions.assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-        var body = responseEntity.getBody();
-        Assertions.assertNotNull(body);
-        Assertions.assertEquals(accountDtoResponse, body);
+    void givenNothing_whenCreateAccount_thenReturnAccountDtoWith404() {
+        var responseEntity =  testRestTemplate.postForEntity("/accounts", accountRequestDtoMock, ProblemDetail.class);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), bodyResponse.getStatus());
+        Assertions.assertEquals("https://problems-registry.smartbear.com/not-found", bodyResponse.getType().toString());
+        Assertions.assertEquals("Not found", bodyResponse.getTitle());
+        Assertions.assertEquals("Role with roleName: CUSTOMER not found", bodyResponse.getDetail());
+        Assertions.assertEquals("/accounts", Objects.requireNonNull(bodyResponse.getInstance()).toString());
     }
 
     @Test
-    @DisplayName("Given username already exists when create account then return ProblemDetail with status 409")
+    @DisplayName("Given nothing when create Role then return roleDto with 201")
     @Order(3)
-    public void given_UsernameExists_whenCreateAccount_thenReturnProblemDetailWithStatus409() throws Exception {
-        var responseBody = testRestTemplate.postForEntity("/accounts", accountDtoRequest, ProblemDetail.class);
-        Assertions.assertEquals(HttpStatus.CONFLICT, responseBody.getStatusCode());
-        var body = responseBody.getBody();
-        Assertions.assertNotNull(body);
-        Assertions.assertEquals(ProblemDetail.class, body.getClass());
-        Assertions.assertEquals(body.getType().toString(),"https://problems-registry.smartbear.com/already-exists");
-        Assertions.assertEquals(body.getTitle(),"Already exists");
-        Assertions.assertEquals(body.getStatus(),HttpStatus.CONFLICT.value());
-        Assertions.assertEquals(body.getDetail(), String.format(TEMPLATE_DETAIL, "Account", "username", accountDtoRequest.getUsername()));
+    void givenNothing_whenCreateRole_thenReturn201() {
+        var responseBody = testRestTemplate.postForEntity("/roles",this.roleDto, RoleDto.class);
+        Assertions.assertEquals(HttpStatus.CREATED, responseBody.getStatusCode());
+        var bodyResponse = responseBody.getBody();
+        Assertions.assertNull(bodyResponse);
+    }
+    @Test
+    @DisplayName("Given already has role, when create new Role then return 409")
+    @Order(4)
+    void givenAlreadyHasRole_whenCreateNewRole_thenReturn409() {
+        var responseEntity =  testRestTemplate.postForEntity("/roles", this.roleDto, ProblemDetail.class);
+        Assertions.assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(HttpStatus.CONFLICT.value(), bodyResponse.getStatus());
+        Assertions.assertEquals("https://problems-registry.smartbear.com/already-exists", bodyResponse.getType().toString());
+        Assertions.assertEquals("Already exists", bodyResponse.getTitle());
+        Assertions.assertEquals(String.format(ALREADY_EXIST_TEMPLATE, "Role", "roleName",this.roleDto.getRoleName().toUpperCase()), bodyResponse.getDetail());
+        Assertions.assertEquals("/roles", Objects.requireNonNull(bodyResponse.getInstance()).toString());
+    }
+
+
+    @Test
+    @DisplayName("Given already has role CUSTOMER when create account then return accountDto with 201")
+    @Order(5)
+    void givenHasCustomerRole_whenCreateAccount_thenReturn201() {
+        var responseBody = testRestTemplate.postForEntity("/accounts", accountRequestDtoMock, AccountResponseDto.class);
+        Assertions.assertEquals(HttpStatus.CREATED, responseBody.getStatusCode());
+        var bodyResponse = responseBody.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(accountResponseDtoMock.getRoleName(), bodyResponse.getRoleName());
+        Assertions.assertEquals(accountResponseDtoMock.getEmail(), bodyResponse.getEmail());
+        Assertions.assertEquals(accountResponseDtoMock.getUsername(), bodyResponse.getUsername());
+        Assertions.assertEquals(accountResponseDtoMock.getUuid(), bodyResponse.getUuid());
+    }
+    @Test
+    @DisplayName("Given uuid already exists when create new account then return 409")
+    @Order(6)
+    void givenAlreadyHasUuid_whenCreateNewAccount_thenReturn409() {
+        var responseEntity = this.testRestTemplate.postForEntity("/accounts", accountRequestDtoMock, ProblemDetail.class);
+        Assertions.assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(HttpStatus.CONFLICT.value(), bodyResponse.getStatus());
+        Assertions.assertEquals("https://problems-registry.smartbear.com/already-exists", bodyResponse.getType().toString());
+        Assertions.assertEquals("Already exists", bodyResponse.getTitle());
+        Assertions.assertEquals(String.format(ALREADY_EXIST_TEMPLATE, "Account", "uuid", accountRequestDtoMock.getUuid()), bodyResponse.getDetail());
+        Assertions.assertEquals("/accounts", Objects.requireNonNull(bodyResponse.getInstance()).toString());
+    }
+
+    @Test
+    @DisplayName("Given username already exists when create new account then return 409")
+    @Order(7)
+    void givenUsernameAlreadyExist_whenCreateAccount_thenReturn409() {
+        this.accountRequestDtoMock = AccountRequestDto.builder()
+                .uuid(UUID.randomUUID().toString())
+                .username(accountRequestDtoMock.getUsername())
+                .password("testPassword")
+                .email("test@gmail.com")
+                .roleName("CUSTOMER")
+                .build();
+        var responseEntity =  testRestTemplate.postForEntity("/accounts", accountRequestDtoMock, ProblemDetail.class);
+        Assertions.assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(HttpStatus.CONFLICT.value(), bodyResponse.getStatus());
+        Assertions.assertEquals("https://problems-registry.smartbear.com/already-exists", bodyResponse.getType().toString());
+        Assertions.assertEquals("Already exists", bodyResponse.getTitle());
+        Assertions.assertEquals(String.format(ALREADY_EXIST_TEMPLATE, "Account", "username",accountRequestDtoMock.getUsername()), bodyResponse.getDetail());
+        Assertions.assertEquals("/accounts", Objects.requireNonNull(bodyResponse.getInstance()).toString());
+    }
+    @Test
+    @DisplayName("Given email already exists when create new account then return 409")
+    @Order(8)
+    void givenAlreadyHasEmail_whenCreateNewAccount_thenReturn409() {
+        var accountRequestDto = AccountRequestDto.builder()
+                .uuid(UUID.randomUUID().toString())
+                .username("testUser2" + random.nextInt())
+                .password("testPassword")
+                .email(accountRequestDtoMock.getEmail())
+                .roleName("CUSTOMER")
+                .build();
+        var responseEntity =  testRestTemplate.postForEntity("/accounts", accountRequestDto, ProblemDetail.class);
+        Assertions.assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(HttpStatus.CONFLICT.value(), bodyResponse.getStatus());
+        Assertions.assertEquals("https://problems-registry.smartbear.com/already-exists", bodyResponse.getType().toString());
+        Assertions.assertEquals("Already exists", bodyResponse.getTitle());
+        Assertions.assertEquals(String.format(ALREADY_EXIST_TEMPLATE, "Account", "email",accountRequestDto.getEmail()), bodyResponse.getDetail());
+        Assertions.assertEquals("/accounts", Objects.requireNonNull(bodyResponse.getInstance()).toString());
+    }
+    @Test
+    @DisplayName("Given has account when get accounts then return accountDto with 200")
+    @Order(9)
+    void givenHasAccount_whenGetAccount_thenReturnAccountDtoWith200() {
+        ParameterizedTypeReference<Set<AccountResponseDto>> parameterizedTypeReference = new ParameterizedTypeReference<>() {};
+        var responseEntity = testRestTemplate.exchange("/accounts", HttpMethod.GET, null, parameterizedTypeReference);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertFalse(bodyResponse.isEmpty());
+        bodyResponse.stream().findFirst().ifPresent(accountResponseDto -> {
+            Assertions.assertEquals(accountResponseDtoMock.getRoleName(), accountResponseDto.getRoleName());
+            Assertions.assertEquals(accountResponseDtoMock.getEmail(), accountResponseDto.getEmail());
+            Assertions.assertEquals(accountResponseDtoMock.getUsername(), accountResponseDto.getUsername());
+            Assertions.assertEquals(accountResponseDtoMock.getUuid(), accountResponseDto.getUuid());
+        });
+    }
+    @Test
+    @DisplayName("Given has account when get account by uuid then return accountDto with 200")
+    @Order(10)
+    void givenHasAccount_whenGetAccountByUuid_thenReturnAccountDtoWith200() {
+        URI uri = URI.create("/accounts/" + accountRequestDtoMock.getUuid());
+        var responseEntity = testRestTemplate.getForEntity(uri, AccountResponseDto.class);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(accountResponseDtoMock.getRoleName(), bodyResponse.getRoleName());
+        Assertions.assertEquals(accountResponseDtoMock.getEmail(), bodyResponse.getEmail());
+        Assertions.assertEquals(accountResponseDtoMock.getUsername(), bodyResponse.getUsername());
+        Assertions.assertEquals(accountResponseDtoMock.getUuid(), bodyResponse.getUuid());
+    }
+    @Test
+    @DisplayName("Given has account when get account by uuid then return accountDto with 404")
+    @Order(11)
+    void givenHasAccount_whenGetAccountByUuid_thenReturnAccountDtoWith404() {
+        URI uri = URI.create("/accounts/" + UUID.randomUUID());
+        var responseEntity = testRestTemplate.getForEntity(uri, ProblemDetail.class);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), bodyResponse.getStatus());
+        Assertions.assertEquals("https://problems-registry.smartbear.com/not-found", bodyResponse.getType().toString());
+        Assertions.assertEquals("Not found", bodyResponse.getTitle());
+        Assertions.assertEquals("Account with accountUuid: " + uri.getPath().substring(uri.getPath().lastIndexOf('/') + 1) + " not found", bodyResponse.getDetail());
+        Assertions.assertEquals(uri.getPath(), Objects.requireNonNull(bodyResponse.getInstance()).toString());
+    }
+    @Test
+    @DisplayName("Given role when get roles then return roleDto with 200")
+    @Order(12)
+    void givenRole_whenGetRoles_thenReturnRoleDtoWith200() {
+        ParameterizedTypeReference<Set<RoleDto>> parameterizedTypeReference = new ParameterizedTypeReference<>() {};
+        var responseEntity = testRestTemplate.exchange("/roles", HttpMethod.GET, null, parameterizedTypeReference);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertFalse(bodyResponse.isEmpty());
+        bodyResponse.stream().findFirst().ifPresent(roleDto -> {
+            Assertions.assertEquals(this.roleDto.getRoleName().toUpperCase(), roleDto.getRoleName());
+            Assertions.assertEquals(this.roleDto.getRoleDescription(), roleDto.getRoleDescription());
+        });
+    }
+    @Test
+    @DisplayName("Given roleuuid not exist when get role by uuid then return problemDetail with 404")
+    @Order(13)
+    @Disabled("This logic is not implemented yet")
+    void givenUUidNotExist_whenGetRoleByUuid_thenReturnProblemDetailWith404() {
+        URI uri = URI.create("/roles/"+ UUID.randomUUID());
+        var responseEntity = testRestTemplate.getForEntity(uri, ProblemDetail.class);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), bodyResponse.getStatus());
+        Assertions.assertEquals("https://problems-registry.smartbear.com/not-found", bodyResponse.getType().toString());
+        Assertions.assertEquals("Not found", bodyResponse.getTitle());
+        Assertions.assertEquals("Role with uuid: " + uri.getPath().substring(uri.getPath().lastIndexOf('/') + 1) + " not found", bodyResponse.getDetail());
+        Assertions.assertEquals(uri.getPath(), Objects.requireNonNull(bodyResponse.getInstance()).toString());
+    }
+    @Test
+    @DisplayName("Given role exist when get roles then  with 200")
+    @Order(14)
+    void givenRoleExist_whenGetRoles_thenReturn200() {
+        ParameterizedTypeReference<Set<RoleDto>> parameterizedTypeReference = new ParameterizedTypeReference<>() {};
+        var responseEntity = testRestTemplate.exchange("/roles", HttpMethod.GET, null, parameterizedTypeReference);
+        Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertFalse(bodyResponse.isEmpty());
+        bodyResponse.stream().findFirst().ifPresent(roleDto -> {
+            Assertions.assertEquals(this.roleDto.getRoleName().toUpperCase(), roleDto.getRoleName());
+            Assertions.assertEquals(this.roleDto.getRoleDescription(), roleDto.getRoleDescription());
+        });
+    }
+    @Test
+    @DisplayName("Given role exist when delete role then return 422 because of role is in use")
+    @Order(15)
+    void givenRoleExist_whenDeleteRole_thenReturn422() {
+        Role role = roleRepository.findRoleByRoleName(this.roleDto.getRoleName().toUpperCase()).orElse(null);
+        assert role != null;
+        URI uri = URI.create("/roles/" + role.getUuid());
+        var responseEntity = testRestTemplate.exchange(uri, HttpMethod.DELETE, null, ProblemDetail.class);
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, responseEntity.getStatusCode());
+        var bodyResponse = responseEntity.getBody();
+        Assertions.assertNotNull(bodyResponse);
+        Assertions.assertEquals(HttpStatus.UNPROCESSABLE_ENTITY.value(), bodyResponse.getStatus());
+        Assertions.assertEquals("https://problems-registry.smartbear.com/business-rule-violation", bodyResponse.getType().toString());
+        Assertions.assertEquals("Business Rule Violation", bodyResponse.getTitle());
+        Assertions.assertNotNull(bodyResponse.getDetail());
+        Assertions.assertTrue(bodyResponse.getDetail().contains("is still referenced"));
+        Assertions.assertEquals(uri.getPath(), Objects.requireNonNull(bodyResponse.getInstance()).toString());
+    }
+    @Test
+    @DisplayName("Given role exist when delete role then return 204")
+    @Order(16)
+    void givenRoleExist_whenDeleteRole_thenReturn204() {
+        accountRepository.deleteAll();
+        Role role = roleRepository.findRoleByRoleName(this.roleDto.getRoleName().toUpperCase()).orElse(null);
+        assert role != null;
+        URI uri = URI.create("/roles/" + role.getUuid());
+        var responseEntity = testRestTemplate.exchange(uri, HttpMethod.DELETE, null, Void.class);
+        Assertions.assertEquals(HttpStatus.ACCEPTED, responseEntity.getStatusCode());
     }
 }

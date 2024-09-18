@@ -3,10 +3,10 @@ ARG SERVICE_NAME
 ENV JAR_PATH=/build/target/${SERVICE_NAME}-0.0.1-SNAPSHOT.jar
 WORKDIR build
 COPY . .
-RUN mvn  clean package -q -DskipTests
-RUN jar -xf $JAR_PATH
-RUN jdeps --ignore-missing-deps --print-module-deps --multi-release 17 --recursive --class-path 'BOOT-INF/lib/*' $JAR_PATH >modules.txt
-RUN jlink --verbose --add-modules $(cat modules.txt) --output /jre --compress 2 --no-header-files
+RUN mvn clean package -q -DskipTests && \
+    jar -xf $JAR_PATH && \
+    jdeps --ignore-missing-deps --print-module-deps --multi-release 17 --recursive --class-path 'BOOT-INF/lib/*' $JAR_PATH >modules.txt && \
+    jlink --verbose --add-modules $(cat modules.txt) --output /jre --compress 2 --no-header-files
 FROM eclipse-temurin:17-jre AS layers
 ARG SERVICE_NAME
 ENV JAR_PATH=/build/target/${SERVICE_NAME}-0.0.1-SNAPSHOT.jar
@@ -26,7 +26,6 @@ COPY --from=layers --chown=app:app --chmod=500 /layers/dependencies/ ./
 COPY --from=layers --chown=app:app --chmod=500 /layers/spring-boot-loader/ ./
 COPY --from=layers --chown=app:app --chmod=500 /layers/snapshot-dependencies/ ./
 COPY --from=layers --chown=app:app --chmod=500 /layers/application/ ./
-
 EXPOSE ${SERVICE_PORT}
 LABEL org.opencontainers.image.source=https://github.com/ngodat0103/yamp
 LABEL  org.opencontainers.image.description="YAMP - Yet Another Microservice Project"

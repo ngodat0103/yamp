@@ -62,7 +62,6 @@ public class CustomerServiceTest {
                 .lastName(lastName)
                 .email(email)
                 .password(password).build();
-
         Customer customerMockResponse = new Customer();
         customerMockResponse.setCustomerUuid(customerUuid);
         customerMockResponse.setFirstName(firstName);

@@ -17,7 +17,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableMethodSecurity
 public class SecurityConfiguration {
     @Bean
-//    @Profile({"pre-prod","prod"})
+    @Profile({"pre-prod","prod"})
     SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(AbstractHttpConfigurer::disable);
@@ -37,18 +37,18 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-//    @Bean
-//    @Profile("local-dev")
-//    // I use this setting for developing only, does not use this in production
-//    SecurityFilterChain apiFilterChain_dev(HttpSecurity http) throws Exception {
-//        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
-//        http.csrf(AbstractHttpConfigurer::disable);
-//        http.cors(AbstractHttpConfigurer::disable);
-//        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//        http.anonymous(anonymous -> {
-//            anonymous.principal("1a35d863-0cd9-4bc1-8cc4-f4cddca97720");
-//        });
-//        return http.build();
-//    }
+    @Bean
+    @Profile({"local-dev","integration-test"})
+    // I use this setting for developing only, does not use this in production
+    SecurityFilterChain apiFilterChain_dev(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.cors(AbstractHttpConfigurer::disable);
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.anonymous(anonymous -> {
+            anonymous.principal("1a35d863-0cd9-4bc1-8cc4-f4cddca97720");
+        });
+        return http.build();
+    }
 
 }

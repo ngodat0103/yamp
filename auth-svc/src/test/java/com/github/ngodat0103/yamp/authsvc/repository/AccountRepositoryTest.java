@@ -3,6 +3,7 @@ package com.github.ngodat0103.yamp.authsvc.repository;
 
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
+import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,8 @@ import java.util.UUID;
 
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
-@ActiveProfiles("unit_test")
+@ActiveProfiles("unit-test")
+@Transactional
 public class AccountRepositoryTest {
 
     @Autowired
@@ -28,6 +30,7 @@ public class AccountRepositoryTest {
     public void givenAccount_whenSave_returnSavedAccount(){
         Account account = new Account();
         account.setEmail("example@gmail.com");
+        account.setUuid(UUID.randomUUID());
         account.setUsername("testUser");
         account.setPassword("bestPassword");
         Account saveAccount = accountRepository.save(account);

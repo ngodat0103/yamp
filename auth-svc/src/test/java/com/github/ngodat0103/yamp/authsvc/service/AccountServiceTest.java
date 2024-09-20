@@ -78,7 +78,7 @@ class AccountServiceTest {
         given(accountRepository.existsById(account.getUuid())).willReturn(true);
         Assertions.assertThatThrownBy(() -> accountService.register(accountRequestDtoMock))
                 .isInstanceOf(ConflictException.class)
-                .hasMessageContaining(String.format(TEMPLATE_CONFLICT, "Account", "accountUuid", account.getUuid()));
+                .hasMessageContaining(String.format(TEMPLATE_CONFLICT, "Account", "uuid", account.getUuid()));
     }
 
     @Test

@@ -38,36 +38,36 @@ jobs:
          echo "- **Service Port**: ${{ inputs.SERVICE_PORT }}" >> $GITHUB_STEP_SUMMARY
          cat $(ls | grep unit_test | grep .txt) >> $GITHUB_STEP_SUMMARY
 
-#  scan_quality_code:
-#    needs: [unit-test]
-#    name: Scan quality
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#      - name: Set up JDK 17
-#        uses: actions/setup-java@v4.2.1
-#        with:
-#          distribution: 'temurin'
-#          java-version: '17'
-#      - name: Cache SonarQube packages
-#        uses: actions/cache@v4.0.2
-#        with:
-#          path: ~/.sonar/cache
-#          key: ${{ runner.os }}-sonar
-#          restore-keys: ${{ runner.os }}-sonar
-#      - name: Cache Maven packages
-#        uses: actions/cache@v4.0.2
-#        with:
-#          path: ~/.m2/repository
-#          key: ${{ runner.os }}-m2-v1
-#      - name: Build and analyze
-#        working-directory: ${{inputs.SERVICE_NAME}}
-#        env:
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-#        run: mvn -DskipTests -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=NGODAT0103_KLTN_469d6be5-1cc8-4567-ae29-7f3f9dc29ff6 -Dsonar.projectName='KLTN'
+  scan_quality_code:
+    needs: [unit-test]
+    name: Scan quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4.2.1
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4.0.2
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Maven packages
+        uses: actions/cache@v4.0.2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-v1
+      - name: Build and analyze
+        working-directory: ${{inputs.SERVICE_NAME}}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: mvn -DskipTests -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ngodat0103_yamp_ff8792e0-48a4-446e-aed6-9161a86c30aa -Dsonar.projectName='yamp'
 
   scan_vulnerability:
     needs: [unit-test]

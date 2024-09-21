@@ -30,6 +30,12 @@
         <java.version>17</java.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+        <sonar.tests>src/test</sonar.tests>
+        <sonar.sources>src/main</sonar.sources>
+        <sonar.projectName>auth-svc</sonar.projectName>
+        <sonar.language>java</sonar.language>
+        <sonar.java.source>17</sonar.java.source>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -192,10 +198,6 @@
 
     </dependencies>
 
-
-
-
-
     <build>
         <plugins>
             <plugin>
@@ -209,6 +211,25 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.12</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

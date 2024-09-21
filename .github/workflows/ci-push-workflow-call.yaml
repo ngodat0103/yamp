@@ -11,36 +11,9 @@ on:
         required: true
         type: string
 jobs:
-  unit-test:
-    name: Run Unit test
-    runs-on: ubuntu-latest
-    container:
-      image: maven:3.9.8-eclipse-temurin-17-alpine
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - name: Cache Maven packages
-        uses: actions/cache@v4.0.2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-v1
-      - name: Running test
-        working-directory: ${{inputs.SERVICE_NAME}}
-        run: mvn  test -Dtest=*UnitTest
-      - name: Create summary
-        working-directory: ${{inputs.SERVICE_NAME}}/target/surefire-reports
-        run: |
-         echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
-         echo "All unit tests have been executed." >> $GITHUB_STEP_SUMMARY
-         echo "- **Service Name**: ${{ inputs.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY
-         echo "- **Service Port**: ${{ inputs.SERVICE_PORT }}" >> $GITHUB_STEP_SUMMARY
-         cat $(ls | grep unit_test | grep .txt) >> $GITHUB_STEP_SUMMARY
 
   scan_quality_code:
-    needs: [unit-test]
-    name: Scan quality
+    name: Unit test and scan quality code
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -67,10 +40,11 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -DskipTests -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ngodat0103_yamp_ff8792e0-48a4-446e-aed6-9161a86c30aa -Dsonar.projectName='yamp'
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dtest=*UnitTest
+#        run: mvn -DskipTests -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey= -Dsonar.projectName='yamp'
 
   scan_vulnerability:
-    needs: [unit-test]
+    needs: [scan_quality_code]
     name: check vulnerability using trivy
     runs-on: ubuntu-latest
     env:

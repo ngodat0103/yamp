@@ -16,7 +16,12 @@ spring:
 
   datasource:
     url: jdbc:postgresql://share-db:5432/product-svc-db
+    username: product-svc-user
+    password: product-svc-user-password
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

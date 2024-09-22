@@ -12,68 +12,104 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
+/** The type Security configuration. */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
+  /**
+   * Actuator filter chain security filter chain.
+   *
+   * @param http the http
+   * @return the security filter chain
+   * @throws Exception the exception
+   */
+  @Bean
+  SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
+    http.securityMatcher(new AntPathRequestMatcher("/actuator/**"));
+    http.authorizeHttpRequests(
+        requests ->
+            requests
+                .requestMatchers("/actuator/prometheus")
+                .permitAll()
+                .requestMatchers("/actuator/health/readiness")
+                .permitAll()
+                .requestMatchers("/actuator/health/liveness")
+                .permitAll()
+                .anyRequest()
+                .hasAnyRole("ACTUATOR", "ADMIN"));
+    http.sessionManagement(
+        sessionManagement ->
+            sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http.csrf(AbstractHttpConfigurer::disable);
+    return http.build();
+  }
 
-    @Bean
-    SecurityFilterChain actuatorFilterChain(HttpSecurity http) throws Exception {
-        http.securityMatcher(new AntPathRequestMatcher("/actuator/**"));
-        http.authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/actuator/prometheus").permitAll()
-                        .requestMatchers("/actuator/health/readiness").permitAll()
-                        .requestMatchers("/actuator/health/liveness").permitAll()
-                        .anyRequest().hasAnyRole("ACTUATOR","ADMIN")
-                );
-        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.csrf(AbstractHttpConfigurer::disable);
-        return http.build();
-    }
+  /**
+   * Api filter chain security filter chain.
+   *
+   * @param http the http
+   * @return the security filter chain
+   * @throws Exception the exception
+   */
+  @Bean
+  @Profile({"pre-prod", "prod"})
+  SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+    http.sessionManagement(
+        sessionManagement ->
+            sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http.csrf(AbstractHttpConfigurer::disable);
+    http.authorizeHttpRequests(
+        requests ->
+            requests
+                .requestMatchers(HttpMethod.GET, "/ui-docs/**", "/api-docs/**", "/swagger-ui/**")
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/actuator/**")
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, "/categories/**")
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, "/products/**")
+                .permitAll()
+                .anyRequest()
+                .authenticated());
+    http.oauth2ResourceServer(resource -> resource.jwt(Customizer.withDefaults()));
+    return http.build();
+  }
 
-    @Bean
-    @Profile({"pre-prod","prod"})
-    SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.authorizeHttpRequests(requests -> requests
-                .requestMatchers(HttpMethod.GET,"/ui-docs/**","/api-docs/**","/swagger-ui/**").permitAll()
-                .requestMatchers(HttpMethod.POST,"/actuator/**").permitAll()
-                .requestMatchers(HttpMethod.GET,"/categories/**").permitAll()
-                .requestMatchers(HttpMethod.GET,"/products/**").permitAll()
-                .anyRequest().authenticated()
-        );
-        http.oauth2ResourceServer(resource-> resource.jwt(Customizer.withDefaults()));
-        return http.build();
-    }
+  /**
+   * Api filter chain dev security filter chain.
+   *
+   * @param http the http
+   * @return the security filter chain
+   * @throws Exception the exception
+   */
+  //    @Bean
+  //    @Profile({"unit-test","integration-test"})
+  //    SecurityFilterChain IntegrationTestFilterChain(HttpSecurity http) throws Exception {
+  //        http.sessionManagement(sessionManagement ->
+  // sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+  //        http.csrf(AbstractHttpConfigurer::disable);
+  //        http.authorizeHttpRequests(requests -> requests.anyRequest().permitAll());
+  //        return http.build();
+  //    }
+  @Bean
+  @Profile({"local-dev", "integration-test"})
+  // I use this setting for developing and testing only, does not use this in production
+  SecurityFilterChain apiFilterChain_dev(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable);
+    http.sessionManagement(
+        sessionManagement ->
+            sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http.authorizeHttpRequests(requests -> requests.anyRequest().permitAll());
 
-//    @Bean
-//    @Profile({"unit-test","integration-test"})
-//    SecurityFilterChain IntegrationTestFilterChain(HttpSecurity http) throws Exception {
-//        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-//        http.csrf(AbstractHttpConfigurer::disable);
-//        http.authorizeHttpRequests(requests -> requests.anyRequest().permitAll());
-//        return http.build();
-//    }
-    @Bean
-    @Profile({"local-dev","integration-test"})
-    // I use this setting for developing and testing only, does not use this in production
-    SecurityFilterChain apiFilterChain_dev(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.authorizeHttpRequests(requests -> requests.anyRequest().permitAll());
-
-        http.anonymous(anonymous -> {
-            String principal = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
-            anonymous.principal(principal);
-            anonymous.authorities("ROLE_ADMIN");
+    http.anonymous(
+        anonymous -> {
+          String principal = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
+          anonymous.principal(principal);
+          anonymous.authorities("ROLE_ADMIN");
         });
-        return http.build();
-    }
-
-
-
+    return http.build();
+  }
 }

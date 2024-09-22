@@ -1,39 +1,48 @@
 package com.github.ngodat0103.yamp.productsvc.persistence.entity;
 
-
 import jakarta.persistence.*;
+import java.util.Set;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-import java.util.UUID;
-
+/** The type Product item. */
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 public class ProductItem extends BaseEntity {
-    @Column(unique = true,nullable = false)
-    private UUID productUuid;
-    int SKU;
-    int quantity;
-    double price;
-    String productImage;
+  @Column(unique = true, nullable = false)
+  private UUID productUuid;
 
-    @JoinColumn(name = "productUuid", insertable = false, updatable = false)
-    @OneToOne
-    Product product;
+  /** The Sku. */
+  int SKU;
 
+  /** The Quantity. */
+  int quantity;
 
+  /** The Price. */
+  double price;
 
+  /** The Product image. */
+  String productImage;
 
-    @OneToMany(mappedBy = "productItem")
-    Set<ProductConfiguration> productConfigurations;
+  /** The Product. */
+  @JoinColumn(name = "productUuid", insertable = false, updatable = false)
+  @OneToOne
+  Product product;
 
+  /** The Product configurations. */
+  @OneToMany(mappedBy = "productItem")
+  Set<ProductConfiguration> productConfigurations;
 
-    public ProductItem(UUID createdBy) {
-        super(createdBy);
-    }
-
+  /**
+   * Instantiates a new Product item.
+   *
+   * @param createdBy the created by
+   */
+  public ProductItem(UUID createdBy) {
+    super(createdBy);
+  }
 }

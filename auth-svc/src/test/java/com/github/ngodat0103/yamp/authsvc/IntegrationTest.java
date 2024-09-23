@@ -64,7 +64,7 @@ class IntegrationTest {
     @Test
     @DisplayName("context loads")
     @Order(1)
-    public void contextLoads() {
+    void contextLoads() {
     }
 
     @Test

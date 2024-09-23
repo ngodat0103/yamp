@@ -11,7 +11,6 @@ on:
         required: true
         type: string
 jobs:
-
   scan_quality_code:
     name: Unit test and scan quality code
     runs-on: ubuntu-latest
@@ -36,13 +35,10 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-m2-v1
       - name: Build and analyze
-        working-directory: ${{inputs.SERVICE_NAME}}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dtest=*UnitTest
-#        run: mvn -DskipTests -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey= -Dsonar.projectName='yamp'
-
+        run: mvn clean verify sonar:sonar -Dtest=*UnitTest -P coverage
   scan_vulnerability:
     needs: [scan_quality_code]
     name: check vulnerability using trivy

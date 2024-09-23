@@ -3,54 +3,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.3</version> <!-- Update to a version that includes the required spring-web version -->
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>com.github.ngodat0103</groupId>
+        <artifactId>yamp</artifactId>
+        <version>latest</version>
     </parent>
     <groupId>com.github.ngodat0103.yamp</groupId>
     <artifactId>auth-svc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>authsvc</name>
     <description>auth-service</description>
-    <url/>
-    <profiles>
-        <profile>
-            <id>local-dev</id>
-            <properties>
-                <spring.profiles.active>local-dev</spring.profiles.active>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-devtools</artifactId>
-                    <scope>runtime</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
-        <sonar.tests>src/test</sonar.tests>
-        <sonar.sources>src/main</sonar.sources>
-        <sonar.projectName>auth-svc</sonar.projectName>
-        <sonar.language>java</sonar.language>
-        <sonar.java.source>17</sonar.java.source>
-        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     </properties>
 
     <dependencyManagement>
@@ -188,11 +153,7 @@
             <version>1.11.0-M1</version>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-devtools</artifactId>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-stream</artifactId>
@@ -217,18 +178,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.graalvm.buildtools</groupId>
-                <artifactId>native-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>build-image</id>
-                        <goals>
-                            <goal>compile-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
@@ -237,40 +186,17 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
-                        <exclude>
-                            <groupId>org.springdoc</groupId>
-                            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-                        </exclude>
                     </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>process-aot</id>
-                        <goals>
-                            <goal>process-aot</goal>
-                        </goals>
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>process-aot</id>-->
+<!--                        <goals>-->
+<!--                            <goal>process-aot</goal>-->
+<!--                        </goals>-->
 
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
+<!--                    </execution>-->
+<!--                </executions>-->
             </plugin>
         </plugins>
     </build>

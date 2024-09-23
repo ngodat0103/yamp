@@ -5,5 +5,4 @@ import org.springframework.session.data.redis.config.annotation.web.server.Enabl
 
 @Configuration
 @EnableRedisWebSession
-public class WebSessionConfiguration {
-}
+public class WebSessionConfiguration {}

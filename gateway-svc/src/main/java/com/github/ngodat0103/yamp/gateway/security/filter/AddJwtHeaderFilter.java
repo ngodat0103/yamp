@@ -15,34 +15,36 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-
-
 @AllArgsConstructor
 public class AddJwtHeaderFilter implements WebFilter {
-    private final ReactiveOAuth2AuthorizedClientService reactiveOAuth2AuthorizedClientService;
-    private static final Log logger = LogFactory.getLog(AuthorizationWebFilter.class);
+  private final ReactiveOAuth2AuthorizedClientService reactiveOAuth2AuthorizedClientService;
+  private static final Log logger = LogFactory.getLog(AuthorizationWebFilter.class);
 
-    @Override
-    @NonNull
-    public Mono<Void> filter(@NonNull ServerWebExchange exchange, WebFilterChain chain) {
-        return ReactiveSecurityContextHolder.getContext()
-                .filter(ctx ->ctx.getAuthentication()!=null && ctx.getAuthentication() instanceof OAuth2AuthenticationToken)
-                .switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
-                .map(SecurityContext::getAuthentication)
-                .cast(OAuth2AuthenticationToken.class)
-                .flatMap(token -> {
-                    String principal = token.getName();
-                    String registrationId = token.getAuthorizedClientRegistrationId();
-                    return reactiveOAuth2AuthorizedClientService.loadAuthorizedClient(registrationId,principal)
-                            .flatMap(oauth2-> {
-                                ServerHttpRequest request = exchange.getRequest();
-                                request.mutate().headers(h->h.setBearerAuth(oauth2.getAccessToken().getTokenValue()));
-                                return chain.filter(exchange);
-                            });
-                });
-
-
-
-    }
-
+  @Override
+  @NonNull
+  public Mono<Void> filter(@NonNull ServerWebExchange exchange, WebFilterChain chain) {
+    return ReactiveSecurityContextHolder.getContext()
+        .filter(
+            ctx ->
+                ctx.getAuthentication() != null
+                    && ctx.getAuthentication() instanceof OAuth2AuthenticationToken)
+        .switchIfEmpty(chain.filter(exchange).then(Mono.empty()))
+        .map(SecurityContext::getAuthentication)
+        .cast(OAuth2AuthenticationToken.class)
+        .flatMap(
+            token -> {
+              String principal = token.getName();
+              String registrationId = token.getAuthorizedClientRegistrationId();
+              return reactiveOAuth2AuthorizedClientService
+                  .loadAuthorizedClient(registrationId, principal)
+                  .flatMap(
+                      oauth2 -> {
+                        ServerHttpRequest request = exchange.getRequest();
+                        request
+                            .mutate()
+                            .headers(h -> h.setBearerAuth(oauth2.getAccessToken().getTokenValue()));
+                        return chain.filter(exchange);
+                      });
+            });
+  }
 }

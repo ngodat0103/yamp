@@ -19,17 +19,19 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 @Getter
 public class AuthConfiguration {
 
-    @Bean
-    RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate){
-        return new JdbcRegisteredClientRepository(jdbcTemplate);
-    }
-    @Bean
-    OAuth2AuthorizationService authorizationService(JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository){
-        return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
-    }
-    @Bean
-    UserDetailsService userDetailService(AccountRepository accountRepository){
-        return new UserDetailServiceImpl(accountRepository);
-    }
+  @Bean
+  RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
+    return new JdbcRegisteredClientRepository(jdbcTemplate);
+  }
 
+  @Bean
+  OAuth2AuthorizationService authorizationService(
+      JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository) {
+    return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
+  }
+
+  @Bean
+  UserDetailsService userDetailService(AccountRepository accountRepository) {
+    return new UserDetailServiceImpl(accountRepository);
+  }
 }

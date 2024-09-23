@@ -3,39 +3,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.3</version> <!-- Update to a version that includes the required spring-web version -->
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>com.github.ngodat0103</groupId>
+        <artifactId>yamp</artifactId>
+        <version>latest</version>
     </parent>
     <groupId>com.github.ngodat0103.yamp</groupId>
     <artifactId>user-svc</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>usersvc</name>
     <description>User-service</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
     <properties>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
         <java.version>17</java.version>
         <spring-cloud.version>2023.0.2</spring-cloud.version>
-        <sonar.tests>src/test</sonar.tests>
-        <sonar.sources>src/main</sonar.sources>
-        <sonar.projectName>user-svc</sonar.projectName>
-        <sonar.language>java</sonar.language>
-        <sonar.java.source>17</sonar.java.source>
-        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     </properties>
     <dependencies>
         <dependency>
@@ -219,28 +199,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
-
     </build>
-
 </project>

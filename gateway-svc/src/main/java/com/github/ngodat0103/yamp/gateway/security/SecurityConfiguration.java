@@ -71,7 +71,7 @@ public class SecurityConfiguration {
                 .permitAll()
                 .pathMatchers("/api/v1/auth/oauth2/authorize")
                 .permitAll()
-                .pathMatchers("/api/v1/auth/login", "/api/v1/auth/logout")
+                .pathMatchers("/api/v1/auth/login", "/api/v1/auth/account/logout")
                 .permitAll()
                 .pathMatchers("/api/v1/auth/oauth2/token")
                 .permitAll()

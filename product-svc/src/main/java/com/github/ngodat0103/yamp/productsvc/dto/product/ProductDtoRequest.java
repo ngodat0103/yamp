@@ -8,7 +8,7 @@ import lombok.Getter;
 @Builder
 @EqualsAndHashCode
 public class ProductDtoRequest {
-    private String name;
-    private String description;
-    private String categorySlug;
+  private String name;
+  private String description;
+  private String categorySlug;
 }

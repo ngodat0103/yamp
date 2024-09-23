@@ -1,28 +1,30 @@
 package com.github.ngodat0103.yamp.productsvc.persistence.entity;
 
 import jakarta.persistence.*;
+import java.io.Serializable;
+import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-import java.util.UUID;
-
+/** The type Product image. */
 @Getter
 @Setter
 @Entity
 public class ProductImage extends BaseEntity {
-    @Getter
-    @Setter
-    @EqualsAndHashCode
-    static class ProductImageId implements Serializable {
-        private UUID productUuid;
-        private String imageUrl;
-    }
-    @Id
-    ProductImageId productImageId;
+  /** The type Product image id. */
+  @Getter
+  @Setter
+  @EqualsAndHashCode
+  static class ProductImageId implements Serializable {
+    private UUID productUuid;
+    private String imageUrl;
+  }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productUuid")
-    private Product product;
+  /** The Product image id. */
+  @Id ProductImageId productImageId;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "productUuid")
+  private Product product;
 }

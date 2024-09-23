@@ -1,7 +1,5 @@
 package com.example.yamp.usersvc.event;
 
-import com.example.yamp.usersvc.cache.AuthSvcRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,13 +15,9 @@ import org.springframework.util.backoff.FixedBackOff;
 @AllArgsConstructor
 public class KafkaConfiguration {
 
-
-
-    @Bean
-    public CommonErrorHandler errorHandler(KafkaOperations<Object, Object> template) {
-        return new DefaultErrorHandler(
-                new DeadLetterPublishingRecoverer(template), new FixedBackOff(1000L, 2));
-    }
-
-
+  @Bean
+  public CommonErrorHandler errorHandler(KafkaOperations<Object, Object> template) {
+    return new DefaultErrorHandler(
+        new DeadLetterPublishingRecoverer(template), new FixedBackOff(1000L, 2));
+  }
 }

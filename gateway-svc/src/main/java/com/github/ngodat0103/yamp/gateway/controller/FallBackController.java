@@ -8,9 +8,10 @@ import reactor.core.publisher.Mono;
 
 @RestController
 public class FallBackController {
-    @GetMapping("/fallback")
-    @ResponseStatus(HttpStatus.TEMPORARY_REDIRECT)
-    public Mono<String> fallBack(){
-        return Mono.just("An error occurred. Please try again later or contact me at github.com/ngodat0103");
-    }
+  @GetMapping("/fallback")
+  @ResponseStatus(HttpStatus.TEMPORARY_REDIRECT)
+  public Mono<String> fallBack() {
+    return Mono.just(
+        "An error occurred. Please try again later or contact me at github.com/ngodat0103");
+  }
 }

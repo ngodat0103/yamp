@@ -11,16 +11,15 @@ import org.springframework.data.redis.connection.lettuce.LettuceClientConfigurat
 
 @Configuration
 public class CacheConfiguration implements LettuceClientConfigurationBuilderCustomizer {
-    @Bean
-    RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory ){
-        return RedisCacheManager.builder(redisConnectionFactory).build();
-    }
+  @Bean
+  RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+    return RedisCacheManager.builder(redisConnectionFactory).build();
+  }
 
-
-    @Override
-    public void customize(LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfigurationBuilder) {
-        clientConfigurationBuilder.clientOptions(ClientOptions.builder()
-                .protocolVersion(ProtocolVersion.RESP3)
-                .build());
-    }
+  @Override
+  public void customize(
+      LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfigurationBuilder) {
+    clientConfigurationBuilder.clientOptions(
+        ClientOptions.builder().protocolVersion(ProtocolVersion.RESP3).build());
+  }
 }

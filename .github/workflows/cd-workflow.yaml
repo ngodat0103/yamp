@@ -56,7 +56,8 @@ jobs:
           echo "gateway_svc_new_version=${GATEWAY_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
           echo "product_svc_new_version=${PRODUCT_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
           echo "user_svc_new_version=${USER_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
-
+      - name: Display what service need to deploy new version
+        run: echo $GITHUB_OUTPUT
   auth-svc-build-push:
     needs: [ prepare ]
     if: needs.prepare.outputs.auth_svc_new_version != ''

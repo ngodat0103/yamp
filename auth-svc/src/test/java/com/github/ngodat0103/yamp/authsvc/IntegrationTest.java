@@ -16,11 +16,34 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("integration-test")
 class IntegrationTest {
+
+  static PostgreSQLContainer<?> postgreSQLContainer= new PostgreSQLContainer<>("postgres:16.3-bullseye");
+
+  @BeforeAll
+  static void  beforeAll(){
+      postgreSQLContainer.start();
+      int stop = 0 ;
+  }
+
+  @DynamicPropertySource
+  static void configureProperties(DynamicPropertyRegistry dynamicPropertyRegistry){
+        dynamicPropertyRegistry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        dynamicPropertyRegistry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        dynamicPropertyRegistry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+  }
+
+  @AfterAll
+  static void afterAll(){
+      postgreSQLContainer.stop();
+  }
   @Autowired private TestRestTemplate testRestTemplate;
   @Autowired AccountMapper accountMapper;
   @Autowired RoleRepository roleRepository;

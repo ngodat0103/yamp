@@ -38,7 +38,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn clean verify sonar:sonar -Dtest=*UnitTest -P coverage
+        run: mvn clean verify sonar:sonar -Dtest=*UnitTest
   scan_vulnerability:
     needs: [scan_quality_code]
     name: check vulnerability using trivy

@@ -2,10 +2,6 @@ spring:
   kafka:
     producer:
       bootstrap-servers: kafka-svc:9092
-  datasource:
-    url: jdbc:postgresql://share-db:5432/test
-    username: 'test'
-    password: 'test'
   config:
     activate:
       on-profile: integration-test

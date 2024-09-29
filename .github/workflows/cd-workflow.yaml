@@ -28,7 +28,6 @@ jobs:
 #          release_branch: release
 #          scheme: semver
 #          increment: patch
-
   prepare:
     name: Detect what service need to deploy new version
     runs-on: ubuntu-latest

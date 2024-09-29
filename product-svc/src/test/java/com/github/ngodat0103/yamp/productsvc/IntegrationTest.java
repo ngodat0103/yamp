@@ -15,12 +15,30 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.Link;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration-test")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 class IntegrationTest {
+  static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:16.3-bullseye");
 
+  @BeforeAll
+  static void beforeAll() {
+    postgreSQLContainer.start();
+  }
+  @DynamicPropertySource
+  static void configureProperties(DynamicPropertyRegistry dynamicPropertyRegistry){
+    dynamicPropertyRegistry.add("spring.datasource.url",postgreSQLContainer::getJdbcUrl);
+    dynamicPropertyRegistry.add("spring.datasource.username",postgreSQLContainer::getUsername);
+    dynamicPropertyRegistry.add("spring.datasource.password",postgreSQLContainer::getPassword);
+  }
+  @AfterAll
+    static void afterAll() {
+        postgreSQLContainer.stop();
+    }
   private final CategoryDtoRequest categoryDtoRequest =
       CategoryDtoRequest.builder().name("Test Category").parentCategoryUuid(null).build();
   @Autowired private TestRestTemplate testRestTemplate;

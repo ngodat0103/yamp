@@ -15,9 +15,9 @@ on:
         required: true
         type: string
 jobs:
-  build-container:
+  build-push:
 #    environment: pre-production
-    name: Building ${{inputs.SERVICE_NAME}} container image
+    name: Build and push container image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -51,7 +51,7 @@ jobs:
             VERSION=${{inputs.VERSION}}
   deploy:
     name: Deploying ${{inputs.SERVICE_NAME}}
-    needs: [build-container]
+    needs: [build-push]
     runs-on: ubuntu-latest
     steps:
       - name: will be implemented later

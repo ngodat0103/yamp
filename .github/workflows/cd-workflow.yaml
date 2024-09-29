@@ -58,48 +58,44 @@ jobs:
           echo "user_svc_new_version=${USER_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
       - name: Display what service need to deploy new version
         run: echo $GITHUB_OUTPUT
-  auth-svc-build-push:
+  auth-svc-deploy:
     needs: [ prepare ]
     if: needs.prepare.outputs.auth_svc_new_version != ''
-    name: "Build and push auth-svc"
     uses: ./.github/workflows/deploy-template.yaml
     secrets: inherit
     with:
       SERVICE_NAME: auth-svc
       SERVICE_PORT: 8001
       VERSION: ${{ needs.prepare.outputs.auth_svc_new_version }}
-#  gateway-svc-build-push:
-#    needs: [prepare]
-#    if: needs.prepare.outputs.gateway_svc_new_version != ''
-#    name: "Build and push gateway-svc"
-#    uses: ./.github/workflows/deploy-template.yaml
-#    secrets: inherit
-#    with:
-#      SERVICE_NAME: gateway-svc
-#      SERVICE_PORT: 8000
-#      VERSION: ${{ needs.prepare.outputs.gateway_svc_new_version }}
-#
-#  user-svc-build-push:
-#    name: "Build and push user-svc"
-#    needs: [ prepare ]
-#    if: needs.prepare.outputs.user_svc_new_version != ''
-#    uses: ./.github/workflows/deploy-template.yaml
-#    secrets: inherit
-#    with:
-#      SERVICE_NAME: user-svc
-#      SERVICE_PORT: 8002
-#      VERSION: ${{ needs.prepare.outputs.user_svc_new_version }}
-#
-#  product-svc-build-push:
-#    name: "Build and push product-svc"
-#    needs: [ prepare ]
-#    if: needs.prepare.outputs.product_svc_new_version != ''
-#    uses: ./.github/workflows/deploy-template.yaml
-#    secrets: inherit
-#    with:
-#      SERVICE_NAME: product-svc
-#      SERVICE_PORT: 8003
-#      VERSION: ${{ needs.prepare.outputs.product_svc_new_version }}
+  gateway-svc-deploy:
+    needs: [prepare]
+    if: needs.prepare.outputs.gateway_svc_new_version != ''
+    uses: ./.github/workflows/deploy-template.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: gateway-svc
+      SERVICE_PORT: 8000
+      VERSION: ${{ needs.prepare.outputs.gateway_svc_new_version }}
+
+  user-svc-deploy:
+    needs: [ prepare ]
+    if: needs.prepare.outputs.user_svc_new_version != ''
+    uses: ./.github/workflows/deploy-template.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: user-svc
+      SERVICE_PORT: 8002
+      VERSION: ${{ needs.prepare.outputs.user_svc_new_version }}
+
+  product-svc-deploy:
+    needs: [ prepare ]
+    if: needs.prepare.outputs.product_svc_new_version != ''
+    uses: ./.github/workflows/deploy-template.yaml
+    secrets: inherit
+    with:
+      SERVICE_NAME: product-svc
+      SERVICE_PORT: 8003
+      VERSION: ${{ needs.prepare.outputs.product_svc_new_version }}
 #  update-deployment-repo:
 #    needs: [prepare]
 #    if: github.event.action == 'released'

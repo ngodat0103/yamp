@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>com.github.ngodat0103.yamp</groupId>
 	<artifactId>gateway-svc</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>API Gateway Server</name>
 	<description>API gateway Server</description>
 	<url/>

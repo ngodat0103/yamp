@@ -1,104 +1,141 @@
 name: Deployment workflow
 on:
-  release:
-    types: [prereleased,released]
+#  release:
+#    types: [prereleased,released]
+  push:
+#    branches:
+#      - master
+#    paths:
+#      - "auth-svc/pom.xml"
+#      - "gateway-svc/pom.xml"
+#      - "product-svc/pom.xml"
+#      - "user-svc/pom.xml"
 jobs:
-  get-current-version:
-    name: Get current tag version
+#  prepare:
+#    name: Get current tag version
+#    runs-on: ubuntu-latest
+#    outputs:
+#      version: ${{ steps.current-version.outputs.current-v-version }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 1
+#      - name: Get current version
+#        uses: reecetech/version-increment@2024.4.4
+#        id: current-version
+#        with:
+#          release_branch: release
+#          scheme: semver
+#          increment: patch
+
+  prepare:
+    name: Detect what service need to deploy new version
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.current-version.outputs.current-v-version }}
+        auth_svc_new_version: ${{ steps.detect-services.outputs.auth_svc_new_version}}
+        gateway_svc_new_version: ${{ steps.detect-services.outputs.gateway_svc_new_version}}
+        product_svc_new_version: ${{ steps.detect-services.outputs.product_svc_new_version}}
+        user_svc_new_version: ${{ steps.detect-services.outputs.user_svc_new_version}}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: Get current version
-        uses: reecetech/version-increment@2024.4.4
-        id: current-version
-        with:
-          release_branch: release
-          scheme: semver
-          increment: patch
+      - name: Detect version changes each service
+        id: detect-services
+        env:
+          SED_REGEX: 's/^+.*<version>\(.*\)<\/version>.*/\1/p'
+          SED_COMMAND: 'sed -n $SED_REGEX'
+          AUTH_SVC_VERSION_GIT_DIFF: $(git diff HEAD^ -- auth-svc/pom.xml -U0 | $SED_COMMAND)
+          GATEWAY_SVC_VERSION_GIT_DIFF: $(git diff HEAD^ -- gateway-svc/pom.xml -U0 | $SED_COMMAND)
+          PRODUCT_SVC_VERSION_GIT_DIFF: $(git diff HEAD^ -- product-svc/pom.xml -U0 | $SED_COMMAND)
+          USER_SVC_VERSION_GIT_DIFF: $(git diff HEAD^ -- user-svc/pom.xml -U0 | $SED_COMMAND)
+        run: |
+          echo "auth_svc_new_version=${AUTH_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
+          echo "gateway_svc_new_version=${GATEWAY_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
+          echo "product_svc_new_version=${PRODUCT_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
+          echo "user_svc_new_version=${USER_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
+
   gateway-svc-build-push:
-    if: github.event.action == 'prereleased'
-    needs: [get-current-version]
+    needs: [prepare]
+    if: needs.prepare.outputs.gateway_svc_new_version != ''
     name: "Build and push gateway-svc"
-    uses: ./.github/workflows/cd-workflow-call.yaml
+    uses: ./.github/workflows/deploy-template.yaml
     secrets: inherit
     with:
       SERVICE_NAME: gateway-svc
       SERVICE_PORT: 8000
-      VERSION: ${{ needs.get-current-version.outputs.version }}
+      VERSION: ${{ needs.prepare.outputs.gateway_svc_new_version }}
   auth-svc-build-push:
-    needs: [ get-current-version ]
-    if: github.event.action == 'prereleased'
+    needs: [ prepare ]
+    if: needs.prepare.outputs.auth_svc_new_version != ''
     name: "Build and push auth-svc"
-    uses: ./.github/workflows/cd-workflow-call.yaml
+    uses: ./.github/workflows/deploy-template.yaml
     secrets: inherit
     with:
       SERVICE_NAME: auth-svc
       SERVICE_PORT: 8001
-      VERSION: ${{ needs.get-current-version.outputs.version }}
+      VERSION: ${{ needs.prepare.outputs.auth_svc_new_version }}
   user-svc-build-push:
     name: "Build and push user-svc"
-    if: github.event.action == 'prereleased'
-    needs: [ get-current-version ]
-    uses: ./.github/workflows/cd-workflow-call.yaml
+    needs: [ prepare ]
+    if: needs.prepare.outputs.user_svc_new_version != ''
+    uses: ./.github/workflows/deploy-template.yaml
     secrets: inherit
     with:
       SERVICE_NAME: user-svc
       SERVICE_PORT: 8002
-      VERSION: ${{ needs.get-current-version.outputs.version }}
+      VERSION: ${{ needs.prepare.outputs.user_svc_new_version }}
 
   product-svc-build-push:
     name: "Build and push product-svc"
-    if: github.event.action == 'prereleased'
-    needs: [ get-current-version ]
-    uses: ./.github/workflows/cd-workflow-call.yaml
+    needs: [ prepare ]
+    if: needs.prepare.outputs.product_svc_new_version != ''
+    uses: ./.github/workflows/deploy-template.yaml
     secrets: inherit
     with:
       SERVICE_NAME: product-svc
       SERVICE_PORT: 8003
-      VERSION: ${{ needs.get-current-version.outputs.version }}
-  update-deployment-repo:
-    needs: [get-current-version]
-    if: github.event.action == 'released'
-    name: "Updating deployment repo and create pull request"
-    environment: staging
-    env:
-      VERSION: ${{ needs.get-current-version.outputs.version }}
-      STAGING_BRANCH_NAME: staging-${{needs.get-current-version.outputs.version}}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up credential
-        uses: de-vri-es/setup-git-credentials@v2.1.2
-        with:
-          credentials: ${{secrets.GIT_CREDENTIALS}}
-      - name: Clone deployment repo
-        run: git clone https://github.com/ngodat0103/yamp-deployment.git
-      - name: Create a $STAGING_BRANCH_NAME branch
-        working-directory: yamp-deployment
-        run: git checkout -b $STAGING_BRANCH_NAME
-      - name: change version to $VERSION
-        working-directory: yamp-deployment/yamp
-        run: |
-          sed -i "s|appVersion:.*|appVersion: $VERSION|" Chart.yaml
-          helm package . --destination charts/
-          helm repo index . --merge index.yaml
-      - name: Commit changes and push changes
-        working-directory: yamp-deployment
-        run: |
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]" 
-          git add .
-          git commit -m "Update version to $VERSION"
-          git push -u origin $STAGING_BRANCH_NAME
-      - name: Create a PR for $STAGING_BRANCH_NAME
-        working-directory: yamp-deployment
-        env:
-          GITHUB_TOKEN: ${{secrets.PET_TOKEN}}
-        run: |
-          gh pr create --base master --head $STAGING_BRANCH_NAME --title "[bot]: Update version to $VERSION" --body "Update version to $VERSION"
-      - name: Clean up
-        run: rm -rf yamp-deployment
+      VERSION: ${{ needs.prepare.outputs.product_svc_new_version }}
+#  update-deployment-repo:
+#    needs: [prepare]
+#    if: github.event.action == 'released'
+#    name: "Updating deployment repo and create pull request"
+#    environment: staging
+#    env:
+#      VERSION: ${{ needs.prepare.outputs.version }}
+#      STAGING_BRANCH_NAME: staging-${{needs.prepare.outputs.version}}
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Set up credential
+#        uses: de-vri-es/setup-git-credentials@v2.1.2
+#        with:
+#          credentials: ${{secrets.GIT_CREDENTIALS}}
+#      - name: Clone deployment repo
+#        run: git clone https://github.com/ngodat0103/yamp-deployment.git
+#      - name: Create a $STAGING_BRANCH_NAME branch
+#        working-directory: yamp-deployment
+#        run: git checkout -b $STAGING_BRANCH_NAME
+#      - name: change version to $VERSION
+#        working-directory: yamp-deployment/yamp
+#        run: |
+#          sed -i "s|appVersion:.*|appVersion: $VERSION|" Chart.yaml
+#          helm package . --destination charts/
+#          helm repo index . --merge index.yaml
+#      - name: Commit changes and push changes
+#        working-directory: yamp-deployment
+#        run: |
+#          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#          git config --global user.name "github-actions[bot]"
+#          git add .
+#          git commit -m "Update version to $VERSION"
+#          git push -u origin $STAGING_BRANCH_NAME
+#      - name: Create a PR for $STAGING_BRANCH_NAME
+#        working-directory: yamp-deployment
+#        env:
+#          GITHUB_TOKEN: ${{secrets.PET_TOKEN}}
+#        run: |
+#          gh pr create --base master --head $STAGING_BRANCH_NAME --title "[bot]: Update version to $VERSION" --body "Update version to $VERSION"
+#      - name: Clean up
+#        run: rm -rf yamp-deployment

@@ -1,4 +1,4 @@
-name: CD workflow call
+name: Deploy template
 on:
   workflow_call:
     inputs:
@@ -15,9 +15,9 @@ on:
         required: true
         type: string
 jobs:
-  build-ready-container:
+  build-container:
 #    environment: pre-production
-    name: build ready container
+    name: Building ${{inputs.SERVICE_NAME}} container image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,8 +53,16 @@ jobs:
           build-args: |
             SERVICE_NAME=${{inputs.SERVICE_NAME}}
             SERVICE_PORT=${{inputs.SERVICE_PORT}}
+            VERSION=${{inputs.VERSION}}
+  deploy:
+    name: Deploying ${{inputs.SERVICE_NAME}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: will be implemented later
+        run: echo "will be implemented later"
+
   clean-up-packages:
-    needs: [build-ready-container]
+    needs: [deploy]
     name: Clean up old packages, and untag old images
     runs-on: ubuntu-latest
     steps:

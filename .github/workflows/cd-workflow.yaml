@@ -47,26 +47,16 @@ jobs:
         env:
           SED_REGEX: 's/^+.*<version>\(.*\)<\/version>.*/\1/p'
           SED_COMMAND: 'sed -n $SED_REGEX'
-          AUTH_SVC_VERSION_GIT_DIFF: $(git diff HEAD^ -- auth-svc/pom.xml -U0 | $SED_COMMAND)
-          GATEWAY_SVC_VERSION_GIT_DIFF: $(git diff HEAD^ -- gateway-svc/pom.xml -U0 | $SED_COMMAND)
-          PRODUCT_SVC_VERSION_GIT_DIFF: $(git diff HEAD^ -- product-svc/pom.xml -U0 | $SED_COMMAND)
-          USER_SVC_VERSION_GIT_DIFF: $(git diff HEAD^ -- user-svc/pom.xml -U0 | $SED_COMMAND)
         run: |
+          AUTH_SVC_VERSION_GIT_DIFF=$(git diff HEAD^ HEAD -- auth-svc/pom.xml -U0 | eval $SED_COMMAND)
+          GATEWAY_SVC_VERSION_GIT_DIFF=$(git diff HEAD^ HEAD -- gateway-svc/pom.xml -U0 | eval $SED_COMMAND)
+          PRODUCT_SVC_VERSION_GIT_DIFF=$(git diff HEAD^ HEAD -- product-svc/pom.xml -U0 | eval $SED_COMMAND)
+          USER_SVC_VERSION_GIT_DIFF=$(git diff HEAD^ HEAD -- user-svc/pom.xml -U0 | eval $SED_COMMAND)
           echo "auth_svc_new_version=${AUTH_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
           echo "gateway_svc_new_version=${GATEWAY_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
           echo "product_svc_new_version=${PRODUCT_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
           echo "user_svc_new_version=${USER_SVC_VERSION_GIT_DIFF}" >> $GITHUB_OUTPUT
 
-  gateway-svc-build-push:
-    needs: [prepare]
-    if: needs.prepare.outputs.gateway_svc_new_version != ''
-    name: "Build and push gateway-svc"
-    uses: ./.github/workflows/deploy-template.yaml
-    secrets: inherit
-    with:
-      SERVICE_NAME: gateway-svc
-      SERVICE_PORT: 8000
-      VERSION: ${{ needs.prepare.outputs.gateway_svc_new_version }}
   auth-svc-build-push:
     needs: [ prepare ]
     if: needs.prepare.outputs.auth_svc_new_version != ''
@@ -77,27 +67,38 @@ jobs:
       SERVICE_NAME: auth-svc
       SERVICE_PORT: 8001
       VERSION: ${{ needs.prepare.outputs.auth_svc_new_version }}
-  user-svc-build-push:
-    name: "Build and push user-svc"
-    needs: [ prepare ]
-    if: needs.prepare.outputs.user_svc_new_version != ''
-    uses: ./.github/workflows/deploy-template.yaml
-    secrets: inherit
-    with:
-      SERVICE_NAME: user-svc
-      SERVICE_PORT: 8002
-      VERSION: ${{ needs.prepare.outputs.user_svc_new_version }}
-
-  product-svc-build-push:
-    name: "Build and push product-svc"
-    needs: [ prepare ]
-    if: needs.prepare.outputs.product_svc_new_version != ''
-    uses: ./.github/workflows/deploy-template.yaml
-    secrets: inherit
-    with:
-      SERVICE_NAME: product-svc
-      SERVICE_PORT: 8003
-      VERSION: ${{ needs.prepare.outputs.product_svc_new_version }}
+#  gateway-svc-build-push:
+#    needs: [prepare]
+#    if: needs.prepare.outputs.gateway_svc_new_version != ''
+#    name: "Build and push gateway-svc"
+#    uses: ./.github/workflows/deploy-template.yaml
+#    secrets: inherit
+#    with:
+#      SERVICE_NAME: gateway-svc
+#      SERVICE_PORT: 8000
+#      VERSION: ${{ needs.prepare.outputs.gateway_svc_new_version }}
+#
+#  user-svc-build-push:
+#    name: "Build and push user-svc"
+#    needs: [ prepare ]
+#    if: needs.prepare.outputs.user_svc_new_version != ''
+#    uses: ./.github/workflows/deploy-template.yaml
+#    secrets: inherit
+#    with:
+#      SERVICE_NAME: user-svc
+#      SERVICE_PORT: 8002
+#      VERSION: ${{ needs.prepare.outputs.user_svc_new_version }}
+#
+#  product-svc-build-push:
+#    name: "Build and push product-svc"
+#    needs: [ prepare ]
+#    if: needs.prepare.outputs.product_svc_new_version != ''
+#    uses: ./.github/workflows/deploy-template.yaml
+#    secrets: inherit
+#    with:
+#      SERVICE_NAME: product-svc
+#      SERVICE_PORT: 8003
+#      VERSION: ${{ needs.prepare.outputs.product_svc_new_version }}
 #  update-deployment-repo:
 #    needs: [prepare]
 #    if: github.event.action == 'released'

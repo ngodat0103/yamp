@@ -1,177 +1,256 @@
 package com.example.yamp.usersvc.service;
 
-import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.BDDMockito.then;
 import com.example.yamp.usersvc.dto.address.AddressDto;
 import com.example.yamp.usersvc.dto.address.AddressResponseDto;
 import com.example.yamp.usersvc.dto.mapper.AddressMapper;
-import com.example.yamp.usersvc.dto.mapper.AddressMapperImpl;
 import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.exception.NotFoundException;
 import com.example.yamp.usersvc.persistence.entity.Address;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import com.example.yamp.usersvc.persistence.repository.AddressRepository;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
-import com.example.yamp.usersvc.service.impl.AddressServiceImpl;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import org.junit.jupiter.api.Assertions;
+
+import com.example.yamp.usersvc.service.impl.AddressServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("unit-test")
-class AddressServiceTest {
-  private AddressRepository addressRepository;
-  private CustomerRepository customerRepository;
-  private final AddressMapper addressMapper = new AddressMapperImpl();
-  private static final UUID customerUuid = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
-  private static final String customerUuidString = "123e4567-e89b-12d3-a456-426614174000";
+public class AddressServiceTest {
 
-  AddressDto addressDto =
-      AddressDto.builder()
-          .name("Home")
-          .cityName("Tphcm")
-          .phoneNumber("0123456789")
-          .province("Tphcm")
-          .street("101 some street")
-          .ward("Some ward")
-          .district("Some district")
-          .addressType("Home")
-          .build();
+  @Mock private AddressRepository addressRepository;
+  @Mock private CustomerRepository customerRepository;
+  @Mock private AddressMapper addressMapper;
+  @Mock private SecurityContext securityContext;
+  @Mock private Authentication authentication;
 
-  Address address = addressMapper.mapToEntity(addressDto);
-  private AddressServiceImpl addressService;
+  @InjectMocks private AddressServiceImpl addressServiceImpl;
+
+  private UUID customerUuid;
+  private UUID addressUuid;
+  private AddressDto addressDto;
+  private Address address;
   private Customer customer;
 
   @BeforeEach
   void setUp() {
-    this.addressRepository = mock(AddressRepository.class);
-    this.customerRepository = mock(CustomerRepository.class);
-    this.addressService =
-        new AddressServiceImpl(addressRepository, customerRepository, addressMapper);
-    Address address = new Address();
-    address.setUuid(UUID.randomUUID());
+    customerUuid = UUID.randomUUID();
+    addressUuid = UUID.randomUUID();
+    addressDto =
+            AddressDto.builder()
+                    .name("Home")
+                    .cityName("City")
+                    .phoneNumber("1234567890")
+                    .province("Province")
+                    .street("Street")
+                    .ward("Ward")
+                    .district("District")
+                    .addressType("Type")
+                    .build();
+    address = new Address();
+    address.setUuid(addressUuid);
+    address.setCustomerUuid(customerUuid);
     address.setName("Home");
+    address.setCityName("City");
+    address.setPhoneNumber("1234567890");
+    address.setProvince("Province");
+    address.setStreet("Street");
+    address.setWard("Ward");
+    address.setDistrict("District");
+    address.setAddressType("Type");
 
-    Customer customer = new Customer();
-    customer.setCustomerUuid(UUID.fromString(customerUuidString));
+    customer = new Customer();
+    customer.setCustomerUuid(customerUuid);
     customer.setFirstName("John");
     customer.setLastName("Doe");
-    this.customer = customer;
+    customer.setPhoneNumber("1234567890");
+    customer.setCreateAtDate(LocalDateTime.now());
+    customer.setLastModifiedDate(LocalDateTime.now());
+    given(securityContext.getAuthentication()).willReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    given(authentication.getName()).willReturn(customerUuid.toString());
   }
 
   @Test
-  @DisplayName("Given valid address, when createAddress, then address is created")
-  @WithMockUser(username = customerUuidString, roles = "CUSTOMER")
-  void givenValidAddress_whenCreateAddress_thenAddressIsCreated() {
-    given(customerRepository.findCustomerByCustomerUuid(UUID.fromString(customerUuidString)))
-        .willReturn(Optional.of(customer));
-    addressService.createAddress(addressDto);
-  }
-
-  @Test
-  @DisplayName("Create a address but have conflict Name")
-  @WithMockUser(username = customerUuidString, roles = "CUSTOMER")
-  void givenExistingAddressName_whenCreateAddress_thenThrowConflictException() {
+  void givenCustomerExistsAndNoAddressConflict_whenCreateAddress_thenSaveAddress() {
+    // given
     given(customerRepository.findCustomerByCustomerUuid(customerUuid))
-        .willReturn(Optional.of(customer));
+            .willReturn(Optional.of(customer));
     given(addressRepository.findAddressByCustomerUuidAndName(customerUuid, addressDto.getName()))
-        .willReturn(Optional.of(address));
-    thenThrownBy(() -> addressService.createAddress(addressDto))
-        .isInstanceOf(ConflictException.class)
-        .hasMessageContaining("Address name conflict");
+            .willReturn(Optional.empty());
+    given(addressMapper.mapToEntity(addressDto)).willReturn(address);
+
+    // when
+    addressServiceImpl.createAddress(addressDto);
+
+    // then
+    then(customerRepository).should().save(customer);
+    then(addressRepository).should().save(address);
   }
 
   @Test
-  @DisplayName("Given valid customer, when getAddresses, then return addresses")
-  @WithMockUser(username = customerUuidString, roles = "CUSTOMER")
-  void givenValidCustomer_whenGetAddresses_thenReturnAddresses() {
-    Set<Address> addresses = Set.of(address);
-
+  void givenCustomerNotFound_whenCreateAddress_thenThrowNotFoundException() {
+    // given
     given(customerRepository.findCustomerByCustomerUuid(customerUuid))
-        .willReturn(Optional.of(customer));
-    given(addressRepository.findAddressByCustomerUuid(customerUuid)).willReturn(addresses);
+            .willReturn(Optional.empty());
 
-    AddressResponseDto response = addressService.getAddresses();
-    Assertions.assertNotNull(response);
-    Assertions.assertEquals(customerUuid, response.getCustomerUuid());
-    Assertions.assertEquals(addresses.size(), response.getCurrentElements());
-    Assertions.assertEquals(addresses.size(), response.getTotalElements());
-    Assertions.assertEquals(1, response.getTotalPages());
-    Assertions.assertNotNull(response.getAddresses());
-    Assertions.assertEquals(addresses.size(), response.getAddresses().size());
-    Assertions.assertEquals(addressDto, response.getAddresses().iterator().next());
+    // when & then
+    assertThatThrownBy(() -> addressServiceImpl.createAddress(addressDto))
+            .isInstanceOf(NotFoundException.class);
   }
 
   @Test
-  @DisplayName("Given non-existing customer, when getAddresses, then throw NotFoundException")
-  @WithMockUser(username = customerUuidString, roles = "CUSTOMER")
-  void givenNonExistingCustomer_whenGetAddresses_thenThrowNotFoundException() {
-
-    given(customerRepository.findCustomerByCustomerUuid(customerUuid)).willReturn(Optional.empty());
-
-    thenThrownBy(() -> addressService.getAddresses())
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining("Customer not found for UUID");
-  }
-
-  @Test
-  @DisplayName("Given valid address, when updateAddress, then address is updated")
-  @WithMockUser(username = customerUuidString, roles = "CUSTOMER")
-  void givenValidAddress_whenUpdateAddress_thenAddressIsUpdated() {
-
+  void givenAddressNameConflict_whenCreateAddress_thenThrowConflictException() {
+    // given
     given(customerRepository.findCustomerByCustomerUuid(customerUuid))
-        .willReturn(Optional.of(customer));
-    given(addressRepository.findById(address.getUuid())).willReturn(Optional.of(address));
-    addressService.updateAddress(address.getUuid(), addressDto);
+            .willReturn(Optional.of(customer));
+    given(addressRepository.findAddressByCustomerUuidAndName(customerUuid, addressDto.getName()))
+            .willReturn(Optional.of(address));
+
+    // when & then
+    assertThatThrownBy(() -> addressServiceImpl.createAddress(addressDto))
+            .isInstanceOf(ConflictException.class);
   }
 
   @Test
-  @DisplayName("Given non-existing address, when updateAddress, then throw NotFoundException")
-  @WithMockUser(username = customerUuidString, roles = "CUSTOMER")
-  void givenNonExistingAddress_whenUpdateAddress_thenThrowNotFoundException() {
-
+  void givenCustomerExistsAndAddressesExist_whenGetAddresses_thenReturnAddresses() {
+    // given
     given(customerRepository.findCustomerByCustomerUuid(customerUuid))
-        .willReturn(Optional.of(customer));
-    given(addressRepository.findById(address.getUuid())).willReturn(Optional.empty());
+            .willReturn(Optional.of(customer));
+    given(addressRepository.findAddressByCustomerUuid(customerUuid))
+            .willReturn(Set.of(address));
+    given(addressMapper.mapToDtos(Set.of(address))).willReturn(Set.of(addressDto));
 
-    thenThrownBy(() -> addressService.updateAddress(address.getUuid(), addressDto))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining("Address not found");
+    // when
+    AddressResponseDto response = addressServiceImpl.getAddresses();
+
+    // then
+    assertThat(response.getCustomerUuid()).isEqualTo(customerUuid);
+    assertThat(response.getAddresses()).containsExactly(addressDto);
+    assertThat(response.getCurrentElements()).isEqualTo(1);
+    assertThat(response.getTotalElements()).isEqualTo(1);
+    assertThat(response.getCurrentPage()).isEqualTo(1);
+    assertThat(response.getTotalPages()).isEqualTo(1);
   }
 
   @Test
-  @DisplayName("Given valid address, when deleteAddress, then address is deleted")
-  @WithMockUser(username = customerUuidString, roles = "CUSTOMER")
-  void givenValidAddress_whenDeleteAddress_thenAddressIsDeleted() {
+  void givenCustomerNotFound_whenGetAddresses_thenThrowNotFoundException() {
+    // given
     given(customerRepository.findCustomerByCustomerUuid(customerUuid))
-        .willReturn(Optional.of(customer));
-    given(addressRepository.existsById(address.getUuid())).willReturn(true);
-    addressService.deleteAddress(address.getUuid());
+            .willReturn(Optional.empty());
+
+    // when & then
+    assertThatThrownBy(() -> addressServiceImpl.getAddresses())
+            .isInstanceOf(NotFoundException.class);
   }
 
   @Test
-  @DisplayName("Given non-existing address, when deleteAddress, then throw NotFoundException")
-  @WithMockUser(username = customerUuidString, roles = "CUSTOMER")
-  void givenNonExistingAddress_whenDeleteAddress_thenThrowNotFoundException() {
-
+  void givenCustomerExistsButNoAddresses_whenGetAddresses_thenReturnEmptyAddresses() {
+    // given
     given(customerRepository.findCustomerByCustomerUuid(customerUuid))
-        .willReturn(Optional.of(customer));
-    given(addressRepository.existsById(address.getUuid())).willReturn(false);
+            .willReturn(Optional.of(customer));
+    given(addressRepository.findAddressByCustomerUuid(customerUuid)).willReturn(Set.of());
+    given(addressMapper.mapToDtos(Set.of())).willReturn(Set.of());
 
-    thenThrownBy(() -> addressService.deleteAddress(address.getUuid()))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining("Address not found");
+    // when
+    AddressResponseDto response = addressServiceImpl.getAddresses();
+
+    // then
+    assertThat(response.getCustomerUuid()).isEqualTo(customerUuid);
+    assertThat(response.getAddresses()).isEmpty();
+    assertThat(response.getCurrentElements()).isEqualTo(0);
+    assertThat(response.getTotalElements()).isEqualTo(0);
+    assertThat(response.getCurrentPage()).isEqualTo(1);
+    assertThat(response.getTotalPages()).isEqualTo(1);
+  }
+
+  @Test
+  void givenCustomerAndAddressFound_whenUpdateAddress_thenUpdateAddress() {
+    // given
+    given(customerRepository.findCustomerByCustomerUuid(customerUuid))
+            .willReturn(Optional.of(customer));
+    given(addressRepository.findById(addressUuid)).willReturn(Optional.of(address));
+    given(addressMapper.mapToEntity(addressDto)).willReturn(address);
+
+    // when
+    addressServiceImpl.updateAddress(addressUuid, addressDto);
+
+    // then
+    then(addressRepository).should().save(address);
+    then(customerRepository).should().save(customer);
+  }
+
+  @Test
+  void givenCustomerNotFound_whenUpdateAddress_thenThrowNotFoundException() {
+    // given
+    given(customerRepository.findCustomerByCustomerUuid(customerUuid))
+            .willReturn(Optional.empty());
+
+    // when & then
+    assertThatThrownBy(() -> addressServiceImpl.updateAddress(addressUuid, addressDto))
+            .isInstanceOf(NotFoundException.class);
+  }
+
+  @Test
+  void givenAddressNotFound_whenUpdateAddress_thenThrowNotFoundException() {
+    // given
+    given(customerRepository.findCustomerByCustomerUuid(customerUuid))
+            .willReturn(Optional.of(customer));
+    given(addressRepository.findById(addressUuid)).willReturn(Optional.empty());
+
+    // when & then
+    assertThatThrownBy(() -> addressServiceImpl.updateAddress(addressUuid, addressDto))
+            .isInstanceOf(NotFoundException.class);
+  }
+
+  @Test
+  void givenCustomerAndAddressFound_whenDeleteAddress_thenDeleteAddress() {
+    // given
+    given(customerRepository.findCustomerByCustomerUuid(customerUuid))
+            .willReturn(Optional.of(customer));
+    given(addressRepository.existsById(addressUuid)).willReturn(true);
+
+    // when
+    addressServiceImpl.deleteAddress(addressUuid);
+
+    // then
+    then(addressRepository).should().deleteByUuid(addressUuid);
+  }
+
+  @Test
+  void givenCustomerNotFound_whenDeleteAddress_thenThrowNotFoundException() {
+    // given
+    given(customerRepository.findCustomerByCustomerUuid(customerUuid))
+            .willReturn(Optional.empty());
+
+    // when & then
+    assertThatThrownBy(() -> addressServiceImpl.deleteAddress(addressUuid))
+            .isInstanceOf(NotFoundException.class);
+  }
+
+  @Test
+  void givenAddressNotFound_whenDeleteAddress_thenThrowNotFoundException() {
+    // given
+    given(customerRepository.findCustomerByCustomerUuid(customerUuid))
+            .willReturn(Optional.of(customer));
+    given(addressRepository.existsById(addressUuid)).willReturn(false);
+
+    // when & then
+    assertThatThrownBy(() -> addressServiceImpl.deleteAddress(addressUuid))
+            .isInstanceOf(NotFoundException.class);
   }
 }

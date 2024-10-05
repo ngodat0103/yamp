@@ -40,15 +40,21 @@ public class ProductController {
    * @param size the size
    * @return the products
    */
-  @Operation(summary = "Get all products", description = "Retrieve a paginated list of all products")
+  @Operation(
+      summary = "Get all products",
+      description = "Retrieve a paginated list of all products")
   @ApiResponses({
-          @ApiResponse(responseCode = "200", description = "Successfully retrieved products"),
-          @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved products"),
+    @ApiResponse(responseCode = "400", description = "Invalid request parameters")
   })
   @GetMapping(path = "/all")
   public PageDto<ProductDtoResponse> getProducts(
-          @Parameter(description = "Page number", example = "0") @RequestParam(required = false, defaultValue = "0") int page,
-          @Parameter(description = "Page size", example = "100") @RequestParam(required = false, defaultValue = "100") int size) {
+      @Parameter(description = "Page number", example = "0")
+          @RequestParam(required = false, defaultValue = "0")
+          int page,
+      @Parameter(description = "Page size", example = "100")
+          @RequestParam(required = false, defaultValue = "100")
+          int size) {
     return productService.getProducts(PageRequest.of(page, size));
   }
 
@@ -58,13 +64,16 @@ public class ProductController {
    * @param slugName the slug name
    * @return the product
    */
-  @Operation(summary = "Get product by slug name", description = "Retrieve a product by its slug name")
+  @Operation(
+      summary = "Get product by slug name",
+      description = "Retrieve a product by its slug name")
   @ApiResponses({
-          @ApiResponse(responseCode = "200", description = "Successfully retrieved product"),
-          @ApiResponse(responseCode = "404", description = "Product not found")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved product"),
+    @ApiResponse(responseCode = "404", description = "Product not found")
   })
   @GetMapping(path = "/{slugName}")
-  public ProductDtoResponse getProduct(@Parameter(description = "Slug name of the product") @PathVariable String slugName) {
+  public ProductDtoResponse getProduct(
+      @Parameter(description = "Slug name of the product") @PathVariable String slugName) {
     return productService.getProduct(slugName);
   }
 
@@ -76,11 +85,12 @@ public class ProductController {
    */
   @Operation(summary = "Get product by UUID", description = "Retrieve a product by its UUID")
   @ApiResponses({
-          @ApiResponse(responseCode = "200", description = "Successfully retrieved product"),
-          @ApiResponse(responseCode = "404", description = "Product not found")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved product"),
+    @ApiResponse(responseCode = "404", description = "Product not found")
   })
   @GetMapping
-  public ProductDtoResponse getProduct(@Parameter(description = "UUID of the product") @RequestParam UUID uuid) {
+  public ProductDtoResponse getProduct(
+      @Parameter(description = "UUID of the product") @RequestParam UUID uuid) {
     return productService.getProduct(uuid);
   }
 
@@ -90,10 +100,12 @@ public class ProductController {
    * @param productDtoRequest the product dto request
    * @return the product dto response
    */
-  @Operation(summary = "Create a new product", description = "Create a new product with the provided details")
+  @Operation(
+      summary = "Create a new product",
+      description = "Create a new product with the provided details")
   @ApiResponses({
-          @ApiResponse(responseCode = "201", description = "Successfully created product"),
-          @ApiResponse(responseCode = "400", description = "Invalid request body")
+    @ApiResponse(responseCode = "201", description = "Successfully created product"),
+    @ApiResponse(responseCode = "400", description = "Invalid request body")
   })
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -110,19 +122,21 @@ public class ProductController {
    * @param productDtoRequest the product dto request
    * @return the product dto response
    */
-  @Operation(summary = "Update an existing product", description = "Update an existing product with the provided details")
+  @Operation(
+      summary = "Update an existing product",
+      description = "Update an existing product with the provided details")
   @ApiResponses({
-          @ApiResponse(responseCode = "202", description = "Successfully updated product"),
-          @ApiResponse(responseCode = "400", description = "Invalid request body"),
-          @ApiResponse(responseCode = "404", description = "Product not found")
+    @ApiResponse(responseCode = "202", description = "Successfully updated product"),
+    @ApiResponse(responseCode = "400", description = "Invalid request body"),
+    @ApiResponse(responseCode = "404", description = "Product not found")
   })
   @PutMapping(path = "/{productUuid}")
   @ResponseStatus(HttpStatus.ACCEPTED)
   @PreAuthorize("hasRole('ADMIN')")
   @SecurityRequirement(name = "oauth2")
   public ProductDtoResponse updateProduct(
-          @Parameter(description = "UUID of the product to be updated") @PathVariable UUID productUuid,
-          @RequestBody @Valid ProductDtoRequest productDtoRequest) {
+      @Parameter(description = "UUID of the product to be updated") @PathVariable UUID productUuid,
+      @RequestBody @Valid ProductDtoRequest productDtoRequest) {
     return productService.updateProduct(productUuid, productDtoRequest);
   }
 
@@ -133,14 +147,16 @@ public class ProductController {
    */
   @Operation(summary = "Delete a product", description = "Delete a product by its UUID")
   @ApiResponses({
-          @ApiResponse(responseCode = "204", description = "Successfully deleted product"),
-          @ApiResponse(responseCode = "404", description = "Product not found")
+    @ApiResponse(responseCode = "204", description = "Successfully deleted product"),
+    @ApiResponse(responseCode = "404", description = "Product not found")
   })
   @DeleteMapping(path = "/{productUuid}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @PreAuthorize("hasRole('ADMIN')")
   @SecurityRequirement(name = "oauth2")
-  public void deleteProduct(@Parameter(description = "UUID of the product to be deleted") @PathVariable UUID productUuid) {
+  public void deleteProduct(
+      @Parameter(description = "UUID of the product to be deleted") @PathVariable
+          UUID productUuid) {
     productService.deleteProduct(productUuid);
   }
 }

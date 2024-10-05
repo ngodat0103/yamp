@@ -10,11 +10,11 @@ spring:
     active: local-dev
   config:
     import:
-      - 'optional:local-dev.yaml'
-      - 'optional:unit-test.yaml'
-      - "optional:integration-test.yaml"
-      - "optional:pre-prod.yaml"
-      - "optional:prod.yaml"
+      - 'optional:local-dev.yml'
+      - 'optional:unit-test.yml'
+      - "optional:integration-test.yml"
+      - "optional:pre-prod.yml"
+      - "optional:prod.yml"
   application:
     name: product-svc
 server:

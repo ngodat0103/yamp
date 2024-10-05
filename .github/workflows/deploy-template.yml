@@ -37,7 +37,7 @@ jobs:
         with:
           images: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}
       - name: build and push with specific tag
-        uses: docker/build-push-action@v6.3.0
+        uses: docker/build-push-action@v6.9.0
         with:
           file: Dockerfile-For-CI
           push: true

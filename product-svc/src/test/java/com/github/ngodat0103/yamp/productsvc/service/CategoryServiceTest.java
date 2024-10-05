@@ -1,7 +1,9 @@
 package com.github.ngodat0103.yamp.productsvc.service;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
+
 import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.dto.category.CategoryDtoRequest;
 import com.github.ngodat0103.yamp.productsvc.dto.category.CategoryDtoResponse;
@@ -12,6 +14,7 @@ import com.github.ngodat0103.yamp.productsvc.persistence.entity.Category;
 import com.github.ngodat0103.yamp.productsvc.persistence.repository.CategoryRepository;
 import com.github.ngodat0103.yamp.productsvc.service.impl.CategoryServiceImpl;
 import com.github.slugify.Slugify;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,28 +27,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.*;
-
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
 
-  @InjectMocks
-  private CategoryServiceImpl categoryService;
+  @InjectMocks private CategoryServiceImpl categoryService;
 
-  @Mock
-  private CategoryRepository categoryRepository;
+  @Mock private CategoryRepository categoryRepository;
 
-  @Mock
-  private CategoryMapper categoryMapper;
+  @Mock private CategoryMapper categoryMapper;
 
-  @Mock
-  private Slugify slugify;
+  @Mock private Slugify slugify;
 
-  @Mock
-  private SecurityContext securityContext;
+  @Mock private SecurityContext securityContext;
 
-  @Mock
-  private Authentication authentication;
+  @Mock private Authentication authentication;
 
   private CategoryDtoRequest categoryDtoRequest;
   private Category category;
@@ -54,7 +49,8 @@ class CategoryServiceTest {
 
   @BeforeEach
   void setUp() {
-    categoryDtoRequest = CategoryDtoRequest.builder()
+    categoryDtoRequest =
+        CategoryDtoRequest.builder()
             .name("Test Category")
             .parentCategoryUuid(UUID.randomUUID().toString())
             .build();
@@ -63,7 +59,8 @@ class CategoryServiceTest {
     category.setName("Test Category");
     category.setSlugName("test-category");
 
-    categoryDtoResponse = CategoryDtoResponse.builder()
+    categoryDtoResponse =
+        CategoryDtoResponse.builder()
             .uuid(UUID.randomUUID())
             .name("Test Category")
             .slugName("test-category")
@@ -84,7 +81,7 @@ class CategoryServiceTest {
 
     // Act & Assert
     assertThatThrownBy(() -> categoryService.createCategory(categoryDtoRequest))
-            .isInstanceOf(ConflictException.class);
+        .isInstanceOf(ConflictException.class);
 
     then(categoryRepository).should(times(1)).existsByName(anyString());
   }
@@ -97,7 +94,7 @@ class CategoryServiceTest {
 
     // Act & Assert
     assertThatThrownBy(() -> categoryService.createCategory(categoryDtoRequest))
-            .isInstanceOf(NotFoundException.class);
+        .isInstanceOf(NotFoundException.class);
 
     then(categoryRepository).should(times(1)).existsByName(anyString());
     then(categoryRepository).should(times(1)).existsById(any(UUID.class));
@@ -108,7 +105,8 @@ class CategoryServiceTest {
     // Arrange
     given(categoryRepository.existsByName(anyString())).willReturn(false);
     given(categoryRepository.existsById(any(UUID.class))).willReturn(true);
-    given(categoryMapper.mapToEntity(any(CategoryDtoRequest.class), any(UUID.class))).willReturn(category);
+    given(categoryMapper.mapToEntity(any(CategoryDtoRequest.class), any(UUID.class)))
+        .willReturn(category);
     given(slugify.slugify(anyString())).willReturn("test-category");
     given(categoryRepository.save(any(Category.class))).willReturn(category);
     given(categoryMapper.mapToDto(any(Category.class))).willReturn(categoryDtoResponse);
@@ -121,7 +119,9 @@ class CategoryServiceTest {
 
     then(categoryRepository).should(times(1)).existsByName(anyString());
     then(categoryRepository).should(times(1)).existsById(any(UUID.class));
-    then(categoryMapper).should(times(1)).mapToEntity(any(CategoryDtoRequest.class), any(UUID.class));
+    then(categoryMapper)
+        .should(times(1))
+        .mapToEntity(any(CategoryDtoRequest.class), any(UUID.class));
     then(slugify).should(times(1)).slugify(anyString());
     then(categoryRepository).should(times(1)).save(any(Category.class));
     then(categoryMapper).should(times(1)).mapToDto(any(Category.class));
@@ -134,7 +134,7 @@ class CategoryServiceTest {
 
     // Act & Assert
     assertThatThrownBy(() -> categoryService.updateCategory(categoryUuid, categoryDtoRequest))
-            .isInstanceOf(NotFoundException.class);
+        .isInstanceOf(NotFoundException.class);
 
     then(categoryRepository).should(times(1)).findById(any(UUID.class));
   }
@@ -147,7 +147,7 @@ class CategoryServiceTest {
 
     // Act & Assert
     assertThatThrownBy(() -> categoryService.updateCategory(categoryUuid, categoryDtoRequest))
-            .isInstanceOf(NotFoundException.class);
+        .isInstanceOf(NotFoundException.class);
 
     then(categoryRepository).should(times(1)).findById(any(UUID.class));
     then(categoryRepository).should(times(1)).existsById(any(UUID.class));
@@ -182,7 +182,7 @@ class CategoryServiceTest {
 
     // Act & Assert
     assertThatThrownBy(() -> categoryService.deleteCategory(categoryUuid))
-            .isInstanceOf(NotFoundException.class);
+        .isInstanceOf(NotFoundException.class);
 
     then(categoryRepository).should(times(1)).existsById(any(UUID.class));
   }
@@ -207,7 +207,7 @@ class CategoryServiceTest {
 
     // Act & Assert
     assertThatThrownBy(() -> categoryService.getCategory("test-category"))
-            .isInstanceOf(NotFoundException.class);
+        .isInstanceOf(NotFoundException.class);
 
     then(categoryRepository).should(times(1)).findCategoryBySlugName(anyString());
   }
@@ -264,7 +264,8 @@ class CategoryServiceTest {
     assertThat(response.getPage()).isEqualTo(0);
     assertThat(response.getSize()).isEqualTo(10);
     assertThat(response.getTotalElements()).isEqualTo(1);
-    assertThat(response.getTotalPages()).isEqualTo( response.getTotalElements() / response.getSize());
+    assertThat(response.getTotalPages())
+        .isEqualTo(response.getTotalElements() / response.getSize());
     then(categoryRepository).should(times(1)).findAll(any(PageRequest.class));
     then(categoryMapper).should(times(1)).mapToDto(any(Category.class));
   }

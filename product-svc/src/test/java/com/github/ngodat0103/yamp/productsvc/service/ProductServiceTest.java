@@ -1,7 +1,7 @@
 package com.github.ngodat0103.yamp.productsvc.service;
 
-import static org.mockito.BDDMockito.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.dto.mapper.ProductMapper;
@@ -51,11 +51,11 @@ public class ProductServiceTest {
   @BeforeEach
   void setUp() {
     productDtoRequest =
-            ProductDtoRequest.builder()
-                    .name("Test Product")
-                    .description("Test Description")
-                    .categorySlug("test-category")
-                    .build();
+        ProductDtoRequest.builder()
+            .name("Test Product")
+            .description("Test Description")
+            .categorySlug("test-category")
+            .build();
 
     category = new Category();
     category.setSlugName("test-category");
@@ -80,14 +80,14 @@ public class ProductServiceTest {
   void testCreateProductWhenProductIsCreatedThenReturnProductDtoResponse() {
     // given
     given(categoryRepository.findCategoryBySlugName(productDtoRequest.getCategorySlug()))
-            .willReturn(Optional.of(category));
+        .willReturn(Optional.of(category));
     given(productRepository.existsByName(productDtoRequest.getName())).willReturn(false);
     given(productRepository.existsBySlugName(slugify.slugify(productDtoRequest.getName())))
-            .willReturn(false);
+        .willReturn(false);
     given(productMapper.toEntity(productDtoRequest, accountUuid)).willReturn(product);
     given(productRepository.save(product)).willReturn(product);
     given(productMapper.toProductDto(product))
-            .willReturn(ProductDtoResponse.builder().name("Test Product").build());
+        .willReturn(ProductDtoResponse.builder().name("Test Product").build());
 
     // when
     ProductDtoResponse response = productService.createProduct(productDtoRequest);
@@ -101,12 +101,12 @@ public class ProductServiceTest {
   void testCreateProductWhenProductWithSameNameExistsThenThrowConflictException() {
     // given
     given(categoryRepository.findCategoryBySlugName(productDtoRequest.getCategorySlug()))
-            .willReturn(Optional.of(category));
+        .willReturn(Optional.of(category));
     given(productRepository.existsByName(productDtoRequest.getName())).willReturn(true);
 
     // when & then
     assertThatThrownBy(() -> productService.createProduct(productDtoRequest))
-            .isInstanceOf(ConflictException.class);
+        .isInstanceOf(ConflictException.class);
   }
 
   @Test
@@ -114,14 +114,13 @@ public class ProductServiceTest {
     // given
     given(productRepository.findById(productUuid)).willReturn(Optional.of(product));
     given(categoryRepository.findCategoryBySlugName(productDtoRequest.getCategorySlug()))
-            .willReturn(Optional.of(category));
+        .willReturn(Optional.of(category));
     given(productRepository.save(product)).willReturn(product);
     given(productMapper.toProductDto(product))
-            .willReturn(ProductDtoResponse.builder().name("Test Product").build());
+        .willReturn(ProductDtoResponse.builder().name("Test Product").build());
 
     // when
-    ProductDtoResponse response =
-            productService.updateProduct(productUuid, productDtoRequest);
+    ProductDtoResponse response = productService.updateProduct(productUuid, productDtoRequest);
 
     // then
     assertThat(response).isNotNull();
@@ -143,10 +142,9 @@ public class ProductServiceTest {
   @Test
   void testGetProductWhenProductIsRetrievedBySlugNameThenReturnProductDtoResponse() {
     // given
-    given(productRepository.findBySlugName(product.getSlugName()))
-            .willReturn(Optional.of(product));
+    given(productRepository.findBySlugName(product.getSlugName())).willReturn(Optional.of(product));
     given(productMapper.toProductDto(product))
-            .willReturn(ProductDtoResponse.builder().name("Test Product").build());
+        .willReturn(ProductDtoResponse.builder().name("Test Product").build());
 
     // when
     ProductDtoResponse response = productService.getProduct(product.getSlugName());
@@ -163,7 +161,7 @@ public class ProductServiceTest {
     Page<Product> productPage = new PageImpl<>(new ArrayList<>(Set.of(product)));
     given(productRepository.findAll(pageRequest)).willReturn(productPage);
     given(productMapper.toProductDto(product))
-            .willReturn(ProductDtoResponse.builder().name("Test Product").build());
+        .willReturn(ProductDtoResponse.builder().name("Test Product").build());
     given(productRepository.count()).willReturn(1L);
 
     // when

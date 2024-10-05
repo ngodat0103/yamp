@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.any;
+
 import com.example.yamp.usersvc.cache.AuthSvcRepository;
 import com.example.yamp.usersvc.dto.customer.CustomerDto;
 import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
@@ -14,13 +15,12 @@ import com.example.yamp.usersvc.exception.NotFoundException;
 import com.example.yamp.usersvc.persistence.entity.Account;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
+import com.example.yamp.usersvc.service.impl.CustomerServiceImpl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
-
-import com.example.yamp.usersvc.service.impl.CustomerServiceImpl;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -68,16 +68,15 @@ public class CustomerServiceTest {
     WebClient webClient = WebClient.builder().baseUrl(mockBaseUri.toString()).build();
     this.customerMapper = new CustomerMapperImpl();
     this.customerServiceImpl =
-            new CustomerServiceImpl(
-                    customerRepository, authSvcRepository, customerMapper, webClient);
+        new CustomerServiceImpl(customerRepository, authSvcRepository, customerMapper, webClient);
     this.customerRegisterDto =
-            CustomerRegisterDto.builder()
-                    .username(username)
-                    .firstName(firstName)
-                    .lastName(lastName)
-                    .email(email)
-                    .password(password)
-                    .build();
+        CustomerRegisterDto.builder()
+            .username(username)
+            .firstName(firstName)
+            .lastName(lastName)
+            .email(email)
+            .password(password)
+            .build();
     Customer customerMockResponse = new Customer();
     customerMockResponse.setCustomerUuid(customerUuid);
     customerMockResponse.setFirstName(firstName);
@@ -88,16 +87,16 @@ public class CustomerServiceTest {
   @Test
   @DisplayName("Register a new customer")
   void givenRegisterDto_whenRegister_thenReturnSuccessfulCustomer()
-          throws IOException, InterruptedException {
+      throws IOException, InterruptedException {
     // given
     InputStream inputStream =
-            classLoader.getResourceAsStream("mockresponse/accountRegisterSuccessful.json");
+        classLoader.getResourceAsStream("mockresponse/accountRegisterSuccessful.json");
     assertThat(inputStream).isNotNull();
     mockWebServer.enqueue(
-            new MockResponse()
-                    .setResponseCode(201)
-                    .addHeader("Content-Type", "application/json")
-                    .setBody(new String(inputStream.readAllBytes())));
+        new MockResponse()
+            .setResponseCode(201)
+            .addHeader("Content-Type", "application/json")
+            .setBody(new String(inputStream.readAllBytes())));
 
     inputStream.close();
 
@@ -115,28 +114,28 @@ public class CustomerServiceTest {
   @Test
   @DisplayName("Register a new customer but conflict at auth-service")
   void givenConflictRegisterAccountDto_whenRegister_thenThrowWebClientResponseException()
-          throws IOException {
+      throws IOException {
     // given
     InputStream inputStream =
-            classLoader.getResourceAsStream("mockresponse/accountRegisterReturnConflict.json");
+        classLoader.getResourceAsStream("mockresponse/accountRegisterReturnConflict.json");
     assertThat(inputStream).isNotNull();
     mockWebServer.enqueue(
-            new MockResponse()
-                    .setResponseCode(409)
-                    .addHeader("Content-Type", "application/json")
-                    .setBody(new String(inputStream.readAllBytes())));
+        new MockResponse()
+            .setResponseCode(409)
+            .addHeader("Content-Type", "application/json")
+            .setBody(new String(inputStream.readAllBytes())));
 
     inputStream.close();
 
     // when & then
     assertThatThrownBy(() -> customerServiceImpl.register(customerRegisterDto))
-            .isInstanceOf(WebClientResponseException.class)
-            .hasMessageContaining("409 Conflict");
+        .isInstanceOf(WebClientResponseException.class)
+        .hasMessageContaining("409 Conflict");
   }
 
   @Test
   @DisplayName("Get customer details")
-  @WithMockUser( username = "1a35d863-0cd9-4bc1-8cc4-f4cddca97721")
+  @WithMockUser(username = "1a35d863-0cd9-4bc1-8cc4-f4cddca97721")
   @Disabled(value = "auth-svc not implement")
   void givenCustomerExists_whenGetCustomer_thenReturnCustomerDto() {
     // given
@@ -145,17 +144,11 @@ public class CustomerServiceTest {
     customer.setFirstName(firstName);
     customer.setLastName(lastName);
     given(customerRepository.findCustomerByCustomerUuid(customerUuid))
-            .willReturn(Optional.of(customer));
+        .willReturn(Optional.of(customer));
 
     Account account = new Account();
 
-    mockWebServer.enqueue(new MockResponse()
-            .setResponseCode(200)
-
-
-    );
-
-
+    mockWebServer.enqueue(new MockResponse().setResponseCode(200));
 
     // when
     CustomerDto customerDto = customerServiceImpl.getCustomer();
@@ -171,10 +164,9 @@ public class CustomerServiceTest {
   @Disabled(value = "auth-svc not implement")
   void givenCustomerNotFound_whenGetCustomer_thenThrowNotFoundException() {
     // given
-    given(customerRepository.findCustomerByCustomerUuid(customerUuid))
-            .willReturn(Optional.empty());
+    given(customerRepository.findCustomerByCustomerUuid(customerUuid)).willReturn(Optional.empty());
     // when & then
     assertThatThrownBy(() -> customerServiceImpl.getCustomer())
-            .isInstanceOf(NotFoundException.class);
+        .isInstanceOf(NotFoundException.class);
   }
 }

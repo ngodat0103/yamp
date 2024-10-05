@@ -3,12 +3,12 @@ spring:
     default: local-dev
   config:
     import:
-      - "optional:unit-test.yaml"
-      - "optional:local-dev.yaml"
-      - "optional:demo.yaml"
-      - "optional:integration-test.yaml"
-      - "optional:pre-prod.yaml"
-      - "optional:prod.yaml"
+      - "optional:unit-test.yml"
+      - "optional:local-dev.yml"
+      - "optional:demo.yml"
+      - "optional:integration-test.yml"
+      - "optional:pre-prod.yml"
+      - "optional:prod.yml"
   application:
     name: auth-svc
   kafka:

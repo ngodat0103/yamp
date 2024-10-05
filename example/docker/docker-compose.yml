@@ -21,59 +21,60 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ../init/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../init/users-and-database.sql:/docker-entrypoint-initdb.d/init.sql
 
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus:v2.50.1
-    extends:
-      file: common-config.yaml
-      service: network-deploy-service
-    ports:
-      - "9090:9090"
-    volumes:
-      - ../../observation-and-monitoring/prometheus/datasources.yaml:/etc/prometheus/datasources.yaml
-  tempo:
-    container_name: tempo
-    networks:
-      - yamp-network
-    image: grafana/tempo:latest
-    command: -config.file=/etc/tempo/datasources.yaml
-    volumes:
-      - ../../observation-and-monitoring/tempo/datasources.yaml:/etc/tempo/datasources.yaml
+#  prometheus:
+#    container_name: prometheus
+#    image: prom/prometheus:v2.50.1
+#    extends:
+#      file: common-config.yaml
+#      service: network-deploy-service
 #    ports:
-#      - 3100:3100
-#      - 4317:4317
-  grafana:
-    container_name: grafana
-    extends:
-      file: common-config.yaml
-      service: network-deploy-service
-    image: grafana/grafana:latest
-    environment:
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        /run.sh
-    ports:
-      - "9000:3000"
-    volumes:
-      - ../../observation-and-monitoring/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
-    healthcheck:
-      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+#      - "9090:9090"
+#    volumes:
+#      - ../../observation-and-monitoring/prometheus/datasources.yaml:/etc/prometheus/datasources.yaml
+#  tempo:
+#    container_name: tempo
+#    networks:
+#      - yamp-network
+#    image: grafana/tempo:latest
+#    command: -config.file=/etc/tempo/datasources.yaml
+#    volumes:
+#      - ../../observation-and-monitoring/tempo/datasources.yaml:/etc/tempo/datasources.yaml
+##    ports:
+##      - 3100:3100
+##      - 4317:4317
+#  grafana:
+#    container_name: grafana
+#    extends:
+#      file: common-config.yaml
+#      service: network-deploy-service
+#    image: grafana/grafana:latest
+#    environment:
+#      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+#      - GF_AUTH_ANONYMOUS_ENABLED=true
+#      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+#    entrypoint:
+#      - sh
+#      - -euc
+#      - |
+#        /run.sh
+#    ports:
+#      - "9000:3000"
+#    volumes:
+#      - ../../observation-and-monitoring/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+#    healthcheck:
+#      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
 
 
 
   auth-svc:
    image: ghcr.io/ngodat0103/yamp/auth-svc:${VERSION}
    container_name: auth-svc
+
    extends:
      file: common-config.yaml
      service: microservice-base-config
@@ -82,28 +83,40 @@ services:
       - share-db
    ports:
     - 8001:8001
-  user-svc:
-    container_name: user-svc
+#  user-svc:
+#    container_name: user-svc
+#    extends:
+#      file: common-config.yaml
+#      service: microservice-base-config
+#    depends_on:
+#      - share-db
+#    image: ghcr.io/ngodat0103/yamp/user-svc:${VERSION}
+#    ports:
+#      - 8002:8002
+#  gateway-svc:
+#    container_name: gateway-svc
+#    depends_on:
+#      - auth-svc
+#      - user-svc
+#    extends:
+#      file: common-config.yaml
+#      service: microservice-base-config
+#    image: ghcr.io/ngodat0103/yamp/gateway-svc:${VERSION}
+#    ports:
+#      - 8000:8000
+  product-svc:
+    image: ghcr.io/ngodat0103/yamp/product-svc:0.0.1 # github container registry
+    container_name: product-svc
     extends:
       file: common-config.yaml
-      service: microservice-base-config
-    depends_on:
-      - share-db
-    image: ghcr.io/ngodat0103/yamp/user-svc:${VERSION}
+      service: network-deploy-service
     ports:
-      - 8002:8002
-  gateway-svc:
-    container_name: gateway-svc
-    depends_on:
-      - auth-svc
-      - user-svc
-    extends:
-      file: common-config.yaml
-      service: microservice-base-config
-    image: ghcr.io/ngodat0103/yamp/gateway-svc:${VERSION}
-    ports:
-      - 8000:8000
-
+      - "8003:8003"
+    environment:
+      - SPRING_PROFILES_ACTIVE=pre-prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://share-db:5432/product-svc-db
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATA_SOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATA_SOURCE_PASSWORD}
 volumes:
   postgres-data:
     name: postgres-data

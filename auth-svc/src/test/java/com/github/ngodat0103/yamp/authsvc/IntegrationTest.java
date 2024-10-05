@@ -25,25 +25,27 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @ActiveProfiles("integration-test")
 class IntegrationTest {
 
-  static PostgreSQLContainer<?> postgreSQLContainer= new PostgreSQLContainer<>("postgres:16.3-bullseye");
+  static PostgreSQLContainer<?> postgreSQLContainer =
+      new PostgreSQLContainer<>("postgres:16.3-bullseye");
 
   @BeforeAll
-  static void  beforeAll(){
-      postgreSQLContainer.start();
-      int stop = 0 ;
+  static void beforeAll() {
+    postgreSQLContainer.start();
+    int stop = 0;
   }
 
   @DynamicPropertySource
-  static void configureProperties(DynamicPropertyRegistry dynamicPropertyRegistry){
-        dynamicPropertyRegistry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        dynamicPropertyRegistry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        dynamicPropertyRegistry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+  static void configureProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {
+    dynamicPropertyRegistry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+    dynamicPropertyRegistry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+    dynamicPropertyRegistry.add("spring.datasource.password", postgreSQLContainer::getPassword);
   }
 
   @AfterAll
-  static void afterAll(){
-      postgreSQLContainer.stop();
+  static void afterAll() {
+    postgreSQLContainer.stop();
   }
+
   @Autowired private TestRestTemplate testRestTemplate;
   @Autowired AccountMapper accountMapper;
   @Autowired RoleRepository roleRepository;

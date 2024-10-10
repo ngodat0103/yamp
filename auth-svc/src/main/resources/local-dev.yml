@@ -6,12 +6,12 @@ spring:
     activate:
       on-profile: local-dev
   kafka:
-    bootstrap-servers: [ kafka-svc:9092 ]
+    bootstrap-servers: [ kafka-svc-controller-headless.default.cluster.local:9092 ]
     producer:
       key-serializer: org.apache.kafka.common.serialization.UUIDSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   datasource:
-    url: jdbc:postgresql://share-db-postgresql:5432/auth-svc-db
+    url: jdbc:postgresql://localhost:5432/auth-svc-db
   jpa:
     show-sql: true
     hibernate:
@@ -21,7 +21,7 @@ spring:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
   data:
     redis:
-      url: redis://redis-svc:6379
+      url: redis://localhost:6379
   security:
     oauth2:
       client:

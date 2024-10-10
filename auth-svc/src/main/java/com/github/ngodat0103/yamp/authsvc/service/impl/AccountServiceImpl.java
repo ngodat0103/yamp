@@ -68,7 +68,6 @@ public class AccountServiceImpl implements AccountService {
   @Transactional
   public AccountResponseDto updateAccount(UpdateAccountDto updateAccountDto) {
     log.debug("Getting accountUuid from SecurityContextHolder");
-    String roleName = updateAccountDto.getRoleName().toUpperCase();
     UUID uuid = getAccountUuidFromAuthentication();
     Account account =
         accountRepository
@@ -76,14 +75,8 @@ public class AccountServiceImpl implements AccountService {
             .orElseThrow(notFoundExceptionSupplier(log, "Account", "accountUuid", uuid));
     account.setEmail(updateAccountDto.getEmail());
     account.setUsername(updateAccountDto.getUsername());
-    account.setRole(
-        roleRepository
-            .findRoleByRoleName(roleName)
-            .orElseThrow(notFoundExceptionSupplier(log, "Role", "roleName", roleName)));
-
     account.setLastModifiedAt(LocalDateTime.now());
     Account savedAccount = accountRepository.save(account);
-
     kafkaTemplate.send("account-update", savedAccount.getUuid(), Action.UPDATE);
     return accountMapper.mapToDto(savedAccount);
   }

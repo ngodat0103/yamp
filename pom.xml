@@ -12,6 +12,7 @@
     <module>user-svc</module>
     <module>gateway-svc</module>
     <module>product-svc</module>
+    <module>order-svc</module>
   </modules>
   <parent>
     <groupId>org.springframework.boot</groupId>

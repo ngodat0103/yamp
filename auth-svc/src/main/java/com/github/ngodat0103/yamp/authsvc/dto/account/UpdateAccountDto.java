@@ -18,7 +18,4 @@ public class UpdateAccountDto {
   @Email(message = "Email is not valid")
   @NotNull(message = "email is required")
   private String email;
-
-  @NotNull(message = "roleName is required")
-  private String roleName;
 }

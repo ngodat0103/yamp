@@ -1,7 +1,6 @@
 package com.ngodat0103.yamp.dto.response.collection;
 
 import java.util.Collection;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,17 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class DtoCollectionResponse<T> {
-	
-	private Collection<T> collection;
-	
+
+  private Collection<T> collection;
 }
-
-
-
-
-
-
-
-
-
-

@@ -174,42 +174,42 @@ public class ProductServiceImpl implements ProductService {
     productDtoResponse.add(uuidLink, slugLink, updateLink, deleteLink, categoryLink);
   }
 
-//  @Override
-//  public String generatePresignedUrl(UUID productId) {
-//    S3Presigner presigner = S3Presigner.builder()
-//            .region(Region.US_EAST_1) // Set your region
-//            .credentialsProvider(DefaultCredentialsProvider.create())
-//            .build();
-//
-//    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-//            .bucket("your-bucket-name")
-//            .key("images/" + productId)
-//            .build();
-//
-//    PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-//            .signatureDuration(Duration.ofMinutes(15))
-//            .putObjectRequest(putObjectRequest)
-//            .build();
-//
-//    URL presignedUrl = presigner.presignPutObject(presignRequest).url();
-//    presigner.close();
-//
-//    // Save the imageUrl to the Product entity
-//    String imageUrl = "https://your-bucket-name.s3.amazonaws.com/product/image/" + productId;
-//    updateProductImageUrl(productId, imageUrl);
-//
-//    return presignedUrl.toString();
-//  }
-//
-//  private void updateProductImageUrl(UUID productId, String imageUrl) {
-//    Optional<Product> productOptional = productRepository.findById(productId);
-//    if (productOptional.isPresent()) {
-//      Product product = productOptional.get();
-//      product.setImageUrl(imageUrl);
-//      productRepository.save(product);
-//    } else {
-//      throw new RuntimeException("Product not found with id: " + productId);
-//    }
-//  }
+  //  @Override
+  //  public String generatePresignedUrl(UUID productId) {
+  //    S3Presigner presigner = S3Presigner.builder()
+  //            .region(Region.US_EAST_1) // Set your region
+  //            .credentialsProvider(DefaultCredentialsProvider.create())
+  //            .build();
+  //
+  //    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+  //            .bucket("your-bucket-name")
+  //            .key("images/" + productId)
+  //            .build();
+  //
+  //    PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+  //            .signatureDuration(Duration.ofMinutes(15))
+  //            .putObjectRequest(putObjectRequest)
+  //            .build();
+  //
+  //    URL presignedUrl = presigner.presignPutObject(presignRequest).url();
+  //    presigner.close();
+  //
+  //    // Save the imageUrl to the Product entity
+  //    String imageUrl = "https://your-bucket-name.s3.amazonaws.com/product/image/" + productId;
+  //    updateProductImageUrl(productId, imageUrl);
+  //
+  //    return presignedUrl.toString();
+  //  }
+  //
+  //  private void updateProductImageUrl(UUID productId, String imageUrl) {
+  //    Optional<Product> productOptional = productRepository.findById(productId);
+  //    if (productOptional.isPresent()) {
+  //      Product product = productOptional.get();
+  //      product.setImageUrl(imageUrl);
+  //      productRepository.save(product);
+  //    } else {
+  //      throw new RuntimeException("Product not found with id: " + productId);
+  //    }
+  //  }
 
 }

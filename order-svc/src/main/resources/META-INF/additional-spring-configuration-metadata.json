@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "springdoc.open-api.info.version",
+      "type": "java.lang.String",
+      "description": "Description for springdoc.open-api.info.version."
+  }
+] }

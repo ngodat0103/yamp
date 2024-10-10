@@ -22,6 +22,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import javax.security.auth.login.AccountNotFoundException;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -67,30 +69,22 @@ public class CustomerServiceImpl implements CustomerService {
             .findCustomerByCustomerUuid(customerUuid)
             .orElseThrow(notFoundExceptionSupplier(log, "Customer", "customerUuid", customerUuid));
 
-    Account account = checkRedisCache(customerUuid);
-    if (account != null) {
-      log.debug("Cache hit,get account with {} from redis cache", customerUuid);
-      CustomerDto customerDto = customerMapper.mapToDto(customer);
-      customerDto.setAccount(customerMapper.mapToDto(account));
-      return customerDto;
-    }
-
-    log.debug("Cache miss, get account with {} by invoking auth-svc endpoint", customerUuid);
-    account =
-        webClient
-            .get()
-            .uri(ACCOUNT_PATH + "/" + customerUuid)
-            .accept(MediaType.APPLICATION_JSON)
-            .retrieve()
-            .bodyToMono(Account.class)
-            .doOnError(getOnError(customerUuid))
-            .block();
-
+    Account account = loadAccount(customerUuid);
     assert account != null;
     authSvcRepository.save(account);
     CustomerDto customerDto = customerMapper.mapToDto(customer);
     customerDto.setAccount(customerMapper.mapToDto(account));
     log.debug("Fetching successful,Account with {} saved to redis cache", customerUuid);
+    return customerDto;
+  }
+
+  @Override
+  public CustomerDto getCustomer(UUID uuid) throws AccountNotFoundException {
+    Customer customer = customerRepository.findCustomerByCustomerUuid(uuid)
+            .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+    Account account = loadAccount(uuid);
+    CustomerDto customerDto = customerMapper.mapToDto(customer);
+    customerDto.setAccount(customerMapper.mapToDto(account));
     return customerDto;
   }
 
@@ -105,6 +99,22 @@ public class CustomerServiceImpl implements CustomerService {
       }
       log.debug("Roll back customer creation for customerUUid: {}", customerUuid);
     };
+  }
+
+  private Account loadAccount(UUID customerUuid) {
+    Account account = checkRedisCache(customerUuid);
+    if (account != null) {
+      log.debug("Cache hit,get account with {} from redis cache", customerUuid);
+      return account;
+    }
+    return webClient
+        .get()
+        .uri(ACCOUNT_PATH + "/" + customerUuid)
+        .accept(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .bodyToMono(Account.class)
+        .doOnError(getOnError(customerUuid))
+        .block();
   }
 
   private Account checkRedisCache(UUID customerUuid) {

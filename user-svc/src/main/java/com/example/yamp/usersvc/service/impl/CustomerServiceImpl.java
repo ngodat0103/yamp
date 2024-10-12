@@ -6,6 +6,7 @@ import com.example.yamp.usersvc.cache.AuthSvcRepository;
 import com.example.yamp.usersvc.dto.customer.AccountRegisterDto;
 import com.example.yamp.usersvc.dto.customer.CustomerDto;
 import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
+import com.example.yamp.usersvc.dto.kafka.AccountTopicContent;
 import com.example.yamp.usersvc.dto.mapper.CustomerMapper;
 import com.example.yamp.usersvc.persistence.entity.Account;
 import com.example.yamp.usersvc.persistence.entity.Customer;
@@ -33,32 +34,19 @@ public class CustomerServiceImpl implements CustomerService {
   private final CustomerMapper customerMapper;
   private final WebClient webClient;
   private static final String ACCOUNT_PATH = "/accounts";
-  private static final String DEFAULT_ROLE = "CUSTOMER";
 
   @Transactional
   @Override
-  public void register(CustomerRegisterDto customerRegisterDto) {
-    Customer customer = customerMapper.mapToEntity(customerRegisterDto);
+  public void create(UUID customerUuid,AccountTopicContent accountTopicContent) {
+    if(customerRepository.findCustomerByCustomerUuid(customerUuid).isPresent()) {
+      log.debug("customerUuid: {} already exists", customerUuid);
+      return;
+    }
+    Customer newCustomer = customerMapper.MapToCustomerEntity(accountTopicContent);
+    newCustomer.setCustomerUuid(customerUuid);
 
-    customer = customerRepository.save(customer);
-    AccountRegisterDto accountRegisterDtoRequest =
-        customerMapper.maptoAccountRegisterDto(customerRegisterDto);
-    accountRegisterDtoRequest.setPassword(customerRegisterDto.getPassword());
-    accountRegisterDtoRequest.setUuid(customer.getCustomerUuid());
-    accountRegisterDtoRequest.setRoleName(DEFAULT_ROLE);
-    log.debug(
-        "New customerUuid {} saved but not commit, wait for auth-svc response",
-        customer.getCustomerUuid());
-    webClient
-        .post()
-        .uri(ACCOUNT_PATH)
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)
-        .bodyValue(accountRegisterDtoRequest)
-        .retrieve()
-        .bodyToMono(AccountRegisterDto.class)
-        .doOnError(getOnError(customer.getCustomerUuid()))
-        .block();
+    customerRepository.save(newCustomer);
+    log.debug("newCustomer: {} saved to database", customerUuid);
   }
 
   @Override

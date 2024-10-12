@@ -2,9 +2,10 @@ package com.github.ngodat0103.yamp.authsvc.service.impl;
 
 import static com.github.ngodat0103.yamp.authsvc.Util.*;
 
-import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRequestDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRegisterDto;
 import com.github.ngodat0103.yamp.authsvc.dto.account.AccountResponseDto;
 import com.github.ngodat0103.yamp.authsvc.dto.account.UpdateAccountDto;
+import com.github.ngodat0103.yamp.authsvc.dto.kafka.AccountTopicContent;
 import com.github.ngodat0103.yamp.authsvc.dto.kafka.Action;
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
@@ -31,16 +32,16 @@ public class AccountServiceImpl implements AccountService {
   private final AccountMapper accountMapper;
   private final PasswordEncoder passwordEncoder;
   private final RoleRepository roleRepository;
-  private final KafkaTemplate<UUID, Action> kafkaTemplate;
+  private final KafkaTemplate<UUID, AccountTopicContent> kafkaTemplate;
+  private final static String TOPIC = "auth-svc-topic";
+
+  private final static String DEFAULT_ROLE = "CUSTOMER";
 
   @Transactional
   @Override
-  public AccountResponseDto register(AccountRequestDto accountRequestDto) {
-    Account account = accountMapper.mapToEntity(accountRequestDto);
+  public AccountResponseDto register(AccountRegisterDto accountRegisterDto) {
+    Account account = accountMapper.mapToEntity(accountRegisterDto);
 
-    if (accountRepository.existsById(account.getUuid())) {
-      throwConflictException(log, "Account", "uuid", account.getUuid());
-    }
     if (accountRepository.existsByUsername(account.getUsername())) {
       throwConflictException(log, "Account", "username", account.getUsername());
     }
@@ -49,18 +50,20 @@ public class AccountServiceImpl implements AccountService {
     }
 
     account.setPassword(passwordEncoder.encode(account.getPassword()));
-    String roleName = accountRequestDto.getRoleName().toUpperCase();
     Role role =
         roleRepository
-            .findRoleByRoleName(roleName)
-            .orElseThrow(notFoundExceptionSupplier(log, "Role", "roleName", roleName));
+            .findRoleByRoleName(DEFAULT_ROLE)
+            .orElseThrow(notFoundExceptionSupplier(log, "Role", "roleName", DEFAULT_ROLE));
     account.setRole(role);
-
     LocalDateTime currentTime = LocalDateTime.now();
     account.setCreateAt(currentTime);
     account.setLastModifiedAt(currentTime);
     Account savedAccount = accountRepository.save(account);
 
+    AccountTopicContent accountTopicContent =
+            accountMapper.mapToTopicContent(accountRegisterDto, Action.CREATE);
+
+    kafkaTemplate.send(TOPIC, savedAccount.getUuid(), accountTopicContent);
     return accountMapper.mapToDto(savedAccount);
   }
 
@@ -77,7 +80,10 @@ public class AccountServiceImpl implements AccountService {
     account.setUsername(updateAccountDto.getUsername());
     account.setLastModifiedAt(LocalDateTime.now());
     Account savedAccount = accountRepository.save(account);
-    kafkaTemplate.send("account-update", savedAccount.getUuid(), Action.UPDATE);
+
+    AccountTopicContent accountTopicContent =
+            accountMapper.mapToTopicContent(updateAccountDto, Action.UPDATE);
+    kafkaTemplate.send(TOPIC, savedAccount.getUuid(), accountTopicContent);
     return accountMapper.mapToDto(savedAccount);
   }
 

@@ -14,7 +14,6 @@ public class UpdateAccountDto {
   @Length(min = 5, message = "Username must be at least 5 characters")
   @NotNull
   private String username;
-
   @Email(message = "Email is not valid")
   @NotNull(message = "email is required")
   private String email;

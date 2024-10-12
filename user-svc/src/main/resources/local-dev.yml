@@ -2,7 +2,7 @@ spring:
   data:
     redis:
       client-type: lettuce
-      host: redis-svc
+      host: localhost
       port: 6379
       database: 2
       client-name: user-svc
@@ -35,12 +35,17 @@ spring:
     activate:
       on-profile: local-dev
   datasource:
-    url: jdbc:postgresql://share-db:5432/user-svc-db
+    url: jdbc:postgresql://localhost:5432/user-svc-db
     username: 'user-svc-user'
     password: '{cipher}0579337b871cd41ba98c4875971fa8eca89a6a6902e15b6cf75f711c299912285e825d81331fa61ec4317b6306c3b29d'
     driver-class-name: org.postgresql.Driver
-
-
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.hibernate.format_sql: true
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
 management:
   endpoints:
     web:

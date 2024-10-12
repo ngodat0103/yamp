@@ -4,6 +4,7 @@ import com.example.yamp.usersvc.dto.customer.AccountDto;
 import com.example.yamp.usersvc.dto.customer.AccountRegisterDto;
 import com.example.yamp.usersvc.dto.customer.CustomerDto;
 import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
+import com.example.yamp.usersvc.dto.kafka.AccountTopicContent;
 import com.example.yamp.usersvc.persistence.entity.Account;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import org.mapstruct.Mapper;
@@ -17,7 +18,9 @@ public interface CustomerMapper {
 
   AccountDto mapToDto(Account customer);
 
-  Customer mapToEntity(CustomerRegisterDto customerRegisterDto);
+  Customer MapToCustomerEntity(AccountTopicContent accountTopicContent);
+
+  Customer MapToCustomerEntity(CustomerRegisterDto customerRegisterDto);
 
   AccountRegisterDto maptoAccountRegisterDto(CustomerRegisterDto customerRegisterDto);
 }

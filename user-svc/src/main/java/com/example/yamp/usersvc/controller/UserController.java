@@ -22,13 +22,6 @@ public class UserController {
     this.customerService = customerService;
   }
 
-  @PostMapping("/register")
-  @ResponseStatus(HttpStatus.CREATED)
-  public void register(@RequestBody @Valid CustomerRegisterDto customerRegisterDto) {
-    log.debug("Controller register method called");
-    customerService.register(customerRegisterDto);
-  }
-
   @SecurityRequirement(name = "oauth2")
   @GetMapping("/get-me")
   public CustomerDto getMe() throws AccountNotFoundException {
@@ -38,6 +31,6 @@ public class UserController {
   @SecurityRequirement(name = "oauth2")
   @GetMapping("/{id}")
     public CustomerDto getCustomer(@PathVariable("id") UUID uuid) throws AccountNotFoundException {
-        return customerService.getCustomer();
+        return customerService.getCustomer(uuid);
     }
 }

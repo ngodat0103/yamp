@@ -1,7 +1,9 @@
 package com.example.yamp.usersvc.event;
 
 import com.example.yamp.usersvc.cache.AuthSvcRepository;
+import com.example.yamp.usersvc.dto.kafka.AccountTopicContent;
 import com.example.yamp.usersvc.dto.kafka.Action;
+import com.example.yamp.usersvc.service.CustomerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
@@ -12,20 +14,29 @@ import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-@KafkaListener(topics = "account-update")
+@KafkaListener(topics = "auth-svc-topic")
 @Service
 @AllArgsConstructor
 @Slf4j
 public class Listener {
-  private AuthSvcRepository authSvcRepository;
-  private ObjectMapper objectMapper;
+  private final AuthSvcRepository authSvcRepository;
+  private final ObjectMapper objectMapper;
+
+  private final CustomerService customerService;
+
 
   @KafkaHandler(isDefault = true)
-  private void accountUpdate(ConsumerRecord<UUID, String> message) throws JsonProcessingException {
+  private void authsvcHandler(ConsumerRecord<UUID, String> message) throws JsonProcessingException {
     UUID accountUuid = message.key();
-    Action action = objectMapper.readValue(message.value(), Action.class);
+    AccountTopicContent accountTopicContent = objectMapper.readValue(message.value(), AccountTopicContent.class);
+    Action action = accountTopicContent.action();
+      log.debug("Received message from authsvc-topic: {}",accountTopicContent);
+
+    if(action.equals(Action.CREATE)) {
+      customerService.create(accountUuid,accountTopicContent);
+      return;
+    }
     if (action.equals(Action.DELETE) || action.equals(Action.UPDATE)) {
-      log.debug("Received message from auth-svc: {}", action);
       authSvcRepository
           .findById(accountUuid)
           .ifPresent(

@@ -13,7 +13,6 @@ import lombok.Setter;
 @Setter
 public class Customer {
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID customerUuid;
 
   @Column(nullable = false)

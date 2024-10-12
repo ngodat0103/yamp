@@ -2,6 +2,8 @@ package com.github.ngodat0103.yamp.authsvc.controller;
 
 import com.github.ngodat0103.yamp.authsvc.dto.RoleDto;
 import com.github.ngodat0103.yamp.authsvc.service.RoleService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.Set;
 import java.util.UUID;
@@ -21,11 +23,14 @@ public class RoleController {
 
   private RoleService roleService;
 
+  @Operation(summary = "Get all roles", description = "Retrieves a list of all roles.")
   @GetMapping(produces = "application/json")
   public Set<RoleDto> getRole() {
     return roleService.getRole();
   }
 
+  @Operation(summary = "Create a new role", description = "Adds a new role to the system.")
+  @ApiResponse(responseCode = "201", description = "Role created successfully")
   @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
   public void createRole(@RequestBody RoleDto roleDto) {
@@ -33,6 +38,8 @@ public class RoleController {
     roleService.addRole(roleDto);
   }
 
+  @Operation(summary = "Delete a role", description = "Removes a role from the system by its UUID.")
+  @ApiResponse(responseCode = "202", description = "Role deleted successfully")
   @DeleteMapping(path = "/{uuid}")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public void deleteRole(@PathVariable UUID uuid) {

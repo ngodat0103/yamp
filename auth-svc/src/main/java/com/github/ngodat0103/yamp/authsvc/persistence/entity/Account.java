@@ -17,6 +17,7 @@ public class Account extends BaseEntity {
   @GeneratedValue(strategy = GenerationType.UUID)
   @Column(nullable = false, updatable = false)
   private UUID uuid;
+
   @Column(nullable = false, unique = true)
   private String username;
 

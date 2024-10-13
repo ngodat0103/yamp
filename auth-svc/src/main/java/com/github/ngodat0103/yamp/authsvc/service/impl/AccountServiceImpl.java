@@ -33,9 +33,9 @@ public class AccountServiceImpl implements AccountService {
   private final PasswordEncoder passwordEncoder;
   private final RoleRepository roleRepository;
   private final KafkaTemplate<UUID, AccountTopicContent> kafkaTemplate;
-  private final static String TOPIC = "auth-svc-topic";
+  private static final String TOPIC = "auth-svc-topic";
 
-  private final static String DEFAULT_ROLE = "CUSTOMER";
+  private static final String DEFAULT_ROLE = "CUSTOMER";
 
   @Transactional
   @Override
@@ -61,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
     Account savedAccount = accountRepository.save(account);
 
     AccountTopicContent accountTopicContent =
-            accountMapper.mapToTopicContent(accountRegisterDto, Action.CREATE);
+        accountMapper.mapToTopicContent(accountRegisterDto, Action.CREATE);
 
     kafkaTemplate.send(TOPIC, savedAccount.getUuid(), accountTopicContent);
     return accountMapper.mapToDto(savedAccount);
@@ -82,7 +82,7 @@ public class AccountServiceImpl implements AccountService {
     Account savedAccount = accountRepository.save(account);
 
     AccountTopicContent accountTopicContent =
-            accountMapper.mapToTopicContent(updateAccountDto, Action.UPDATE);
+        accountMapper.mapToTopicContent(updateAccountDto, Action.UPDATE);
     kafkaTemplate.send(TOPIC, savedAccount.getUuid(), accountTopicContent);
     return accountMapper.mapToDto(savedAccount);
   }

@@ -30,7 +30,9 @@ public class AccountController {
     this.accountService = accountService;
   }
 
-  @Operation(summary = "Register a new account", description = "Creates a new account with the provided details.")
+  @Operation(
+      summary = "Register a new account",
+      description = "Creates a new account with the provided details.")
   @ApiResponse(responseCode = "201", description = "Account created successfully")
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -46,7 +48,9 @@ public class AccountController {
     return accountService.getAccounts();
   }
 
-  @Operation(summary = "Get account by UUID", description = "Retrieves account information by its unique identifier.")
+  @Operation(
+      summary = "Get account by UUID",
+      description = "Retrieves account information by its unique identifier.")
   @ApiResponse(responseCode = "200", description = "Account retrieved successfully")
   @GetMapping(path = "/{accountUuid}")
   @PreAuthorize("hasAuthority('SCOPE_auth-service.read')")
@@ -55,22 +59,31 @@ public class AccountController {
     return accountService.getAccount(accountUuid);
   }
 
-  @Operation(summary = "Get accounts by filter", description = "Retrieves a list of accounts based on specified criteria.")
+  @Operation(
+      summary = "Get accounts by filter",
+      description = "Retrieves a list of accounts based on specified criteria.")
   @GetMapping(value = "/filter")
   public Set<AccountResponseDto> getAccountsFilterByRoles(
-      @Parameter(description = "Set of roles to filter accounts") @RequestParam(required = false) Set<String> roles,
-      @Parameter(description = "Account UUID to filter") @RequestParam(required = false) UUID accountUuid,
-      @Parameter(description = "Username to filter") @RequestParam(required = false) String username) {
+      @Parameter(description = "Set of roles to filter accounts") @RequestParam(required = false)
+          Set<String> roles,
+      @Parameter(description = "Account UUID to filter") @RequestParam(required = false)
+          UUID accountUuid,
+      @Parameter(description = "Username to filter") @RequestParam(required = false)
+          String username) {
     return accountService.getAccountFilter(roles, accountUuid, username);
   }
 
-  @Operation(summary = "Update account", description = "Modifies an existing account's information.")
+  @Operation(
+      summary = "Update account",
+      description = "Modifies an existing account's information.")
   @PutMapping()
   public AccountResponseDto updateAccount(@RequestBody @Valid UpdateAccountDto updateAccountDto) {
     return accountService.updateAccount(updateAccountDto);
   }
 
-  @Operation(summary = "Logout", description = "Logs out the current user and invalidates the session.")
+  @Operation(
+      summary = "Logout",
+      description = "Logs out the current user and invalidates the session.")
   @DeleteMapping(path = "/logout")
   @ResponseStatus(HttpStatus.ACCEPTED)
   public void logout(HttpServletRequest request) {

@@ -18,5 +18,6 @@ public interface AccountMapper {
   AccountResponseDto mapToDto(Account account);
 
   AccountTopicContent mapToTopicContent(AccountRegisterDto accountRegisterDto, Action action);
+
   AccountTopicContent mapToTopicContent(UpdateAccountDto updateAccountDto, Action action);
 }

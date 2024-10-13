@@ -1,210 +1,141 @@
-//package com.github.ngodat0103.yamp.authsvc.service;
-//
-//import static com.github.ngodat0103.yamp.authsvc.Util.*;
-//import static org.mockito.BDDMockito.*;
-//
-//import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRegisterDto;
-//import com.github.ngodat0103.yamp.authsvc.dto.account.AccountResponseDto;
-//import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
-//import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapperImpl;
-//import com.github.ngodat0103.yamp.authsvc.exception.ConflictException;
-//import com.github.ngodat0103.yamp.authsvc.exception.NotFoundException;
-//import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
-//import com.github.ngodat0103.yamp.authsvc.persistence.entity.Role;
-//import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
-//import com.github.ngodat0103.yamp.authsvc.persistence.repository.RoleRepository;
-//import com.github.ngodat0103.yamp.authsvc.service.impl.AccountServiceImpl;
-//import java.time.LocalDateTime;
-//import java.util.UUID;
-//import org.assertj.core.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.Mockito;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.context.annotation.Profile;
-//import org.springframework.kafka.core.KafkaTemplate;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//
-//@ExtendWith(MockitoExtension.class)
-//@Profile("uni-test")
-//class AccountServiceTest {
-//
-//  private AccountRepository accountRepository;
-//  private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//  private RoleRepository roleRepository;
-//
-//  private AccountServiceImpl accountService;
-//
-//  private AccountRegisterDto accountRegisterDtoMock;
-//  private AccountResponseDto accountResponseDtoMock;
-//  private Account account;
-//  private Role role;
-//
-//  @BeforeEach
-//  void setUp() {
-//    this.roleRepository = Mockito.mock(RoleRepository.class);
-//    KafkaTemplate kafkaTemplate = Mockito.mock(KafkaTemplate.class);
-//    this.accountRepository = Mockito.mock(AccountRepository.class);
-//    AccountMapper accountMapper = new AccountMapperImpl();
-//    this.accountService =
-//        new AccountServiceImpl(
-//            accountRepository, accountMapper, passwordEncoder, roleRepository, kafkaTemplate);
-//    this.accountRegisterDtoMock =
-//        AccountRegisterDto.builder()
-//            .uuid(UUID.randomUUID().toString())
-//            .username("test")
-//            .password("password")
-//            .email("example@gmail.com")
-//            .roleName("CUSTOMER")
-//            .build();
-//    this.accountResponseDtoMock =
-//        AccountResponseDto.builder()
-//            .uuid(accountRegisterDtoMock.getUuid())
-//            .username(accountRegisterDtoMock.getUsername())
-//            .email(accountRegisterDtoMock.getEmail())
-//            .roleName(accountRegisterDtoMock.getRoleName())
-//            .build();
-//    this.account = accountMapper.mapToEntity(accountRegisterDtoMock);
-//    this.role = new Role();
-//    role.setRoleName(accountRegisterDtoMock.getRoleName());
-//    role.setUuid(UUID.randomUUID());
-//    role.setCreateAt(LocalDateTime.now());
-//    role.setLastModifiedAt(LocalDateTime.now());
-//  }
-//
-//  @Test
-//  @DisplayName(
-//      "Given already existing account with UUID, when register, then throw ConflictException")
-//  void givenUuidAlreadyExist_whenRegister_thenThrowConflictException() {
-//    given(accountRepository.existsById(account.getUuid())).willReturn(true);
-//    Assertions.assertThatThrownBy(() -> accountService.register(accountRegisterDtoMock))
-//        .isInstanceOf(ConflictException.class)
-//        .hasMessageContaining(
-//            String.format(TEMPLATE_CONFLICT, "Account", "uuid", account.getUuid()));
-//  }
-//
-//  @Test
-//  @DisplayName(
-//      "Given already existing account with email, when register, then throw ConflictException")
-//  void giveAccountUsernameExists_whenRegister_thenThrowConflict() {
-//    given(accountRepository.existsById(account.getUuid())).willReturn(false);
-//    given(accountRepository.existsByUsername(account.getUsername())).willReturn(true);
-//    Assertions.assertThatThrownBy(() -> accountService.register(accountRegisterDtoMock))
-//        .isInstanceOf(ConflictException.class)
-//        .hasMessageContaining(
-//            String.format(TEMPLATE_CONFLICT, "Account", "username", account.getUsername()));
-//  }
-//
-//  @Test
-//  @DisplayName(
-//      "Given already existing account with email, when register, then throw ConflictException")
-//  void giveAccountEmailExists_whenRegister_thenThrowConflict() {
-//    given(accountRepository.existsById(account.getUuid())).willReturn(false);
-//    given(accountRepository.existsByUsername(account.getUsername())).willReturn(false);
-//    given(accountRepository.existsByEmail(account.getEmail())).willReturn(true);
-//    Assertions.assertThatThrownBy(() -> accountService.register(accountRegisterDtoMock))
-//        .isInstanceOf(ConflictException.class)
-//        .hasMessageContaining(
-//            String.format(TEMPLATE_CONFLICT, "Account", "email", account.getEmail()));
-//  }
-//
-//  @Test
-//  @DisplayName(
-//      "Given not exists account but not exists role when register then throw NotFoundException")
-//  void givenRoleNotExists_whenRegister_thenThrowNotFoundException() {
-//    given(accountRepository.existsById(account.getUuid())).willReturn(false);
-//    given(accountRepository.existsByUsername(account.getUsername())).willReturn(false);
-//    given(accountRepository.existsByEmail(account.getEmail())).willReturn(false);
-//    given(roleRepository.findRoleByRoleName(accountRegisterDtoMock.getRoleName()))
-//        .willReturn(java.util.Optional.empty());
-//    Assertions.assertThatThrownBy(() -> accountService.register(accountRegisterDtoMock))
-//        .isInstanceOf(NotFoundException.class)
-//        .hasMessageContaining(
-//            String.format(
-//                TEMPLATE_NOT_FOUND, "Role", "roleName", accountRegisterDtoMock.getRoleName()));
-//  }
-//
-//  @Test
-//  @DisplayName("Given nothing account and exist role when register then saved account")
-//  void givenAccountDto_whenRegister_thenReturnSavedAccountDto() {
-//    given(accountRepository.existsById(account.getUuid())).willReturn(false);
-//    given(accountRepository.existsByUsername(account.getUsername())).willReturn(false);
-//    given(accountRepository.existsByEmail(account.getEmail())).willReturn(false);
-//    given(roleRepository.findRoleByRoleName(any(String.class)))
-//        .willReturn(java.util.Optional.of(role));
-//    Account accountResponse = new Account();
-//    accountResponse.setUuid(account.getUuid());
-//    accountResponse.setUsername(account.getUsername());
-//    accountResponse.setPassword(account.getPassword());
-//    accountResponse.setEmail(account.getEmail());
-//    accountResponse.setRole(role);
-//    accountResponse.setCreateAt(LocalDateTime.now());
-//    accountResponse.setLastModifiedAt(LocalDateTime.now());
-//    given(accountRepository.save(any(Account.class))).willReturn(accountResponse);
-//    AccountResponseDto result = accountService.register(accountRegisterDtoMock);
-//    Assertions.assertThat(result).isNotNull();
-//    Assertions.assertThat(result).isEqualTo(accountResponseDtoMock);
-//    verify(accountRepository).save(any(Account.class));
-//  }
-//
-//  //
-//  //    @Test
-//  //    void updateAccount_updatesExistingAccount() {
-//  //        UUID uuid = UUID.randomUUID();
-//  //        UpdateAccountDto updateAccountDto = UpdateAccountDto.builder()
-//  //                .username("newUsername")
-//  //                .email("test@gmail.com")
-//  //                .roleName("CUSTOMER")
-//  //                .build();
-//  //        when(accountRepository.findById(any(UUID.class))).thenReturn(Optional.of(account));
-//  //
-//  // when(roleRepository.findRoleByRoleName(any(String.class))).thenReturn(Optional.of(role));
-//  //        when(accountRepository.save(any(Account.class))).thenReturn(account);
-//  //        when(accountMapper.mapToDto(any(Account.class))).thenReturn(accountDto);
-//  //
-//  //        AccountDto result = accountService.updateAccount(updateAccountDto);
-//  //        assertNotNull(result);
-//  //        assertEquals(accountDto, result);
-//  //    }
-//  //
-//  //    @Test
-//  //    void getAccount_returnsAccountByUuid() {
-//  //        UUID uuid = UUID.randomUUID();
-//  //        when(accountRepository.findById(any(UUID.class))).thenReturn(Optional.of(account));
-//  //        when(accountMapper.mapToDto(any(Account.class))).thenReturn(accountDto);
-//  //
-//  //        AccountDto result = accountService.getAccount(uuid);
-//  //
-//  //        assertNotNull(result);
-//  //        assertEquals(accountDto, result);
-//  //    }
-//  //
-//  //    @Test
-//  //    void getAccounts_returnsAllAccounts() {
-//  //        when(accountRepository.findAll()).thenReturn(List.of(account));
-//  //        when(accountMapper.mapToDto(any(Account.class))).thenReturn(accountDto);
-//  //
-//  //        Set<AccountDto> result = accountService.getAccounts();
-//  //
-//  //        assertNotNull(result);
-//  //        assertEquals(1, result.size());
-//  //        assertTrue(result.contains(accountDto));
-//  //    }
-//  //
-//  //    @Test
-//  //    void getAccountFilter_returnsAccountsByRole() {
-//  //        Set<String> roles = Set.of("USER");
-//  //        when(roleRepository.findRolesByRoleNameIn(anySet())).thenReturn(Set.of(role));
-//  //        when(role.getAccounts()).thenReturn(Set.of(account));
-//  //        when(accountMapper.mapToDto(any(Account.class))).thenReturn(accountDto);
-//  //
-//  //        Set<AccountDto> result = accountService.getAccountFilter(roles, null, null);
-//  //
-//  //        assertNotNull(result);
-//  //        assertEquals(1, result.size());
-//  //        assertTrue(result.contains(accountDto));
-//  //    }
-//}
+package com.github.ngodat0103.yamp.authsvc.service;
+
+import static com.github.ngodat0103.yamp.authsvc.Util.*;
+import static org.mockito.BDDMockito.*;
+
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRegisterDto;
+import com.github.ngodat0103.yamp.authsvc.dto.account.AccountResponseDto;
+import com.github.ngodat0103.yamp.authsvc.dto.kafka.AccountTopicContent;
+import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
+import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapperImpl;
+import com.github.ngodat0103.yamp.authsvc.exception.ConflictException;
+import com.github.ngodat0103.yamp.authsvc.exception.NotFoundException;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.Account;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.Role;
+import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
+import com.github.ngodat0103.yamp.authsvc.persistence.repository.RoleRepository;
+import com.github.ngodat0103.yamp.authsvc.service.impl.AccountServiceImpl;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Profile;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@ExtendWith(MockitoExtension.class)
+@Profile("uni-test")
+class AccountServiceTest {
+
+  private AccountRepository accountRepository;
+  private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+  private RoleRepository roleRepository;
+
+  private AccountServiceImpl accountService;
+
+  private AccountRegisterDto accountRegisterDtoMock;
+  private AccountResponseDto accountResponseDtoMock;
+  private Account account;
+  private Role role;
+
+  private static final String uuidMock = UUID.randomUUID().toString();
+  private static final String defaultRoleName = "CUSTOMER";
+
+    @BeforeEach
+  void setUp() {
+    this.roleRepository = Mockito.mock(RoleRepository.class);
+        KafkaTemplate<UUID, AccountTopicContent> kafkaTemplate = Mockito.mock(KafkaTemplate.class);
+    this.accountRepository = Mockito.mock(AccountRepository.class);
+      AccountMapper accountMapper = new AccountMapperImpl();
+    this.accountService =
+        new AccountServiceImpl(
+            accountRepository, accountMapper, passwordEncoder, roleRepository, kafkaTemplate);
+    this.accountRegisterDtoMock =
+        AccountRegisterDto.builder()
+            .username("test")
+            .password("password")
+            .email("example@gmail.com")
+            .build();
+    this.accountResponseDtoMock =
+        AccountResponseDto.builder()
+            .uuid(uuidMock)
+            .username(accountRegisterDtoMock.getUsername())
+            .email(accountRegisterDtoMock.getEmail())
+            .roleName(defaultRoleName)
+            .build();
+    this.account = accountMapper.mapToEntity(accountRegisterDtoMock);
+    this.role = new Role();
+    role.setRoleName(defaultRoleName);
+    role.setUuid(UUID.randomUUID());
+    role.setCreateAt(LocalDateTime.now());
+    role.setLastModifiedAt(LocalDateTime.now());
+  }
+
+  @Test
+  @DisplayName(
+      "Given already existing account with email, when register, then throw ConflictException")
+  void giveAccountUsernameExists_whenRegister_thenThrowConflict() {
+    given(accountRepository.existsByUsername(account.getUsername())).willReturn(true);
+    Assertions.assertThatThrownBy(() -> accountService.register(accountRegisterDtoMock))
+        .isInstanceOf(ConflictException.class)
+        .hasMessageContaining(
+            String.format(TEMPLATE_CONFLICT, "Account", "username", account.getUsername()));
+  }
+
+  @Test
+  @DisplayName(
+      "Given already existing account with email, when register, then throw ConflictException")
+  void giveAccountEmailExists_whenRegister_thenThrowConflict() {
+    given(accountRepository.existsByUsername(account.getUsername())).willReturn(false);
+    given(accountRepository.existsByEmail(account.getEmail())).willReturn(true);
+    Assertions.assertThatThrownBy(() -> accountService.register(accountRegisterDtoMock))
+        .isInstanceOf(ConflictException.class)
+        .hasMessageContaining(
+            String.format(TEMPLATE_CONFLICT, "Account", "email", account.getEmail()));
+  }
+
+  @Test
+  @DisplayName(
+      "Given not exists account but not exists role when register then throw NotFoundException")
+  void givenRoleNotExists_whenRegister_thenThrowNotFoundException() {
+    given(accountRepository.existsByUsername(account.getUsername())).willReturn(false);
+    given(accountRepository.existsByEmail(account.getEmail())).willReturn(false);
+    given(roleRepository.findRoleByRoleName(defaultRoleName))
+        .willReturn(java.util.Optional.empty());
+    Assertions.assertThatThrownBy(() -> accountService.register(accountRegisterDtoMock))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining(
+            String.format(TEMPLATE_NOT_FOUND, "Role", "roleName", defaultRoleName));
+  }
+
+  @Test
+  @DisplayName("Given an exist role when register then saved account")
+  void givenAccountDto_whenRegister_thenReturnSavedAccountDto() {
+    given(accountRepository.existsByUsername(account.getUsername())).willReturn(false);
+    given(accountRepository.existsByEmail(account.getEmail())).willReturn(false);
+    given(roleRepository.findRoleByRoleName(any(String.class)))
+        .willReturn(java.util.Optional.of(role));
+    Account accountResponse = new Account();
+    accountResponse.setUuid(UUID.fromString(uuidMock));
+    accountResponse.setUsername(account.getUsername());
+    accountResponse.setPassword(account.getPassword());
+    accountResponse.setEmail(account.getEmail());
+    accountResponse.setRole(role);
+    accountResponse.setCreateAt(LocalDateTime.now());
+    accountResponse.setLastModifiedAt(LocalDateTime.now());
+
+    given(accountRepository.save(any(Account.class))).willReturn(accountResponse);
+    AccountResponseDto result = accountService.register(accountRegisterDtoMock);
+    Assertions.assertThat(result).isNotNull();
+    Assertions.assertThat(result).isEqualTo(accountResponseDtoMock);
+    verify(accountRepository).save(any(Account.class));
+    //    verify(kafkaTemplate.send("authsvc-topic",any(UUID.class),
+    // any(AccountTopicContent.class)));
+  }
+}

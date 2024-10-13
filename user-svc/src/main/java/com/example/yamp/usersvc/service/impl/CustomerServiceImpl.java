@@ -69,7 +69,7 @@ public class CustomerServiceImpl implements CustomerService {
   @Override
   public CustomerDto getCustomer(UUID uuid) throws AccountNotFoundException {
     Customer customer = customerRepository.findCustomerByCustomerUuid(uuid)
-            .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+            .orElseThrow(() -> new AccountNotFoundException("Customer not found"));
     Account account = loadAccount(uuid);
     CustomerDto customerDto = customerMapper.mapToDto(customer);
     customerDto.setAccount(customerMapper.mapToDto(account));

@@ -16,14 +16,11 @@ import com.example.yamp.usersvc.persistence.entity.Account;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
 import com.example.yamp.usersvc.service.impl.CustomerServiceImpl;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -33,12 +30,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.json.BasicJsonTester;
-import org.springframework.boot.test.json.JsonContent;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)

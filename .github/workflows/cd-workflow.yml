@@ -3,13 +3,13 @@ on:
 #  release:
 #    types: [prereleased,released]
   push:
-#    branches:
-#      - master
-#    paths:
-#      - "auth-svc/pom.xml"
-#      - "gateway-svc/pom.xml"
-#      - "product-svc/pom.xml"
-#      - "user-svc/pom.xml"
+    branches:
+      - master
+    paths:
+      - "auth-svc/pom.xml"
+      - "gateway-svc/pom.xml"
+      - "product-svc/pom.xml"
+      - "user-svc/pom.xml"
 jobs:
 #  prepare:
 #    name: Get current tag version

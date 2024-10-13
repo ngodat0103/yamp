@@ -16,7 +16,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CustomerDto {
-  @JsonIgnore private UUID accountUuid;
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+  private UUID accountUuid;
   AccountDto account;
 
   @NotNull(message = "First name should not be null")

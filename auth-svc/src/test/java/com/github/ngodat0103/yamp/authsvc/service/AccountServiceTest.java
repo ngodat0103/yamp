@@ -47,12 +47,12 @@ class AccountServiceTest {
   private static final String uuidMock = UUID.randomUUID().toString();
   private static final String defaultRoleName = "CUSTOMER";
 
-    @BeforeEach
+  @BeforeEach
   void setUp() {
     this.roleRepository = Mockito.mock(RoleRepository.class);
-        KafkaTemplate<UUID, AccountTopicContent> kafkaTemplate = Mockito.mock(KafkaTemplate.class);
+    KafkaTemplate<UUID, AccountTopicContent> kafkaTemplate = Mockito.mock(KafkaTemplate.class);
     this.accountRepository = Mockito.mock(AccountRepository.class);
-      AccountMapper accountMapper = new AccountMapperImpl();
+    AccountMapper accountMapper = new AccountMapperImpl();
     this.accountService =
         new AccountServiceImpl(
             accountRepository, accountMapper, passwordEncoder, roleRepository, kafkaTemplate);

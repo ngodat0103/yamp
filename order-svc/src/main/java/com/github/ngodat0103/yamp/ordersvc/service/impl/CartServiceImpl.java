@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 public class CartServiceImpl implements CartService {
 
   private final CartRepository cartRepository;
-  private final WebClient webClient;
+  private final WebClient userSvcWebClient;
   private final CartMapper cartMapper;
 
   @Override
@@ -31,13 +31,19 @@ public class CartServiceImpl implements CartService {
     log.info("*** CartDto List, service; fetch all carts *");
     return this.cartRepository.findAll().stream()
         .map(cartMapper::toDto)
-        .peek(c -> {
-          Mono<UserDto> userDtoMono = this.webClient.get()
-              .uri(AppConstant.DiscoveredDomainsApi.USER_SERVICE_API_URL + "/" + c.getUserDto().getUserId())
-              .retrieve()
-              .bodyToMono(UserDto.class);
-          c.setUserDto(userDtoMono.block());
-        })
+        .peek(
+            c -> {
+              Mono<UserDto> userDtoMono =
+                  this.userSvcWebClient
+                      .get()
+                      .uri(
+                          AppConstant.DiscoveredDomainsApi.USER_SERVICE_API_URL
+                              + "/"
+                              + c.getUserDto().getUserId())
+                      .retrieve()
+                      .bodyToMono(UserDto.class);
+              c.setUserDto(userDtoMono.block());
+            })
         .toList();
   }
 
@@ -47,15 +53,22 @@ public class CartServiceImpl implements CartService {
     return this.cartRepository
         .findById(cartId)
         .map(cartMapper::toDto)
-        .map(c -> {
-          Mono<UserDto> userDtoMono = this.webClient.get()
-              .uri(AppConstant.DiscoveredDomainsApi.USER_SERVICE_API_URL + "/" + c.getUserDto().getUserId())
-              .retrieve()
-              .bodyToMono(UserDto.class);
-          c.setUserDto(userDtoMono.block());
-          return c;
-        })
-        .orElseThrow(() -> new CartNotFoundException(String.format("Cart with id: %d not found", cartId)));
+        .map(
+            c -> {
+              Mono<UserDto> userDtoMono =
+                  this.userSvcWebClient
+                      .get()
+                      .uri(
+                          AppConstant.DiscoveredDomainsApi.USER_SERVICE_API_URL
+                              + "/"
+                              + c.getUserDto().getUserId())
+                      .retrieve()
+                      .bodyToMono(UserDto.class);
+              c.setUserDto(userDtoMono.block());
+              return c;
+            })
+        .orElseThrow(
+            () -> new CartNotFoundException(String.format("Cart with id: %d not found", cartId)));
   }
 
   @Override

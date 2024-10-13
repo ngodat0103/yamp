@@ -24,16 +24,16 @@ public class Listener {
 
   private final CustomerService customerService;
 
-
   @KafkaHandler(isDefault = true)
   private void authsvcHandler(ConsumerRecord<UUID, String> message) throws JsonProcessingException {
     UUID accountUuid = message.key();
-    AccountTopicContent accountTopicContent = objectMapper.readValue(message.value(), AccountTopicContent.class);
+    AccountTopicContent accountTopicContent =
+        objectMapper.readValue(message.value(), AccountTopicContent.class);
     Action action = accountTopicContent.action();
-      log.debug("Received message from authsvc-topic: {}",accountTopicContent);
+    log.debug("Received message from authsvc-topic: {}", accountTopicContent);
 
-    if(action.equals(Action.CREATE)) {
-      customerService.create(accountUuid,accountTopicContent);
+    if (action.equals(Action.CREATE)) {
+      customerService.create(accountUuid, accountTopicContent);
       return;
     }
     if (action.equals(Action.DELETE) || action.equals(Action.UPDATE)) {

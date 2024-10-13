@@ -52,7 +52,7 @@ public class CustomerServiceTest {
   private static final String email = "example@gmail.com";
   private static final String firstName = "John";
   private static final String lastName = "Doe";
-  private static final UUID customerUuid = UUID.fromString("1a35d863-0cd9-4bc1-8cc4-f4cddca97721");
+  private static final UUID customerUuidMock = UUID.fromString("1a35d863-0cd9-4bc1-8cc4-f4cddca97721");
   private CustomerRegisterDto customerRegisterDto;
   private final ClassLoader classLoader = getClass().getClassLoader();
   private CustomerMapper customerMapper;
@@ -65,69 +65,13 @@ public class CustomerServiceTest {
     this.customerMapper = new CustomerMapperImpl();
     this.customerServiceImpl =
         new CustomerServiceImpl(customerRepository, authSvcRepository, customerMapper, webClient);
-    this.customerRegisterDto =
-        CustomerRegisterDto.builder()
-            .username(username)
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(email)
-            .password(password)
-            .build();
     Customer customerMockResponse = new Customer();
-    customerMockResponse.setCustomerUuid(customerUuid);
+    customerMockResponse.setCustomerUuid(customerUuidMock);
     customerMockResponse.setFirstName(firstName);
     customerMockResponse.setLastName(lastName);
     given(customerRepository.save(any(Customer.class))).willReturn(customerMockResponse);
   }
 
-//  @Test
-//  @DisplayName("Register a new customer")
-//  void givenRegisterDto_whenCreate_thenReturnSuccessfulCustomer()
-//      throws IOException, InterruptedException {
-//    // given
-//    InputStream inputStream =
-//        classLoader.getResourceAsStream("mockresponse/accountRegisterSuccessful.json");
-//    assertThat(inputStream).isNotNull();
-//    mockWebServer.enqueue(
-//        new MockResponse()
-//            .setResponseCode(201)
-//            .addHeader("Content-Type", "application/json")
-//            .setBody(new String(inputStream.readAllBytes())));
-//
-//    inputStream.close();
-//
-//    // when
-//    customerServiceImpl.create(customerRegisterDto);
-//
-//    // then
-//    RecordedRequest recordedRequest = mockWebServer.takeRequest();
-//    JsonContent<Object> body = jsonTester.from(recordedRequest.getBody().readUtf8());
-//    assertThat(body).extractingJsonPathValue("$.username").isEqualTo(username);
-//    assertThat(body).extractingJsonPathValue("$.email").isEqualTo(email);
-//    assertThat(body).extractingJsonPathStringValue("$.uuid").isNotEmpty();
-//  }
-
-//  @Test
-//  @DisplayName("Register a new customer but conflict at auth-service")
-//  void givenConflictRegisterAccountDto_whenCreate_thenThrowWebClientResponseException()
-//      throws IOException {
-//    // given
-//    InputStream inputStream =
-//        classLoader.getResourceAsStream("mockresponse/accountRegisterReturnConflict.json");
-//    assertThat(inputStream).isNotNull();
-//    mockWebServer.enqueue(
-//        new MockResponse()
-//            .setResponseCode(409)
-//            .addHeader("Content-Type", "application/json")
-//            .setBody(new String(inputStream.readAllBytes())));
-//
-//    inputStream.close();
-//
-//    // when & then
-//    assertThatThrownBy(() -> customerServiceImpl.create(customerRegisterDto))
-//        .isInstanceOf(WebClientResponseException.class)
-//        .hasMessageContaining("409 Conflict");
-//  }
 
   @Test
   @DisplayName("Get customer details")
@@ -136,10 +80,10 @@ public class CustomerServiceTest {
   void givenCustomerExists_whenGetCustomer_thenReturnCustomerDto() {
     // given
     Customer customer = new Customer();
-    customer.setCustomerUuid(customerUuid);
+    customer.setCustomerUuid(customerUuidMock);
     customer.setFirstName(firstName);
     customer.setLastName(lastName);
-    given(customerRepository.findCustomerByCustomerUuid(customerUuid))
+    given(customerRepository.findCustomerByCustomerUuid(customerUuidMock))
         .willReturn(Optional.of(customer));
 
     Account account = new Account();
@@ -151,7 +95,7 @@ public class CustomerServiceTest {
 
     // then
     assertThat(customerDto).isNotNull();
-    then(customerRepository).should().findCustomerByCustomerUuid(customerUuid);
+    then(customerRepository).should().findCustomerByCustomerUuid(customerUuidMock);
   }
 
   @Test
@@ -160,7 +104,7 @@ public class CustomerServiceTest {
   @Disabled(value = "auth-svc not implement")
   void givenCustomerNotFound_whenGetCustomer_thenThrowNotFoundException() {
     // given
-    given(customerRepository.findCustomerByCustomerUuid(customerUuid)).willReturn(Optional.empty());
+    given(customerRepository.findCustomerByCustomerUuid(customerUuidMock)).willReturn(Optional.empty());
     // when & then
     assertThatThrownBy(() -> customerServiceImpl.getCustomer())
         .isInstanceOf(NotFoundException.class);

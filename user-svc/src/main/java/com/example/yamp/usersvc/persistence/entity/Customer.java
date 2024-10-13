@@ -12,8 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Customer {
-  @Id
-  private UUID customerUuid;
+  @Id private UUID customerUuid;
 
   @Column(nullable = false)
   private String firstName;

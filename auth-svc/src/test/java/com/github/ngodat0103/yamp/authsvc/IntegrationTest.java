@@ -3,7 +3,6 @@ package com.github.ngodat0103.yamp.authsvc;
 import com.github.ngodat0103.yamp.authsvc.dto.RoleDto;
 import com.github.ngodat0103.yamp.authsvc.dto.account.AccountRegisterDto;
 import com.github.ngodat0103.yamp.authsvc.dto.account.AccountResponseDto;
-import com.github.ngodat0103.yamp.authsvc.dto.mapper.AccountMapper;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Role;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.RoleRepository;

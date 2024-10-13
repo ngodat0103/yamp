@@ -3,9 +3,8 @@ package com.example.yamp.usersvc.service.impl;
 import static com.example.yamp.usersvc.Util.*;
 
 import com.example.yamp.usersvc.cache.AuthSvcRepository;
-import com.example.yamp.usersvc.dto.customer.AccountRegisterDto;
 import com.example.yamp.usersvc.dto.customer.CustomerDto;
-import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
+import com.example.yamp.usersvc.dto.kafka.AccountTopicContent;
 import com.example.yamp.usersvc.dto.mapper.CustomerMapper;
 import com.example.yamp.usersvc.persistence.entity.Account;
 import com.example.yamp.usersvc.persistence.entity.Customer;
@@ -14,6 +13,7 @@ import com.example.yamp.usersvc.service.CustomerService;
 import jakarta.transaction.Transactional;
 import java.util.UUID;
 import java.util.function.Consumer;
+import javax.security.auth.login.AccountNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -31,32 +31,19 @@ public class CustomerServiceImpl implements CustomerService {
   private final CustomerMapper customerMapper;
   private final WebClient webClient;
   private static final String ACCOUNT_PATH = "/accounts";
-  private static final String DEFAULT_ROLE = "CUSTOMER";
 
   @Transactional
   @Override
-  public void register(CustomerRegisterDto customerRegisterDto) {
-    Customer customer = customerMapper.mapToEntity(customerRegisterDto);
+  public void create(UUID customerUuid, AccountTopicContent accountTopicContent) {
+    if (customerRepository.findCustomerByCustomerUuid(customerUuid).isPresent()) {
+      log.debug("customerUuid: {} already exists", customerUuid);
+      return;
+    }
+    Customer newCustomer = customerMapper.MapToCustomerEntity(accountTopicContent);
+    newCustomer.setCustomerUuid(customerUuid);
 
-    customer = customerRepository.save(customer);
-    AccountRegisterDto accountRegisterDtoRequest =
-        customerMapper.maptoAccountRegisterDto(customerRegisterDto);
-    accountRegisterDtoRequest.setPassword(customerRegisterDto.getPassword());
-    accountRegisterDtoRequest.setUuid(customer.getCustomerUuid());
-    accountRegisterDtoRequest.setRoleName(DEFAULT_ROLE);
-    log.debug(
-        "New customerUuid {} saved but not commit, wait for auth-svc response",
-        customer.getCustomerUuid());
-    webClient
-        .post()
-        .uri(ACCOUNT_PATH)
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)
-        .bodyValue(accountRegisterDtoRequest)
-        .retrieve()
-        .bodyToMono(AccountRegisterDto.class)
-        .doOnError(getOnError(customer.getCustomerUuid()))
-        .block();
+    customerRepository.save(newCustomer);
+    log.debug("newCustomer: {} saved to database", customerUuid);
   }
 
   @Override
@@ -67,30 +54,24 @@ public class CustomerServiceImpl implements CustomerService {
             .findCustomerByCustomerUuid(customerUuid)
             .orElseThrow(notFoundExceptionSupplier(log, "Customer", "customerUuid", customerUuid));
 
-    Account account = checkRedisCache(customerUuid);
-    if (account != null) {
-      log.debug("Cache hit,get account with {} from redis cache", customerUuid);
-      CustomerDto customerDto = customerMapper.mapToDto(customer);
-      customerDto.setAccount(customerMapper.mapToDto(account));
-      return customerDto;
-    }
-
-    log.debug("Cache miss, get account with {} by invoking auth-svc endpoint", customerUuid);
-    account =
-        webClient
-            .get()
-            .uri(ACCOUNT_PATH + "/" + customerUuid)
-            .accept(MediaType.APPLICATION_JSON)
-            .retrieve()
-            .bodyToMono(Account.class)
-            .doOnError(getOnError(customerUuid))
-            .block();
-
+    Account account = loadAccount(customerUuid);
     assert account != null;
     authSvcRepository.save(account);
-    CustomerDto customerDto = customerMapper.mapToDto(customer);
-    customerDto.setAccount(customerMapper.mapToDto(account));
+    CustomerDto customerDto = customerMapper.mapToCustomerDto(customer);
+    customerDto.setAccountDto(customerMapper.mapToAccountDto(account));
     log.debug("Fetching successful,Account with {} saved to redis cache", customerUuid);
+    return customerDto;
+  }
+
+  @Override
+  public CustomerDto getCustomer(UUID uuid) throws AccountNotFoundException {
+    Customer customer =
+        customerRepository
+            .findCustomerByCustomerUuid(uuid)
+            .orElseThrow(() -> new AccountNotFoundException("Customer not found"));
+    Account account = loadAccount(uuid);
+    CustomerDto customerDto = customerMapper.mapToCustomerDto(customer);
+    customerDto.setAccountDto(customerMapper.mapToAccountDto(account));
     return customerDto;
   }
 
@@ -105,6 +86,32 @@ public class CustomerServiceImpl implements CustomerService {
       }
       log.debug("Roll back customer creation for customerUUid: {}", customerUuid);
     };
+  }
+
+  private Account loadAccount(UUID customerUuid) {
+    Account account = checkRedisCache(customerUuid);
+    if (account != null) {
+      if (log.isDebugEnabled()) {
+        log.debug("Cache hit,get account with {} from cache", customerUuid);
+      }
+      return account;
+    }
+    log.debug("Cache miss,fetching account with {} from auth-svc", customerUuid);
+    account =
+        webClient
+            .get()
+            .uri(ACCOUNT_PATH + "/" + customerUuid)
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .bodyToMono(Account.class)
+            .doOnError(getOnError(customerUuid))
+            .block();
+    assert account != null;
+    if (log.isDebugEnabled()) {
+      log.debug("Save Account {} to cache", customerUuid);
+    }
+    authSvcRepository.save(account);
+    return account;
   }
 
   private Account checkRedisCache(UUID customerUuid) {

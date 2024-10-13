@@ -11,4 +11,4 @@
 /example/kubernetes/ghcr-secret.yaml
 /development-environment/docker/init.sql
 /kafka/
-/kafka/
+*ghcr-secret.yml

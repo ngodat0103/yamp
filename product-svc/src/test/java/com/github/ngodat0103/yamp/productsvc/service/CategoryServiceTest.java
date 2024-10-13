@@ -1,306 +1,272 @@
 package com.github.ngodat0103.yamp.productsvc.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
 
-import com.github.ngodat0103.yamp.productsvc.CustomerTestWithMockUser;
 import com.github.ngodat0103.yamp.productsvc.dto.PageDto;
 import com.github.ngodat0103.yamp.productsvc.dto.category.CategoryDtoRequest;
 import com.github.ngodat0103.yamp.productsvc.dto.category.CategoryDtoResponse;
 import com.github.ngodat0103.yamp.productsvc.dto.mapper.CategoryMapper;
-import com.github.ngodat0103.yamp.productsvc.dto.mapper.CategoryMapperImpl;
 import com.github.ngodat0103.yamp.productsvc.exception.ConflictException;
 import com.github.ngodat0103.yamp.productsvc.exception.NotFoundException;
 import com.github.ngodat0103.yamp.productsvc.persistence.entity.Category;
 import com.github.ngodat0103.yamp.productsvc.persistence.repository.CategoryRepository;
 import com.github.ngodat0103.yamp.productsvc.service.impl.CategoryServiceImpl;
 import com.github.slugify.Slugify;
-import java.util.Locale;
-import java.util.UUID;
-import org.junit.jupiter.api.*;
+import java.util.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("unit-test")
-@Disabled("Unit test still in progress")
 class CategoryServiceTest {
-  private CategoryService categoryService;
-  private CategoryRepository categoryRepository;
+
+  @InjectMocks private CategoryServiceImpl categoryService;
+
+  @Mock private CategoryRepository categoryRepository;
+
+  @Mock private CategoryMapper categoryMapper;
+
+  @Mock private Slugify slugify;
+
+  @Mock private SecurityContext securityContext;
+
+  @Mock private Authentication authentication;
+
   private CategoryDtoRequest categoryDtoRequest;
   private Category category;
-  private UUID parentCategoryUuid;
+  private CategoryDtoResponse categoryDtoResponse;
+  private UUID categoryUuid;
 
   @BeforeEach
   void setUp() {
-    this.categoryRepository = Mockito.mock(CategoryRepository.class);
-    CategoryMapper categoryMapper = new CategoryMapperImpl();
-    Locale locale = new Locale("vi", "VN");
-    Slugify slugify = Slugify.builder().locale(locale).lowerCase(true).build();
-    this.categoryService = new CategoryServiceImpl(categoryRepository, categoryMapper, slugify);
-    Category category = new Category();
-    category.setUuid(UUID.randomUUID());
-    category.setName("Category test");
-    category.setSlugName("category-test");
-    category.setThumbnailUrl("https://example.com/thumbnail.jpg");
-    category.setParentCategoryUuid(UUID.randomUUID());
-    this.parentCategoryUuid = category.getParentCategoryUuid();
-    this.category = category;
-
-    this.categoryDtoRequest =
+    categoryDtoRequest =
         CategoryDtoRequest.builder()
-            .name("Category test")
-            .parentCategoryUuid(category.getParentCategoryUuid().toString())
+            .name("Test Category")
+            .parentCategoryUuid(UUID.randomUUID().toString())
             .build();
+
+    category = new Category(UUID.randomUUID());
+    category.setName("Test Category");
+    category.setSlugName("test-category");
+
+    categoryDtoResponse =
+        CategoryDtoResponse.builder()
+            .uuid(UUID.randomUUID())
+            .name("Test Category")
+            .slugName("test-category")
+            .build();
+
+    categoryUuid = UUID.randomUUID();
+
+    // Mock SecurityContext and Authentication
+    lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
+    SecurityContextHolder.setContext(securityContext);
+    lenient().when(authentication.getName()).thenReturn(UUID.randomUUID().toString());
   }
 
   @Test
-  @DisplayName("Call service but not contain Authentication object")
-  void givenNoAuthentication_whenCreateCategory_thenThrowIllegalArgumentException() {
-    Exception exceptionForCreate =
-        Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> {
-              categoryService.createCategory(categoryDtoRequest);
-            });
-    Exception exceptionForUpdate =
-        Assertions.assertThrows(
-            IllegalArgumentException.class,
-            () -> {
-              categoryService.updateCategory(UUID.randomUUID(), categoryDtoRequest);
-            });
-    Assertions.assertAll(
-        () ->
-            Assertions.assertEquals(
-                "Authentication object is required", exceptionForCreate.getMessage()),
-        () ->
-            Assertions.assertEquals(
-                "Authentication object is required", exceptionForUpdate.getMessage()));
+  void testCreateCategoryWhenCategoryWithSameNameExistsThenThrowConflictException() {
+    // Arrange
+    given(categoryRepository.existsByName(anyString())).willReturn(true);
+
+    // Act & Assert
+    assertThatThrownBy(() -> categoryService.createCategory(categoryDtoRequest))
+        .isInstanceOf(ConflictException.class);
+
+    then(categoryRepository).should(times(1)).existsByName(anyString());
   }
 
-  @CustomerTestWithMockUser
-  @DisplayName(
-      "Given a CategoryDto, when creating a category, then throw ConflictException if the category name already exists")
-  public void givenCategoryDto_whenCreateCategory_thenThrowConflictException() {
-    given(categoryRepository.existsByName(categoryDtoRequest.getName())).willReturn(true);
-    Exception exception =
-        Assertions.assertThrows(
-            ConflictException.class,
-            () -> {
-              categoryService.createCategory(categoryDtoRequest);
-            });
-    String message =
-        String.format("Category with name: \"%s\" already exists", categoryDtoRequest.getName());
-    Assertions.assertEquals(message, exception.getMessage());
-    then(categoryRepository).should().existsByName(categoryDtoRequest.getName());
+  @Test
+  void testCreateCategoryWhenParentCategoryDoesNotExistThenThrowNotFoundException() {
+    // Arrange
+    given(categoryRepository.existsByName(anyString())).willReturn(false);
+    given(categoryRepository.existsById(any(UUID.class))).willReturn(false);
+
+    // Act & Assert
+    assertThatThrownBy(() -> categoryService.createCategory(categoryDtoRequest))
+        .isInstanceOf(NotFoundException.class);
+
+    then(categoryRepository).should(times(1)).existsByName(anyString());
+    then(categoryRepository).should(times(1)).existsById(any(UUID.class));
   }
 
-  @CustomerTestWithMockUser
-  @DisplayName(
-      "Given a CategoryDto, when creating a category, then throw NotFoundException if the parent category does not exist")
-  public void givenCategoryDto_whenCreateCategory_thenThrowNotFoundException() {
-    given(categoryRepository.existsByName(categoryDtoRequest.getName())).willReturn(false);
-    given(categoryRepository.existsById(this.parentCategoryUuid)).willReturn(false);
-    Exception exception =
-        Assertions.assertThrows(
-            NotFoundException.class,
-            () -> {
-              categoryService.createCategory(categoryDtoRequest);
-            });
-    Assertions.assertEquals(
-        "Category with parentCategoryUuid: "
-            + categoryDtoRequest.getParentCategoryUuid()
-            + " not found",
-        exception.getMessage());
-    then(categoryRepository).should().existsByName(categoryDtoRequest.getName());
-    then(categoryRepository)
-        .should()
-        .existsById(UUID.fromString(categoryDtoRequest.getParentCategoryUuid()));
-  }
-
-  @CustomerTestWithMockUser
-  @DisplayName("Given a CategoryDto, when creating a category, then return a CategoryDto")
-  public void givenCategoryDto_whenCreateCategory_thenReturnCategoryDto() {
-    given(categoryRepository.existsByName(this.categoryDtoRequest.getName())).willReturn(false);
-    given(
-            categoryRepository.existsById(
-                UUID.fromString(categoryDtoRequest.getParentCategoryUuid())))
-        .willReturn(true);
+  @Test
+  void testCreateCategoryWhenCategoryIsSuccessfullyCreatedThenReturnCategoryDtoResponse() {
+    // Arrange
+    given(categoryRepository.existsByName(anyString())).willReturn(false);
+    given(categoryRepository.existsById(any(UUID.class))).willReturn(true);
+    given(categoryMapper.mapToEntity(any(CategoryDtoRequest.class), any(UUID.class)))
+        .willReturn(category);
+    given(slugify.slugify(anyString())).willReturn("test-category");
     given(categoryRepository.save(any(Category.class))).willReturn(category);
-    CategoryDtoResponse categoryDtoResponse =
-        categoryService.createCategory(this.categoryDtoRequest);
-    Assertions.assertNotNull(categoryDtoResponse);
-    then(categoryRepository).should().existsByName(categoryDtoResponse.getName());
-    then(categoryRepository).should().existsById(categoryDtoResponse.getParentCategoryUuid());
-    then(categoryRepository).should().save(any(Category.class));
+    given(categoryMapper.mapToDto(any(Category.class))).willReturn(categoryDtoResponse);
+
+    // Act
+    CategoryDtoResponse response = categoryService.createCategory(categoryDtoRequest);
+
+    // Assert
+    assertThat(response).isEqualTo(categoryDtoResponse);
+
+    then(categoryRepository).should(times(1)).existsByName(anyString());
+    then(categoryRepository).should(times(1)).existsById(any(UUID.class));
+    then(categoryMapper)
+        .should(times(1))
+        .mapToEntity(any(CategoryDtoRequest.class), any(UUID.class));
+    then(slugify).should(times(1)).slugify(anyString());
+    then(categoryRepository).should(times(1)).save(any(Category.class));
+    then(categoryMapper).should(times(1)).mapToDto(any(Category.class));
   }
 
-  @CustomerTestWithMockUser
-  @DisplayName(
-      "Given a CategoryDto, when updating a category, then throw NotFoundException if the category does not exist")
-  public void givenCategoryDto_whenUpdateCategory_thenThrowNotFoundException() {
-    given(categoryRepository.findById(category.getUuid())).willReturn(java.util.Optional.empty());
-    Exception exception =
-        Assertions.assertThrows(
-            NotFoundException.class,
-            () -> {
-              categoryService.updateCategory(category.getUuid(), categoryDtoRequest);
-            });
-    Assertions.assertEquals("Category not found", exception.getMessage());
+  @Test
+  void testUpdateCategoryWhenCategoryDoesNotExistThenThrowNotFoundException() {
+    // Arrange
+    given(categoryRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+    // Act & Assert
+    assertThatThrownBy(() -> categoryService.updateCategory(categoryUuid, categoryDtoRequest))
+        .isInstanceOf(NotFoundException.class);
+
+    then(categoryRepository).should(times(1)).findById(any(UUID.class));
   }
 
-  @CustomerTestWithMockUser
-  @DisplayName(
-      "Given a CategoryDto, when updating a category, then throw NotFoundException if the parent category does not exist")
-  public void givenCategoryDto_whenUpdateCategory_thenThrowNotFoundExceptionIfParentNotExists() {
-    given(categoryRepository.findById(category.getUuid()))
-        .willReturn(java.util.Optional.of(category));
-    given(categoryRepository.existsById(this.parentCategoryUuid)).willReturn(false);
-    Exception exception =
-        Assertions.assertThrows(
-            NotFoundException.class,
-            () -> {
-              categoryService.updateCategory(category.getUuid(), categoryDtoRequest);
-            });
-    String message =
-        String.format(
-            "Category with parentCategoryUuid: %s not found",
-            categoryDtoRequest.getParentCategoryUuid());
-    Assertions.assertEquals(message, exception.getMessage());
+  @Test
+  void testUpdateCategoryWhenParentCategoryDoesNotExistThenThrowNotFoundException() {
+    // Arrange
+    given(categoryRepository.findById(any(UUID.class))).willReturn(Optional.of(category));
+    given(categoryRepository.existsById(any(UUID.class))).willReturn(false);
+
+    // Act & Assert
+    assertThatThrownBy(() -> categoryService.updateCategory(categoryUuid, categoryDtoRequest))
+        .isInstanceOf(NotFoundException.class);
+
+    then(categoryRepository).should(times(1)).findById(any(UUID.class));
+    then(categoryRepository).should(times(1)).existsById(any(UUID.class));
   }
 
-  @CustomerTestWithMockUser
-  @DisplayName("Given a CategoryDto, when updating a category, then return a CategoryDto")
-  public void givenCategoryDto_whenUpdateCategory_thenReturnCategoryDto() {
-    given(categoryRepository.findById(category.getUuid()))
-        .willReturn(java.util.Optional.of(category));
-    given(categoryRepository.existsById(this.parentCategoryUuid)).willReturn(true);
+  @Test
+  void testUpdateCategoryWhenCategoryIsSuccessfullyUpdatedThenReturnCategoryDtoResponse() {
+    // Arrange
+    given(categoryRepository.findById(any(UUID.class))).willReturn(Optional.of(category));
+    given(categoryRepository.existsById(any(UUID.class))).willReturn(true);
+    given(slugify.slugify(anyString())).willReturn("test-category");
     given(categoryRepository.save(any(Category.class))).willReturn(category);
-    CategoryDtoResponse categoryDtoResponse =
-        categoryService.updateCategory(category.getUuid(), this.categoryDtoRequest);
-    Assertions.assertNotNull(categoryDtoResponse);
-    then(categoryRepository).should().findById(category.getUuid());
-    then(categoryRepository).should().existsById(categoryDtoResponse.getParentCategoryUuid());
-    then(categoryRepository).should().save(any(Category.class));
+    given(categoryMapper.mapToDto(any(Category.class))).willReturn(categoryDtoResponse);
+
+    // Act
+    CategoryDtoResponse response = categoryService.updateCategory(categoryUuid, categoryDtoRequest);
+
+    // Assert
+    assertThat(response).isEqualTo(categoryDtoResponse);
+
+    then(categoryRepository).should(times(1)).findById(any(UUID.class));
+    then(categoryRepository).should(times(1)).existsById(any(UUID.class));
+    then(slugify).should(times(1)).slugify(anyString());
+    then(categoryRepository).should(times(1)).save(any(Category.class));
+    then(categoryMapper).should(times(1)).mapToDto(any(Category.class));
   }
 
   @Test
-  @DisplayName(
-      "Given a category UUID, when deleting a category, then throw NotFoundException if the category does not exist")
-  void givenCategoryUuid_whenDeleteCategory_thenThrowNotFoundException() {
-    given(categoryRepository.existsById(category.getUuid())).willReturn(false);
-    Exception exception =
-        Assertions.assertThrows(
-            NotFoundException.class,
-            () -> {
-              categoryService.deleteCategory(category.getUuid());
-            });
-    Assertions.assertEquals("Category not found", exception.getMessage());
+  void testDeleteCategoryWhenCategoryDoesNotExistThenThrowNotFoundException() {
+    // Arrange
+    given(categoryRepository.existsById(any(UUID.class))).willReturn(false);
+
+    // Act & Assert
+    assertThatThrownBy(() -> categoryService.deleteCategory(categoryUuid))
+        .isInstanceOf(NotFoundException.class);
+
+    then(categoryRepository).should(times(1)).existsById(any(UUID.class));
   }
 
   @Test
-  @DisplayName("Given a category UUID, when deleting a category, then delete the category")
-  void givenCategoryUuid_whenDeleteCategory_thenDeleteCategory() {
-    given(categoryRepository.existsById(category.getUuid())).willReturn(true);
-    categoryService.deleteCategory(category.getUuid());
-    then(categoryRepository).should().deleteById(category.getUuid());
+  void testDeleteCategoryWhenCategoryIsSuccessfullyDeletedThenReturnVoid() {
+    // Arrange
+    given(categoryRepository.existsById(any(UUID.class))).willReturn(true);
+
+    // Act
+    categoryService.deleteCategory(categoryUuid);
+
+    // Assert
+    then(categoryRepository).should(times(1)).existsById(any(UUID.class));
+    then(categoryRepository).should(times(1)).deleteById(any(UUID.class));
   }
 
   @Test
-  @DisplayName(
-      "Given categorySlug, when get category by slugName, then throw NotFoundException if the category does not exist")
-  void givenCategorySlug_whenGetCategoryBySlug_thenThrowNotFoundException() {
-    given(categoryRepository.findCategoryBySlugName(category.getName()))
-        .willReturn(java.util.Optional.empty());
-    Exception exception =
-        Assertions.assertThrows(
-            NotFoundException.class,
-            () -> {
-              categoryService.getCategory(category.getName());
-            });
-    Assertions.assertEquals(
-        "Category with slugName " + category.getName() + " not found", exception.getMessage());
+  void testGetCategoryWhenCategoryDoesNotExistThenThrowNotFoundException() {
+    // Arrange
+    given(categoryRepository.findCategoryBySlugName(anyString())).willReturn(Optional.empty());
+
+    // Act & Assert
+    assertThatThrownBy(() -> categoryService.getCategory("test-category"))
+        .isInstanceOf(NotFoundException.class);
+
+    then(categoryRepository).should(times(1)).findCategoryBySlugName(anyString());
   }
 
   @Test
-  @DisplayName("Given slugName, when get category by slugName, then return a CategoryDto")
-  void givenCategoryUuid_whenGetCategoryBySlug_thenReturnCategoryDto() {
-    String slugName = category.getSlugName();
-    given(categoryRepository.findCategoryBySlugName(slugName))
-        .willReturn(java.util.Optional.of(category));
-    CategoryDtoResponse dtpResponse = categoryService.getCategory(slugName);
-    Assertions.assertNotNull(dtpResponse);
-    Assertions.assertEquals(category.getName(), dtpResponse.getName());
-    Assertions.assertEquals(category.getUuid(), dtpResponse.getUuid());
-    Assertions.assertEquals(category.getParentCategoryUuid(), dtpResponse.getParentCategoryUuid());
-    Assertions.assertEquals(category.getThumbnailUrl(), dtpResponse.getThumbnailUrl());
-    Assertions.assertEquals(category.getSlugName(), dtpResponse.getSlugName());
-    then(categoryRepository).should().findCategoryBySlugName(slugName);
+  void testGetCategoryWhenCategoryIsSuccessfullyRetrievedThenReturnCategoryDtoResponse() {
+    // Arrange
+    given(categoryRepository.findCategoryBySlugName(anyString())).willReturn(Optional.of(category));
+    given(categoryMapper.mapToDto(any(Category.class))).willReturn(categoryDtoResponse);
+
+    // Act
+    CategoryDtoResponse response = categoryService.getCategory("test-category");
+
+    // Assert
+    assertThat(response).isEqualTo(categoryDtoResponse);
+
+    then(categoryRepository).should(times(1)).findCategoryBySlugName(anyString());
+    then(categoryMapper).should(times(1)).mapToDto(any(Category.class));
   }
 
   @Test
-  @DisplayName(
-      "Given category UUID, when get category by UUID, then throw NotFoundException if the category does not exist")
-  void givenCategoryUuid_whenGetCategoryByUuid_thenThrowNotFoundException() {
-    given(categoryRepository.findById(category.getUuid())).willReturn(java.util.Optional.empty());
-    Exception exception =
-        Assertions.assertThrows(
-            NotFoundException.class,
-            () -> {
-              categoryService.getCategory(category.getUuid());
-            });
-    Assertions.assertEquals("Category not found", exception.getMessage());
+  void testGetAllCategoriesWhenThereAreNoCategoriesThenReturnEmptyList() {
+    // Arrange
+    PageRequest pageRequest = PageRequest.of(0, 10);
+    given(categoryRepository.findAll(any(PageRequest.class))).willReturn(Page.empty());
+
+    // Act
+    PageDto<CategoryDtoResponse> response = categoryService.getAllCategories(pageRequest);
+
+    // Assert
+    assertThat(response.getData()).isEmpty();
+    assertThat(response.getPage()).isEqualTo(0);
+    assertThat(response.getSize()).isEqualTo(10);
+    assertThat(response.getTotalElements()).isEqualTo(0);
+    assertThat(response.getTotalPages()).isEqualTo(0);
+
+    then(categoryRepository).should(times(1)).findAll(any(PageRequest.class));
   }
 
   @Test
-  @DisplayName("Given category UUID, when get category by UUID, then return a CategoryDto")
-  void givenCategoryUuid_whenGetCategoryByUuid_thenReturnCategoryDto() {
-    given(categoryRepository.findById(category.getUuid()))
-        .willReturn(java.util.Optional.of(category));
-    CategoryDtoResponse dtpResponse = categoryService.getCategory(category.getUuid());
-    Assertions.assertNotNull(dtpResponse);
-    Assertions.assertEquals(category.getName(), dtpResponse.getName());
-    Assertions.assertEquals(category.getUuid(), dtpResponse.getUuid());
-    Assertions.assertEquals(category.getParentCategoryUuid(), dtpResponse.getParentCategoryUuid());
-    Assertions.assertEquals(category.getThumbnailUrl(), dtpResponse.getThumbnailUrl());
-    Assertions.assertEquals(category.getSlugName(), dtpResponse.getSlugName());
-    then(categoryRepository).should().findById(category.getUuid());
-  }
-
-  @Test
-  @DisplayName("Given nothing, when get all categories, then return a list of CategoryDto")
-  void givenNothing_whenGetAllCategories_thenReturnListOfCategoryDto() {
-    PageRequest pageRequest = PageRequest.of(0, 100);
-    PageImpl<Category> pageImpl = new PageImpl<>(java.util.List.of(category), pageRequest, 1);
-
-    given(categoryRepository.findAll(pageRequest)).willReturn(pageImpl);
+  void testGetAllCategoriesWhenThereAreCategoriesThenReturnListOfCategories() {
+    // Arrange
+    PageRequest pageRequest = PageRequest.of(0, 10);
+    List<Category> categories = List.of(category);
+    Page<Category> categoryPage = new PageImpl<>(categories, pageRequest, categories.size());
+    given(categoryRepository.findAll(any(PageRequest.class))).willReturn(categoryPage);
+    given(categoryMapper.mapToDto(any(Category.class))).willReturn(categoryDtoResponse);
     given(categoryRepository.count()).willReturn(1L);
+    // Act
+    PageDto<CategoryDtoResponse> response = categoryService.getAllCategories(pageRequest);
 
-    PageDto<CategoryDtoResponse> pageDto = categoryService.getAllCategories(PageRequest.of(0, 100));
-    Assertions.assertNotNull(pageDto);
-    Assertions.assertEquals(pageRequest.getPageNumber(), pageDto.getPage());
-    Assertions.assertEquals(pageRequest.getPageSize(), pageDto.getSize());
-    Assertions.assertEquals(pageImpl.getTotalElements(), pageDto.getTotalElements());
-
-    Assertions.assertEquals(1, pageDto.getData().size());
-
-    pageDto
-        .getData()
-        .forEach(
-            categoryDto -> {
-              Assertions.assertEquals(category.getName(), categoryDto.getName());
-              Assertions.assertEquals(category.getUuid(), categoryDto.getUuid());
-              Assertions.assertEquals(
-                  category.getParentCategoryUuid(), categoryDto.getParentCategoryUuid());
-              Assertions.assertEquals(category.getThumbnailUrl(), categoryDto.getThumbnailUrl());
-              Assertions.assertEquals(category.getSlugName(), categoryDto.getSlugName());
-            });
-    then(categoryRepository).should().findAll(pageRequest);
-    then(categoryRepository).should().count();
+    // Assert
+    assertThat(response.getData()).hasSize(1);
+    assertThat(response.getPage()).isEqualTo(0);
+    assertThat(response.getSize()).isEqualTo(10);
+    assertThat(response.getTotalElements()).isEqualTo(1);
+    assertThat(response.getTotalPages())
+        .isEqualTo(response.getTotalElements() / response.getSize());
+    then(categoryRepository).should(times(1)).findAll(any(PageRequest.class));
+    then(categoryMapper).should(times(1)).mapToDto(any(Category.class));
   }
 }

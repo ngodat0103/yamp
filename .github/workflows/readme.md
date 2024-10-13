@@ -13,7 +13,30 @@ Deploy the application to the Kubernetes cluster
 - Template for PR and Push
 
 ## WorkFlow push
-![push-commit](../../draft/output/commit-example-workflow.png)
+```mermaid
+graph TD;
+    A[ci-pr-workflow] -->|Security Check| B[Security check using snyk]
+    A -->|Build and Push| C[Build and push with pull request tag]
+    C -->|Security Check| D[Security check for docker image]
+
+    E[ci-push-workflow] -->|Quality Code Scan| F[Unit test and scan quality code]
+    F -->|Vulnerability Scan| G[Check vulnerability using trivy]
+
+    H[product-svc-workflow] -->|Push| I[product-svc-commit]
+    H -->|PR Integration Test| J[product-svc-integration-test]
+    J -->|PR| K[product-svc-pr]
+
+    L[user-svc-workflow] -->|Push| M[user-svc-commit]
+    L -->|PR Integration Test| N[user-svc-integration-test]
+    N -->|PR Push Image| O[Push docker image]
+
+    P[auth-svc-workflow] -->|Push| Q[auth-svc-push]
+    P -->|PR Integration Test| R[auth-svc-integration-test]
+    R -->|PR Push Image| S[auth-svc-pr-push-image]
+
+    T[gateway-svc-workflow] -->|Push| U[gateway-svc-push]
+    T -->|PR| V[gateway-svc-pr]
+```
 ## Deploying workflow
 ![deploy](../../draft/output/deployment-example-workflow.png)
 ## Caching

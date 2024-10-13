@@ -14,6 +14,7 @@ import lombok.Setter;
 public class Account extends BaseEntity {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(nullable = false, updatable = false)
   private UUID uuid;
 

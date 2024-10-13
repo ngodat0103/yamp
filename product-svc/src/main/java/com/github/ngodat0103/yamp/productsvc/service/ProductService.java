@@ -18,4 +18,6 @@ public interface ProductService {
   ProductDtoResponse getProduct(UUID productUuid);
 
   PageDto<ProductDtoResponse> getProducts(PageRequest pageRequest);
+  //  String generatePresignedUrl(UUID productId);
+
 }

@@ -1,26 +1,19 @@
 package com.example.yamp.usersvc.dto.mapper;
 
 import com.example.yamp.usersvc.dto.customer.AccountDto;
-import com.example.yamp.usersvc.dto.customer.AccountRegisterDto;
 import com.example.yamp.usersvc.dto.customer.CustomerDto;
-import com.example.yamp.usersvc.dto.customer.CustomerRegisterDto;
 import com.example.yamp.usersvc.dto.kafka.AccountTopicContent;
 import com.example.yamp.usersvc.persistence.entity.Account;
 import com.example.yamp.usersvc.persistence.entity.Customer;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface CustomerMapper {
-  @Mapping(target = "accountUuid", ignore = true)
-  @Mapping(target = "account", ignore = true)
-  CustomerDto mapToDto(Customer customer);
 
-  AccountDto mapToDto(Account customer);
+  CustomerDto mapToCustomerDto(Customer customer);
+
+  AccountDto mapToAccountDto(Account account);
 
   Customer MapToCustomerEntity(AccountTopicContent accountTopicContent);
-
-  Customer MapToCustomerEntity(CustomerRegisterDto customerRegisterDto);
-
-  AccountRegisterDto maptoAccountRegisterDto(CustomerRegisterDto customerRegisterDto);
 }

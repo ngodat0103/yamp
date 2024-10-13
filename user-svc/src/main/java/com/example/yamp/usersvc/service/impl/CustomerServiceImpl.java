@@ -57,8 +57,8 @@ public class CustomerServiceImpl implements CustomerService {
     Account account = loadAccount(customerUuid);
     assert account != null;
     authSvcRepository.save(account);
-    CustomerDto customerDto = customerMapper.mapToDto(customer);
-    customerDto.setAccount(customerMapper.mapToDto(account));
+    CustomerDto customerDto = customerMapper.mapToCustomerDto(customer);
+    customerDto.setAccountDto(customerMapper.mapToAccountDto(account));
     log.debug("Fetching successful,Account with {} saved to redis cache", customerUuid);
     return customerDto;
   }
@@ -70,8 +70,8 @@ public class CustomerServiceImpl implements CustomerService {
             .findCustomerByCustomerUuid(uuid)
             .orElseThrow(() -> new AccountNotFoundException("Customer not found"));
     Account account = loadAccount(uuid);
-    CustomerDto customerDto = customerMapper.mapToDto(customer);
-    customerDto.setAccount(customerMapper.mapToDto(account));
+    CustomerDto customerDto = customerMapper.mapToCustomerDto(customer);
+    customerDto.setAccountDto(customerMapper.mapToAccountDto(account));
     return customerDto;
   }
 

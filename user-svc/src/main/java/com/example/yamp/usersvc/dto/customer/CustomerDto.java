@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CustomerDto {
-  AccountDto account;
+  AccountDto accountDto;
 
   @NotNull(message = "First name should not be null")
   private String firstName;

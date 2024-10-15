@@ -15,7 +15,7 @@ jobs:
   push:
     name: gateway-svc-push
     if: github.event_name == 'push'
-    uses: ./.github/workflows/ci-push-workflow-call.yaml
+    uses: ./.github/workflows/CI_template.yaml
     with:
       SERVICE_NAME: gateway-svc
       SERVICE_PORT: 8000

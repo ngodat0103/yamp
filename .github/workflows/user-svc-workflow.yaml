@@ -1,22 +1,22 @@
 on:
   push:
-    branches:
-      - "features/**"
-      - "fix/**"
-    paths:
-      - "user-svc/**"
-  pull_request_target:
-    types: [ opened,reopened ]
-    branches:
-      - "feature/**"
-      - "fix/**"
-    paths:
-      - "user-svc/**"
+#    branches:
+#      - "features/**"
+#      - "fix/**"
+#    paths:
+#      - "user-svc/**"
+#  pull_request_target:
+#    types: [ opened,reopened ]
+#    branches:
+#      - "feature/**"
+#      - "fix/**"
+#    paths:
+#      - "user-svc/**"
 jobs:
   push:
     name: user-svc-commit
     if: github.event_name == 'push'
-    uses: ./.github/workflows/ci-push-workflow-call.yaml
+    uses: ./.github/workflows/CI_template.yaml
     with:
       SERVICE_NAME: user-svc
       SERVICE_PORT: 8002

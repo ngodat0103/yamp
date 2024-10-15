@@ -16,7 +16,7 @@ jobs:
   push:
     name: product-svc-commit
     if: github.event_name == 'push'
-    uses: ./.github/workflows/ci-push-workflow-call.yaml
+    uses: ./.github/workflows/CI_template.yaml
     with:
       SERVICE_NAME: product-svc
       SERVICE_PORT: 8003

@@ -16,7 +16,7 @@ jobs:
   push:
     name: auth-svc-push
     if: github.event_name == 'push'
-    uses: ./.github/workflows/ci-push-workflow-call.yaml
+    uses: ./.github/workflows/CI_template.yaml
     with:
       SERVICE_NAME: auth-svc
       SERVICE_PORT: 8001

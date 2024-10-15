@@ -28,9 +28,9 @@ public class SecurityConfiguration {
             authorize
                 .requestMatchers(HttpMethod.POST, "/register")
                 .permitAll()
-                .requestMatchers("/ui-docs/**")
+                .requestMatchers("**/ui-docs/**")
                 .permitAll()
-                .requestMatchers("/api-docs/**")
+                .requestMatchers("**/api-docs/**")
                 .permitAll()
                 .requestMatchers("/actuator/prometheus")
                 .permitAll()
@@ -40,7 +40,7 @@ public class SecurityConfiguration {
                 .permitAll()
                 .requestMatchers("/actuator/**")
                 .hasAnyRole("ACTUATOR", "ADMIN")
-                .requestMatchers("/swagger-ui/**")
+                .requestMatchers("**/swagger-ui/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated());

@@ -1,0 +1,78 @@
+spring:
+  data:
+    redis:
+      client-type: lettuce
+      host: localhost
+      port: 6379
+      database: 2
+      client-name: user-svc
+  kafka:
+    bootstrap-servers: [ kafka-svc:9092 ]
+  cloud:
+    inetutils:
+      default-hostname: yamp-backend.local
+
+  security:
+    oauth2:
+      client:
+        provider:
+          auth-service-internal:
+            token-uri: http://auth-svc:8001/api/v1/auth/oauth2/token
+          auth-service-external:
+            authorization-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/authorize
+            token-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/token
+            jwk-set-uri: http://${spring.cloud.inetutils.default-hostname}:8000/api/v1/auth/oauth2/jwks
+        registration:
+          user-service:
+            client-id: user-service
+            client-secret: "{cipher}e256a67c78a19d92012597e4883a0f2c26b8919abe197a6e070dae506935262d3ae6bc840d9697adb7e038cd36751954"
+            scope: auth-service.write,auth-service.read
+            provider: auth-service-internal
+            client-name: User Service
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: client_credentials
+  config:
+    activate:
+      on-profile: local-dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/user-svc-db
+    username: 'user-svc-user'
+    password: '{cipher}0579337b871cd41ba98c4875971fa8eca89a6a6902e15b6cf75f711c299912285e825d81331fa61ec4317b6306c3b29d'
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.hibernate.format_sql: true
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+logging:
+  level:
+    org.apache.tomcat: DEBUG
+    org.springframework.web: DEBUG
+    com.example.userservice.controller: DEBUG
+    com.example.userservice.service: DEBUG
+    com.example.yamp.usersvc.event: DEBUG
+  pattern:
+    level:  "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

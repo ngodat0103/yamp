@@ -1,0 +1,31 @@
+server:
+  port: 8004
+springdoc:
+  api-docs:
+    path: /api/v1/order/api-docs
+  swagger-ui:
+    path: /api/v1/order/ui-docs
+  open-api:
+    info:
+      version: ${APP_VERSION}
+      title: Order Service
+      description: Order Service API
+      contact:
+        name: NgoDat0103
+        url: https://github.com/NGODAT0103
+        email: ngovuminhdat@gmail.com
+spring:
+  application:
+    name: order-svc
+  profiles:
+    active:
+    - local-dev
+
+
+
+
+
+
+
+
+

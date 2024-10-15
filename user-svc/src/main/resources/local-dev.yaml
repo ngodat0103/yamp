@@ -42,7 +42,7 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate.hibernate.format_sql: true
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect

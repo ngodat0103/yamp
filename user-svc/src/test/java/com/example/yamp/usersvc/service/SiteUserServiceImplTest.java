@@ -8,7 +8,7 @@ import com.example.yamp.usersvc.dto.mapper.SiteUserMapper;
 import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.persistence.entity.SiteUser;
 import com.example.yamp.usersvc.persistence.repository.SiteUserRepository;
-import com.example.yamp.usersvc.impl.SiteUserServiceImpl;
+import com.example.yamp.usersvc.service.impl.SiteUserServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,7 +42,7 @@ class SiteUserServiceImplTest {
   void createUser_shouldReturnSiteUserDto() {
     when(siteUserMapper.toEntity(any(SiteUserDto.class))).thenReturn(siteUser);
     when(siteUserRepository.save(any(SiteUser.class))).thenReturn(siteUser);
-    when(siteUserMapper.toDto(any(SiteUser.class))).thenReturn(siteUserDto);
+    when(siteUserMapper.toSiteUserDto(any(SiteUser.class))).thenReturn(siteUserDto);
 
     SiteUserDto result = siteUserService.createUser(siteUserDto);
 
@@ -53,7 +53,7 @@ class SiteUserServiceImplTest {
   @Test
   void getUserById_shouldReturnSiteUserDto_whenUserExists() {
     when(siteUserRepository.findById(any(UUID.class))).thenReturn(Optional.of(siteUser));
-    when(siteUserMapper.toDto(any(SiteUser.class))).thenReturn(siteUserDto);
+    when(siteUserMapper.toSiteUserDto(any(SiteUser.class))).thenReturn(siteUserDto);
 
     SiteUserDto result = siteUserService.getUserById(UUID.randomUUID());
 
@@ -63,7 +63,7 @@ class SiteUserServiceImplTest {
   @Test
   void getAllUsers_shouldReturnListOfSiteUserDto() {
     when(siteUserRepository.findAll()).thenReturn(List.of(siteUser));
-    when(siteUserMapper.toDto(any(SiteUser.class))).thenReturn(siteUserDto);
+    when(siteUserMapper.toSiteUserDto(any(SiteUser.class))).thenReturn(siteUserDto);
 
     List<SiteUserDto> result = siteUserService.getAllUsers();
 

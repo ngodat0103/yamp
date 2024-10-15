@@ -1,4 +1,4 @@
-package com.example.yamp.usersvc.impl;
+package com.example.yamp.usersvc.service.impl;
 
 import com.example.yamp.usersvc.dto.UserAddressDto;
 import com.example.yamp.usersvc.dto.mapper.UserAddressMapper;
@@ -6,7 +6,7 @@ import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.persistence.entity.UserAddress;
 import com.example.yamp.usersvc.persistence.entity.UserAddressId;
 import com.example.yamp.usersvc.persistence.repository.UserAddressRepository;
-import com.example.yamp.usersvc.UserAddressService;
+import com.example.yamp.usersvc.service.UserAddressService;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;

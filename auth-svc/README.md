@@ -1,6 +1,6 @@
 # auth-svc
 
-An authorization service responsible for user authentication, authorization, and account management.
+An authorization service responsible for user authentication, authorization, and user management.
 
 ## Table of Contents
 - [Technologies Used](#technologies-used)
@@ -115,8 +115,8 @@ sequenceDiagram
     AuthService->>AccountRepository: existsByEmail(email)
     AuthService->>RoleRepository: findRoleByRoleName(DEFAULT_ROLE)
     AuthService->>PasswordEncoder: encode(password)
-    AuthService->>AccountRepository: save(account)
-    AuthService->>KafkaTemplate: send(TOPIC, savedAccount.getUuid(), accountTopicContent)
+    AuthService->>AccountRepository: save(user)
+    AuthService->>KafkaTemplate: send(TOPIC, savedUser.getUuid(), siteUserTopicDto)
     AuthService->>Client: 201 Created (AccountResponseDto)
 ```
 
@@ -125,15 +125,15 @@ sequenceDiagram
 sequenceDiagram
     Client->>AuthService: PUT /api/v1/auth/accounts (UpdateAccountDto)
     AuthService->>AccountRepository: findById(accountUuid)
-    AuthService->>AccountRepository: save(account)
-    AuthService->>KafkaTemplate: send(TOPIC, savedAccount.getUuid(), accountTopicContent)
+    AuthService->>AccountRepository: save(user)
+    AuthService->>KafkaTemplate: send(TOPIC, savedUser.getUuid(), siteUserTopicDto)
     AuthService->>Client: 200 OK (AccountResponseDto)
 ```
 
 ### Kafka
-- `auth-svc-topic` - Topic for account-related events.
-    - `CREATE` - Event triggered when a new account is created.
-    - `UPDATE` - Event triggered when an account is updated.
+- `auth-svc-topic` - Topic for user-related events.
+    - `CREATE` - Event triggered when a new user is created.
+    - `UPDATE` - Event triggered when an user is updated.
 
 ## Contribution Guidelines
 

@@ -1,4 +1,4 @@
-package com.example.yamp.usersvc.impl;
+package com.example.yamp.usersvc.service.impl;
 
 import com.example.yamp.usersvc.dto.AddressDto;
 import com.example.yamp.usersvc.dto.mapper.AddressMapper;
@@ -8,7 +8,7 @@ import com.example.yamp.usersvc.persistence.entity.Address;
 import com.example.yamp.usersvc.persistence.entity.Country;
 import com.example.yamp.usersvc.persistence.repository.AddressRepository;
 import com.example.yamp.usersvc.persistence.repository.CountryRepository;
-import com.example.yamp.usersvc.AddressService;
+import com.example.yamp.usersvc.service.AddressService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;

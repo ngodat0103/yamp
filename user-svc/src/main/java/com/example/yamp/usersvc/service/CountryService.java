@@ -1,4 +1,4 @@
-package com.example.yamp.usersvc;
+package com.example.yamp.usersvc.service;
 
 import com.example.yamp.usersvc.dto.CountryDto;
 import java.util.List;

@@ -8,7 +8,6 @@ import com.github.ngodat0103.yamp.authsvc.dto.mapper.RoleMapper;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Role;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.RoleRepository;
 import com.github.ngodat0103.yamp.authsvc.service.RoleService;
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,8 +40,7 @@ public class RoleServiceImpl implements RoleService {
     if (roleRepository.existsByRoleName(role.getRoleName())) {
       throwConflictException(log, "Role", "roleName", role.getRoleName());
     }
-    role.setCreateAt(LocalDateTime.now());
-    role.setLastModifiedAt(LocalDateTime.now());
+
     roleRepository.save(role);
     log.debug("Role added: {}", roleDto.getRoleName());
   }
@@ -57,7 +55,6 @@ public class RoleServiceImpl implements RoleService {
     log.debug("Updating role: {}", roleDto.getRoleName());
     role.setRoleName(roleDto.getRoleName());
     role.setRoleDescription(roleDto.getRoleDescription());
-    role.setLastModifiedAt(LocalDateTime.now());
     roleRepository.save(role);
     log.debug("Role updated: {}", roleDto.getRoleName());
   }

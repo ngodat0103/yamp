@@ -1,6 +1,6 @@
 package com.github.ngodat0103.yamp.authsvc.security.authserver;
 
-import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
+import com.github.ngodat0103.yamp.authsvc.persistence.repository.UserRepository;
 import com.github.ngodat0103.yamp.authsvc.service.impl.UserDetailServiceImpl;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +31,7 @@ public class AuthConfiguration {
   }
 
   @Bean
-  UserDetailsService userDetailService(AccountRepository accountRepository) {
-    return new UserDetailServiceImpl(accountRepository);
+  UserDetailsService userDetailService(UserRepository userRepository) {
+    return new UserDetailServiceImpl(userRepository);
   }
 }

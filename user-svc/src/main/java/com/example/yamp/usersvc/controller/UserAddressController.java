@@ -1,7 +1,7 @@
 package com.example.yamp.usersvc.controller;
 
 import com.example.yamp.usersvc.dto.UserAddressDto;
-import com.example.yamp.usersvc.UserAddressService;
+import com.example.yamp.usersvc.service.UserAddressService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

@@ -8,24 +8,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Account extends BaseEntity {
+public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(nullable = false, updatable = false)
-  private UUID uuid;
+  private UUID id;
 
   @Column(nullable = false, unique = true)
-  private String username;
-
-  @Column(nullable = false, unique = true)
-  private String email;
+  private String emailAddress;
 
   @Column(nullable = false)
-  private String password;
+  private String hashedPassword;
 
   @JsonIgnore private boolean enabled = true;
   @JsonIgnore private boolean accountNonExpired = true;
@@ -36,9 +33,8 @@ public class Account extends BaseEntity {
   @JoinColumn(name = "role_uuid")
   private Role role;
 
-  public Account(String email, String username, String password) {
-    this.username = username;
-    this.password = password;
-    this.email = email;
+  public User(String emailAddress, String hashedPassword) {
+    this.hashedPassword = hashedPassword;
+    this.emailAddress = emailAddress;
   }
 }

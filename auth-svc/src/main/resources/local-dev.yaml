@@ -7,15 +7,12 @@ spring:
       on-profile: local-dev
   kafka:
     bootstrap-servers: [ kafka-svc:9092 ]
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.UUIDSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   datasource:
     url: jdbc:postgresql://localhost:5432/auth-svc-db
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate.hibernate.format_sql: true
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -35,6 +32,5 @@ spring:
 
 logging:
   level:
-    com.github.ngodat0103.yamp.authsvc.service: DEBUG
-    com.github.ngodat0103.yamp.authsvc.controller: DEBUG
+    com.github.ngodat0103.yamp.authsvc: DEBUG
     org.springframework.security: DEBUG

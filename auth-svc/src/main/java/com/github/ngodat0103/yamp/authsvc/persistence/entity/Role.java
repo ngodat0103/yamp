@@ -9,7 +9,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Role extends BaseEntity {
+public class Role {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   @Column(nullable = false, updatable = false)
@@ -21,5 +21,5 @@ public class Role extends BaseEntity {
   private String roleDescription;
 
   @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-  private Set<Account> accounts;
+  private Set<User> users;
 }

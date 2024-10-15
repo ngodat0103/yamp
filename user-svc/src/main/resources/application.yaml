@@ -18,10 +18,9 @@ spring:
           authorities-claim-name: "roles"
           authority-prefix: "ROLE_"
   kafka:
-    consumer:
-      group-id: user-svc
-      key-deserializer: org.apache.kafka.common.serialization.UUIDDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.UUIDSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 server:
   port: 8002
   forward-headers-strategy: framework

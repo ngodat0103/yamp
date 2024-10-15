@@ -1,6 +1,6 @@
 package com.github.ngodat0103.yamp.authsvc.security.authserver;
 
-import com.github.ngodat0103.yamp.authsvc.persistence.repository.AccountRepository;
+import com.github.ngodat0103.yamp.authsvc.persistence.repository.UserRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -35,7 +35,7 @@ public class Oauth2Configuration {
 
   @Bean
   public OAuth2TokenCustomizer<JwtEncodingContext> jwtTokenCustomizer(
-      AccountRepository accountRepository) {
+      UserRepository userRepository) {
     return context -> {
       if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
         UUID uuid;
@@ -49,7 +49,7 @@ public class Oauth2Configuration {
             .getClaims()
             .claims(
                 claims -> {
-                  accountRepository
+                  userRepository
                       .findById(uuid)
                       .ifPresent(account -> claims.put("role", account.getRole().getRoleName()));
                 });

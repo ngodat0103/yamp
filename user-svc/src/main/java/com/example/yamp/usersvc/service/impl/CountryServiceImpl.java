@@ -1,4 +1,4 @@
-package com.example.yamp.usersvc.impl;
+package com.example.yamp.usersvc.service.impl;
 
 import com.example.yamp.usersvc.dto.CountryDto;
 import com.example.yamp.usersvc.dto.mapper.CountryMapper;
@@ -6,7 +6,7 @@ import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.exception.NotFoundException;
 import com.example.yamp.usersvc.persistence.entity.Country;
 import com.example.yamp.usersvc.persistence.repository.CountryRepository;
-import com.example.yamp.usersvc.CountryService;
+import com.example.yamp.usersvc.service.CountryService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;

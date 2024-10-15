@@ -9,7 +9,7 @@ import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.persistence.entity.UserAddress;
 import com.example.yamp.usersvc.persistence.entity.UserAddressId;
 import com.example.yamp.usersvc.persistence.repository.UserAddressRepository;
-import com.example.yamp.usersvc.impl.UserAddressServiceImpl;
+import com.example.yamp.usersvc.service.impl.UserAddressServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

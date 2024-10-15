@@ -1,17 +1,22 @@
-package com.example.yamp.usersvc.impl;
+package com.example.yamp.usersvc.service.impl;
 
 import com.example.yamp.usersvc.dto.SiteUserDto;
+import com.example.yamp.usersvc.dto.kafka.Action;
+import com.example.yamp.usersvc.dto.kafka.SiteUserTopicDto;
 import com.example.yamp.usersvc.dto.mapper.SiteUserMapper;
 import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.exception.NotFoundException;
 import com.example.yamp.usersvc.persistence.entity.SiteUser;
 import com.example.yamp.usersvc.persistence.repository.SiteUserRepository;
-import com.example.yamp.usersvc.SiteUserService;
+import com.example.yamp.usersvc.service.SiteUserService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,6 +27,9 @@ public class SiteUserServiceImpl implements SiteUserService {
   private SiteUserRepository siteUserRepository;
 
   private SiteUserMapper siteUserMapper;
+  private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+  private final KafkaTemplate<UUID, SiteUserTopicDto> kafkaTemplate;
+  private final static String TOPIC = "user-svc-topic";
 
   @Override
   public SiteUserDto createUser(SiteUserDto siteUserDto) {
@@ -30,19 +38,26 @@ public class SiteUserServiceImpl implements SiteUserService {
     siteUser.setCreatedAt(LocalDateTime.now());
     siteUser.setLastModifiedAt(LocalDateTime.now());
     SiteUser savedSiteUser = siteUserRepository.save(siteUser);
-    return siteUserMapper.toDto(savedSiteUser);
+
+    String hashedPassword = passwordEncoder.encode(siteUserDto.getPassword());
+    SiteUserTopicDto siteUserTopicDto = siteUserMapper.toSiteUserTopicDto(savedSiteUser,hashedPassword, Action.CREATE);
+    kafkaTemplate.send(TOPIC,savedSiteUser.getId(),siteUserTopicDto);
+    if(log.isDebugEnabled()){
+      log.debug("User sent to kafka topic. User: {}",siteUserTopicDto);
+    }
+    return siteUserMapper.toSiteUserDto(savedSiteUser);
   }
 
   @Override
   public SiteUserDto getUserById(UUID id) {
     SiteUser siteUser = siteUserRepository.findById(id).orElse(null);
-    return siteUser != null ? siteUserMapper.toDto(siteUser) : null;
+    return siteUser != null ? siteUserMapper.toSiteUserDto(siteUser) : null;
   }
 
   @Override
   public List<SiteUserDto> getAllUsers() {
     List<SiteUser> siteUsers = siteUserRepository.findAll();
-    return siteUsers.stream().map(siteUserMapper::toDto).toList();
+    return siteUsers.stream().map(siteUserMapper::toSiteUserDto).toList();
   }
 
   @Override
@@ -60,7 +75,7 @@ public class SiteUserServiceImpl implements SiteUserService {
     siteUser.setLastModifiedAt(LocalDateTime.now());
 
     SiteUser updatedSiteUser = siteUserRepository.save(siteUser);
-    return siteUserMapper.toDto(updatedSiteUser);
+    return siteUserMapper.toSiteUserDto(updatedSiteUser);
   }
 
   @Override

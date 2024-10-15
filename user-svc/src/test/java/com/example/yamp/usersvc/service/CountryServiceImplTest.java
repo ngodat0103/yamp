@@ -8,7 +8,7 @@ import com.example.yamp.usersvc.dto.mapper.CountryMapper;
 import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.persistence.entity.Country;
 import com.example.yamp.usersvc.persistence.repository.CountryRepository;
-import com.example.yamp.usersvc.impl.CountryServiceImpl;
+import com.example.yamp.usersvc.service.impl.CountryServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

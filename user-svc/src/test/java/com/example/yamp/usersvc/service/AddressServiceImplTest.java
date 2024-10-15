@@ -8,7 +8,7 @@ import com.example.yamp.usersvc.dto.mapper.AddressMapper;
 import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.persistence.entity.Address;
 import com.example.yamp.usersvc.persistence.repository.AddressRepository;
-import com.example.yamp.usersvc.impl.AddressServiceImpl;
+import com.example.yamp.usersvc.service.impl.AddressServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

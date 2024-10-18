@@ -32,9 +32,9 @@ logging:
     level:  "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 springdoc:
   api-docs:
-    path: /api/v1/user-svc/api-docs
+    path: /api/v1/users/api-docs
   swagger-ui:
-    path: /api/v1/user-svc/ui-docs
+    path: /api/v1/users/ui-docs
   open-api:
     info:
       version: ${APP_VERSION}

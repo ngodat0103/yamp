@@ -58,11 +58,11 @@ services:
 #    volumes:
 #      - ../observation-and-monitoring/prometheus/datasources.yaml:/etc/prometheus/datasources.yaml
 #  tempo:
-#    network_mode: host
+#    container_name: tempo
 #    image: grafana/tempo:latest
 #    command: -config.file=/etc/tempo/datasources.yaml
 #    volumes:
-#      - ../observation-and-monitoring/tempo/datasources.yaml:/etc/tempo/datasources.yaml
+#      - ../../observation-and-monitoring/tempo/:/etc/tempo/
 #    ports:
 #      - 3100:3100
 #      - 4317:4317

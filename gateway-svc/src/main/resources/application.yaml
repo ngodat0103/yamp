@@ -1,12 +1,6 @@
 spring:
   profiles:
     default: local-dev
-  data:
-    redis:
-      url: redis://redis-svc:6379
-      client-type: lettuce
-      database: 1
-      client-name: gateway-svc
   config:
     import:
       - "optional:local-dev.yaml"
@@ -27,27 +21,10 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: grafana
-          uri: http://grafana.monitoring.svc.cluster.local:3000
-          predicates:
-              - Path=/grafana/**
-          filters:
-            - name: SetRequestHostHeader
-              args:
-                host: localhost:8000
-        - id: auth-svc
-          uri: http://auth-svc:8001
-          predicates:
-            - Path=/api/v1/auth/**
-#          filters:
-#            - name: CircuitBreaker
-#              args:
-#                name: auth-service-breaker
-#                fallbackUri: forward:/fallback/auth-svc
         - id: user-svc
           uri: http://user-svc:8002
           predicates:
-            - Path=/api/v1/user/**
+            - Path=/api/v1/users/**
         - id: product-svc
           uri: http://product-svc:8003
           predicates:
@@ -69,13 +46,18 @@ spring:
 #              args:
 #                name: user-service-breaker
 #                fallbackUri: forward:/fallback
-
 logging:
   pattern:
     level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
 server:
   port: 8000
 management:
+  observations:
+    key-values:
+        application: ${spring.application.name}
+  tracing:
+    sampling:
+      probability: 1.0
   endpoints:
     web:
       exposure:

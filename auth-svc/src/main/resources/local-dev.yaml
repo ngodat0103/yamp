@@ -6,7 +6,7 @@ spring:
     activate:
       on-profile: local-dev
   kafka:
-    bootstrap-servers: [ kafka-svc:9092 ]
+    bootstrap-servers: [ localhost:9092 ]
   datasource:
     url: jdbc:postgresql://localhost:5432/auth-svc-db
   jpa:

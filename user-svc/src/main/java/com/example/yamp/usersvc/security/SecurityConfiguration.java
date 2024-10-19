@@ -1,7 +1,6 @@
 package com.example.yamp.usersvc.security;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -42,6 +41,9 @@ public class SecurityConfiguration {
                 .hasAnyRole("ACTUATOR", "ADMIN")
                 .requestMatchers("**/swagger-ui/**")
                 .permitAll()
+                    .requestMatchers( HttpMethod.POST, "/api/v1/users")
+                    .permitAll()
+
                 .anyRequest()
                 .authenticated());
     http.sessionManagement(

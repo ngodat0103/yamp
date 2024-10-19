@@ -8,7 +8,33 @@ spring:
   cloud:
     inetutils:
       default-hostname: "yamp-backend.local"
-
+    gateway:
+      routes:
+        - id: user-svc
+          uri: http://localhost:8002
+          predicates:
+            - Path=/api/v1/users/**,/api/v1/address/**,/api/v1/user-address/**,/api/v1/countries/**
+#        - id: product-svc
+#          uri: http://localhost:8003
+#          predicates:
+#            - Path=/api/v1/product/**
+  #          filters:
+  #            - name: RequestRateLimiter
+  #              args:
+  #                redis-rate-limiter.replenishRate: 1
+  #                redis-rate-limiter.burstCapacity: 1
+  #                redis-rate-limiter.requestedTokens: 1
+  #            - name: Retry
+  #              args:
+  #                method: GET
+  #                backoff:
+  #                  firstBackoff: 100ms
+  #                  maxBackoff: 1000ms
+  #                  factor: 2
+  #            - name: CircuitBreaker
+  #              args:
+  #                name: user-service-breaker
+  #                fallbackUri: forward:/fallback
   data:
     redis:
       url: redis://localhost:6379

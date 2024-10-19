@@ -1,0 +1,35 @@
+# my global config
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+# - alertmanager:9093
+
+rule_files:
+# - "first_rules.yml"
+# - "second_rules.yml"
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+  - job_name: "auth-svc"
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['auth-svc:8001']
+  - job_name: 'user-svc'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['user-svc:8002']
+  - job_name: 'gateway-svc'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['gateway-svc:8000']
+#  - job_name: 'product-svc'
+#    metrics_path: '/actuator/prometheus'
+#    static_configs:
+#      - targets: ['product-svc.yamp.svc.cluster.local:8003']

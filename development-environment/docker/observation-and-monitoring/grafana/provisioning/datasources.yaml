@@ -30,19 +30,19 @@ datasources:
       httpMethod: GET
       serviceMap:
         datasourceUid: 'prometheus'
-#  - name: Loki
-#    type: loki
-#    uid: loki
-#    access: proxy
-#    orgId: 1
-#    editable: true
-#    url: http://gateway:3100
-#    jsonData:
-#      httpHeaderName1: "X-Scope-OrgID"
-#      derivedFields:
-#        - datasourceUid: tempo
-#          matcherRegex: "\\[.+,(.+),.+\\]"
-#          name: TraceID
-#          url: '$${__value.raw}'
+  - name: Loki
+    type: loki
+    uid: loki
+    access: proxy
+    orgId: 1
+    editable: true
+    url: http://loki:3100
+    jsonData:
+      httpHeaderName1: "X-Scope-OrgID"
+      derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: "\\[.+,(.+),.+\\]"
+          name: TraceID
+          url: '$${__value.raw}'
     secureJsonData:
       httpHeaderValue1: "tenant1"

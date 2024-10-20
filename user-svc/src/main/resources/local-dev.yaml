@@ -7,7 +7,7 @@ spring:
       database: 2
       client-name: user-svc
   kafka:
-    bootstrap-servers: [ localhost:9092 ]
+    bootstrap-servers: [ kafka-svc:9092 ]
   cloud:
     inetutils:
       default-hostname: yamp-backend.local
@@ -16,9 +16,7 @@ spring:
     activate:
       on-profile: local-dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/user-svc-db
-    username: 'user-svc-user'
-    password: '{cipher}0579337b871cd41ba98c4875971fa8eca89a6a6902e15b6cf75f711c299912285e825d81331fa61ec4317b6306c3b29d'
+    url: jdbc:postgresql://share-db:5432/user-svc-db
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true

@@ -9,8 +9,10 @@ services:
       resources:
         limits:
           memory: 700m
+    volumes:
+      - /home/akira/.m2:/home/akira/.m2:ro
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      JAVA_TOOL_OPTIONS: "-javaagent:/opt/app/BOOT-INF/lib/opentelemetry-javaagent-1.33.5.jar"
+      SPRING_PROFILES_ACTIVE: local-dev
+      JAVA_TOOL_OPTIONS: "-javaagent:/home/akira/.m2/repository/io/opentelemetry/javaagent/opentelemetry-javaagent/1.33.5/opentelemetry-javaagent-1.33.5.jar"
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
       OTEL_METRICS_EXPORTER: none

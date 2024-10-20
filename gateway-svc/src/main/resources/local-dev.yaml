@@ -11,7 +11,7 @@ spring:
     gateway:
       routes:
         - id: user-svc
-          uri: http://localhost:8002
+          uri: http://user-svc:8002
           predicates:
             - Path=/api/v1/users/**,/api/v1/address/**,/api/v1/user-address/**,/api/v1/countries/**
 #        - id: product-svc
@@ -37,7 +37,7 @@ spring:
   #                fallbackUri: forward:/fallback
   data:
     redis:
-      url: redis://localhost:6379
+      url: redis://redis-svc:6379
       client-type: lettuce
       database: 1
       client-name: gateway-svc

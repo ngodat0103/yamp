@@ -179,7 +179,7 @@ services:
     command: [ java, -jar, /run/gateway-svc.jar ]
     extends:
       file: common-config.yaml
-      service: network-deploy-service
+      service: microservice-base-config
     ports:
       - "8000:8000"
     environment:
@@ -209,6 +209,7 @@ volumes:
     name: minio_data
   postgres-data:
     name: postgres-data
+    external: true
 networks:
   yamp-network:
     name: yamp-network-development

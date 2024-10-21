@@ -27,3 +27,17 @@ discovery.docker "logs_collector" {
   }
   external_labels = {}
 }
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://prometheus:9090/api/prom/push"
+  }
+}
+
+prometheus.scrape "example" {
+  // Collect metrics from the default listen address.
+  targets = [{
+    __address__ = "127.0.0.1:12345",
+  }]
+
+  forward_to = [prometheus.remote_write.default.receiver]
+}

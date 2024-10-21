@@ -33,9 +33,9 @@ server:
   forward-headers-strategy: framework
 springdoc:
   api-docs:
-    path: /api-docs
+    path: /api/v1/auth/api-docs
   swagger-ui:
-    path: /ui-docs
+    path: /api/v1/auth/ui-docs
   open-api:
     info:
       version: ${APP_VERSION}

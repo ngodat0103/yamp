@@ -29,9 +29,9 @@ public class User {
   @JsonIgnore private boolean accountNonLocked = true;
   @JsonIgnore private boolean credentialsNonExpired = true;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "role_uuid")
-  private Role role;
+  //  @ManyToOne(fetch = FetchType.EAGER)
+  //  @JoinColumn(name = "role_uuid")
+  //  private Role role;
 
   public User(String emailAddress, String hashedPassword) {
     this.hashedPassword = hashedPassword;

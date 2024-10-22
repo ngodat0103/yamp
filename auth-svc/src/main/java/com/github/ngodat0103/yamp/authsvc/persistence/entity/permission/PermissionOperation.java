@@ -2,13 +2,18 @@ package com.github.ngodat0103.yamp.authsvc.persistence.entity.permission;
 
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.Operation;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "PERMISSIONS_OPERATIONS")
-public class PermissionsOperations {
+@Getter
+@Setter
+public class PermissionOperation {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(updatable = false)
   private Long id;
 
   @ManyToOne
@@ -18,29 +23,4 @@ public class PermissionsOperations {
   @ManyToOne
   @JoinColumn(name = "operations_id", nullable = false)
   private Operation operation;
-
-  // Getters and Setters
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public Permission getPermission() {
-    return permission;
-  }
-
-  public void setPermission(Permission permission) {
-    this.permission = permission;
-  }
-
-  public Operation getOperations() {
-    return operation;
-  }
-
-  public void setOperations(Operation operation) {
-    this.operation = operation;
-  }
 }

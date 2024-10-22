@@ -1,7 +1,6 @@
 package com.github.ngodat0103.yamp.authsvc.service;
 
 import java.util.List;
-import java.util.Objects;
 
 public interface EntityCrudService<E, D, ID> {
 

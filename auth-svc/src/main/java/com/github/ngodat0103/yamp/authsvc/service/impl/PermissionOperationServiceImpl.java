@@ -16,11 +16,10 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class PermissionsOperationsServiceImpl
+public class PermissionOperationServiceImpl
     implements EntityCrudService<PermissionOperation, PermissionOperationDto, Long> {
-
-  private final PermissionOperationRepository permissionOperationRepository;
-  private final PermissionOperationMapper permissionOperationMapper;
+  private PermissionOperationRepository permissionOperationRepository;
+  private PermissionOperationMapper permissionOperationMapper;
 
   @Override
   public PermissionOperationDto create(PermissionOperationDto newDto) {
@@ -47,7 +46,7 @@ public class PermissionsOperationsServiceImpl
     return permissionOperationMapper.toDetailDto(permissionOperation);
   }
 
-  public List<PermissionOperationDetailDto> readAllDetail() {
+  public List<PermissionOperationDetailDto> findAllDetail() {
     return permissionOperationRepository.findAll().stream()
         .map(permissionOperationMapper::toDetailDto)
         .toList();
@@ -58,8 +57,8 @@ public class PermissionsOperationsServiceImpl
     if (!permissionOperationRepository.existsById(id)) {
       throwNotFoundException(log, "PermissionOperation", "id", id);
     }
-    PermissionOperation permissionOperation = permissionOperationMapper.toEntity(updateDto);
-
+    var permissionOperation = permissionOperationMapper.toEntity(updateDto);
+    checkNull(permissionOperation, updateDto);
     permissionOperation = permissionOperationRepository.save(permissionOperation);
     return permissionOperationMapper.toDto(permissionOperation);
   }

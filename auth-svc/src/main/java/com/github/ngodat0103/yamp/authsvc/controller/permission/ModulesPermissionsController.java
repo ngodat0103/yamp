@@ -2,7 +2,6 @@ package com.github.ngodat0103.yamp.authsvc.controller.permission;
 
 import com.github.ngodat0103.yamp.authsvc.dto.permission.ModulePermissionDetailDto;
 import com.github.ngodat0103.yamp.authsvc.dto.permission.ModulePermissionDto;
-import com.github.ngodat0103.yamp.authsvc.persistence.entity.permission.ModulePermission;
 import com.github.ngodat0103.yamp.authsvc.service.impl.ModulesPermissionsServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,14 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api/v1/modules-permissions")
 @AllArgsConstructor
 @SecurityRequirement(name = "oauth2")
-//@PreAuthorize("hasRole('ADMIN')")
+// @PreAuthorize("hasRole('ADMIN')")
 @Tag(
     name = "Modules Permissions",
     description = "Operations related to modules permissions management")
@@ -58,15 +54,14 @@ public class ModulesPermissionsController {
       description = "Adds a new module permission to the system.")
   @ApiResponses(
       value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Module permission created successfully"),
+        @ApiResponse(responseCode = "201", description = "Module permission created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
       })
   @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
-  public ModulePermissionDto createModulePermission(@RequestBody @Valid ModulePermissionDto modulePermission) {
-   return  modulesPermissionsService.create(modulePermission);
+  public ModulePermissionDto createModulePermission(
+      @RequestBody @Valid ModulePermissionDto modulePermission) {
+    return modulesPermissionsService.create(modulePermission);
   }
 
   @Operation(
@@ -105,15 +100,10 @@ public class ModulesPermissionsController {
         @ApiResponse(responseCode = "404", description = "Module permission not found")
       })
   @PutMapping(path = "/{id}")
-  public ModulePermissionDto
-      updateModulePermission(
-          @Parameter(description = "ID of the module permission to be updated") @PathVariable
-              Long id,
-          @RequestBody
-          @Valid
-          ModulePermissionDto
-                  updateModulePermissionDto) {
-    return modulesPermissionsService.update(id,updateModulePermissionDto);
+  public ModulePermissionDto updateModulePermission(
+      @Parameter(description = "ID of the module permission to be updated") @PathVariable Long id,
+      @RequestBody @Valid ModulePermissionDto updateModulePermissionDto) {
+    return modulesPermissionsService.update(id, updateModulePermissionDto);
   }
 
   @Operation(

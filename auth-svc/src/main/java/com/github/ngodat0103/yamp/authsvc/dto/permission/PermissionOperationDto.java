@@ -7,13 +7,13 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class ModulePermissionDto {
+public class PermissionOperationDto {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private Long id;
 
-  @NotNull(message = "Module ID is required")
-  private Long modulesId;
+  @NotNull(message = "Operation ID is required")
+  private Long operationId;
 
   @NotNull(message = "Permission ID is required")
-  private Long permissionsId;
+  private Long permissionId;
 }

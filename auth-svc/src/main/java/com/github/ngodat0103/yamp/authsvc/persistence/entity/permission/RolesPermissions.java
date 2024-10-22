@@ -1,6 +1,6 @@
 package com.github.ngodat0103.yamp.authsvc.persistence.entity.permission;
 
-import com.github.ngodat0103.yamp.authsvc.persistence.entity.roles.Roles;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.roles.Role;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,7 +13,7 @@ public class RolesPermissions {
 
   @ManyToOne
   @JoinColumn(name = "roles_id", nullable = false)
-  private Roles roles;
+  private Role role;
 
   @ManyToOne
   @JoinColumn(name = "permissions_id", nullable = false)
@@ -28,12 +28,12 @@ public class RolesPermissions {
     this.id = id;
   }
 
-  public Roles getRoles() {
-    return roles;
+  public Role getRoles() {
+    return role;
   }
 
-  public void setRoles(Roles roles) {
-    this.roles = roles;
+  public void setRoles(Role role) {
+    this.role = role;
   }
 
   public Permission getPermissions() {

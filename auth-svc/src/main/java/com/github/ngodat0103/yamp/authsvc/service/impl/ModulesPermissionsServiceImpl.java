@@ -1,7 +1,6 @@
 package com.github.ngodat0103.yamp.authsvc.service.impl;
 
 import static com.github.ngodat0103.yamp.authsvc.Util.*;
-
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.permission.ModulePermissionMapper;
 import com.github.ngodat0103.yamp.authsvc.dto.permission.ModulePermissionDetailDto;
 import com.github.ngodat0103.yamp.authsvc.dto.permission.ModulePermissionDto;
@@ -38,17 +37,19 @@ public class ModulesPermissionsServiceImpl
             .orElseThrow(notFoundExceptionSupplier(log, "ModulePermission", "id", id));
     return modulePermissionMapper.toDto(modulePermission);
   }
-  public ModulePermissionDetailDto readDetailById(Long id){
+
+  public ModulePermissionDetailDto readDetailById(Long id) {
     var modulePermission =
-            modulePermissionRepository
-                    .findById(id)
-                    .orElseThrow(notFoundExceptionSupplier(log, "ModulePermission", "id", id));
+        modulePermissionRepository
+            .findById(id)
+            .orElseThrow(notFoundExceptionSupplier(log, "ModulePermission", "id", id));
     return modulePermissionMapper.toDetailDto(modulePermission);
   }
-  public List<ModulePermissionDetailDto> findAllDetail(){
+
+  public List<ModulePermissionDetailDto> findAllDetail() {
     return modulePermissionRepository.findAll().stream()
-            .map(modulePermissionMapper::toDetailDto)
-            .toList();
+        .map(modulePermissionMapper::toDetailDto)
+        .toList();
   }
 
   @Override

@@ -6,6 +6,7 @@ import com.github.ngodat0103.yamp.authsvc.persistence.entity.permission.ModulePe
 
 public interface ModulePermissionMapper {
   ModulePermissionDto toDto(ModulePermission modulePermission);
+
   ModulePermissionDetailDto toDetailDto(ModulePermission modulePermission);
 
   ModulePermission toEntity(ModulePermissionDto modulePermissionDto);

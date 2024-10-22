@@ -45,38 +45,59 @@ The project follows a layered architecture with clear separation of concerns:
 - **Event Layer**: Handles asynchronous communication using Kafka.
 
 ## Entity-Relationship Diagram (ERD)
+**For more information, check the [RBAC in microservices](https://elang2.github.io/myblog/posts/2018-09-29-Role-Based-Access-Control-MicroServices.html)**
 
 ```mermaid
 erDiagram
-    Account {
-        UUID uuid
-        String username
-        String email
-        String password
-        boolean enabled
-        boolean accountNonExpired
-        boolean accountNonLocked
-        boolean credentialsNonExpired
+    ROLE_GROUPS {
+        int id PK
+        varchar name
     }
-    Role {
-        UUID uuid
-        String roleName
-        String roleDescription
+    ROLES {
+        int id PK
+        varchar name
     }
-    Oauth2Authorization {
-        String id
-        String registeredClientId
-        String principalName
-        String authorizationGrantType
+    ROLE_GROUPS_ROLES {
+        int id PK
+        int role_groups_id FK
+        int role_id FK
     }
-    Oauth2RegisteredClient {
-        String id
-        String clientId
-        Instant clientIdIssuedAt
-        String clientSecret
+    PERMISSIONS {
+        int id PK
+        varchar name
     }
-    Account }o--|| Role : "has a"
-    Oauth2Authorization }o--|| Oauth2RegisteredClient : "belongs to"
+    ROLES_PERMISSIONS {
+        int id PK
+        int roles_id FK
+        int permissions_id FK
+    }
+    MODULES {
+        int id PK
+        varchar name
+    }
+    MODULES_PERMISSIONS {
+        int id PK
+        int modules_id FK
+        int permissions_id FK
+    }
+    OPERATIONS {
+        int id PK
+        varchar name
+    }
+    PERMISSIONS_OPERATIONS {
+        int id PK
+        int permission_id FK
+        int operations_id FK
+    }
+    
+    ROLE_GROUPS ||--o{ ROLE_GROUPS_ROLES : "has"
+    ROLES ||--o{ ROLE_GROUPS_ROLES : "has"
+    ROLES ||--o{ ROLES_PERMISSIONS : "has"
+    PERMISSIONS ||--o{ ROLES_PERMISSIONS : "has"
+    MODULES ||--o{ MODULES_PERMISSIONS : "has"
+    PERMISSIONS ||--o{ MODULES_PERMISSIONS : "has"
+    PERMISSIONS ||--o{ PERMISSIONS_OPERATIONS : "has"
+    OPERATIONS ||--o{ PERMISSIONS_OPERATIONS : "has"
 ```
 
 ## Setup and Installation
@@ -104,40 +125,6 @@ erDiagram
 This command will build the project, resolve dependencies, and start the application.
 
 ## API Endpoints and Flow
-
-### HTTP
-
-#### Register a New Account
-```mermaid
-sequenceDiagram
-    Client->>AuthService: POST /api/v1/auth/accounts (AccountRegisterDto)
-    AuthService->>AccountRepository: existsByUsername(username)
-    AuthService->>AccountRepository: existsByEmail(email)
-    AuthService->>RoleRepository: findRoleByRoleName(DEFAULT_ROLE)
-    AuthService->>PasswordEncoder: encode(password)
-    AuthService->>AccountRepository: save(user)
-    AuthService->>KafkaTemplate: send(TOPIC, savedUser.getUuid(), siteUserTopicDto)
-    AuthService->>Client: 201 Created (AccountResponseDto)
-```
-
-#### Update an Existing Account
-```mermaid
-sequenceDiagram
-    Client->>AuthService: PUT /api/v1/auth/accounts (UpdateAccountDto)
-    AuthService->>AccountRepository: findById(accountUuid)
-    AuthService->>AccountRepository: save(user)
-    AuthService->>KafkaTemplate: send(TOPIC, savedUser.getUuid(), siteUserTopicDto)
-    AuthService->>Client: 200 OK (AccountResponseDto)
-```
-
-### Kafka
-- `auth-svc-topic` - Topic for user-related events.
-    - `CREATE` - Event triggered when a new user is created.
-    - `UPDATE` - Event triggered when an user is updated.
-
-## Contribution Guidelines
-
-Contributions are welcome! Please fork the repository and submit a pull request for any improvements or bug fixes.
 
 ## License
 

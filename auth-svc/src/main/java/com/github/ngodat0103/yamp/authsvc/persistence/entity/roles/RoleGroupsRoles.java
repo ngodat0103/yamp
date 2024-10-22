@@ -16,7 +16,7 @@ public class RoleGroupsRoles {
 
   @ManyToOne
   @JoinColumn(name = "role_id", nullable = false)
-  private Roles role;
+  private Role role;
 
   // Getters and Setters
   public Long getId() {
@@ -35,11 +35,11 @@ public class RoleGroupsRoles {
     this.roleGroups = roleGroups;
   }
 
-  public Roles getRole() {
+  public Role getRole() {
     return role;
   }
 
-  public void setRole(Roles role) {
+  public void setRole(Role role) {
     this.role = role;
   }
 }

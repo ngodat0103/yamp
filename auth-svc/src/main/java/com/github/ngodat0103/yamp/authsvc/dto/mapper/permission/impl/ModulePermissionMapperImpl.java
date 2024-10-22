@@ -35,10 +35,10 @@ public class ModulePermissionMapperImpl implements ModulePermissionMapper {
   @Override
   public ModulePermissionDetailDto toDetailDto(ModulePermission modulePermission) {
     return ModulePermissionDetailDto.builder()
-            .id(modulePermission.getId())
-            .moduleDto(moduleMapper.toDto(modulePermission.getModule()))
-            .permissionDto(permissionMapper.toDto(modulePermission.getPermission()))
-            .build();
+        .id(modulePermission.getId())
+        .moduleDto(moduleMapper.toDto(modulePermission.getModule()))
+        .permissionDto(permissionMapper.toDto(modulePermission.getPermission()))
+        .build();
   }
 
   @Override

@@ -1,4 +1,4 @@
-package com.github.ngodat0103.yamp.authsvc.persistence.entity.roles;
+package com.github.ngodat0103.yamp.authsvc.persistence.entity.role;
 
 import jakarta.persistence.*;
 

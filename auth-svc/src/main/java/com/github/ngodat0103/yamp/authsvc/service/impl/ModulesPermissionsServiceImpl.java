@@ -1,6 +1,7 @@
 package com.github.ngodat0103.yamp.authsvc.service.impl;
 
 import static com.github.ngodat0103.yamp.authsvc.Util.*;
+
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.permission.ModulePermissionMapper;
 import com.github.ngodat0103.yamp.authsvc.dto.permission.ModulePermissionDetailDto;
 import com.github.ngodat0103.yamp.authsvc.dto.permission.ModulePermissionDto;

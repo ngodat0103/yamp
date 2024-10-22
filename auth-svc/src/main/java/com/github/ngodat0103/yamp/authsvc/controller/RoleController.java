@@ -1,4 +1,4 @@
-package com.github.ngodat0103.yamp.authsvc.controller.role;
+package com.github.ngodat0103.yamp.authsvc.controller;
 
 import com.github.ngodat0103.yamp.authsvc.dto.role.RoleDto;
 import com.github.ngodat0103.yamp.authsvc.service.impl.RoleServiceImpl;

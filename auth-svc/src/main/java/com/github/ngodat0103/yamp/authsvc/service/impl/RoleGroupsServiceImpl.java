@@ -1,7 +1,7 @@
 package com.github.ngodat0103.yamp.authsvc.service.impl;
 
 import com.github.ngodat0103.yamp.authsvc.dto.role.RoleGroupsDto;
-import com.github.ngodat0103.yamp.authsvc.persistence.entity.roles.RoleGroups;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.role.RoleGroups;
 import com.github.ngodat0103.yamp.authsvc.service.EntityCrudService;
 import java.util.List;
 import lombok.AllArgsConstructor;

@@ -4,7 +4,7 @@ import static com.github.ngodat0103.yamp.authsvc.Util.*;
 
 import com.github.ngodat0103.yamp.authsvc.dto.mapper.role.RoleMapper;
 import com.github.ngodat0103.yamp.authsvc.dto.role.RoleDto;
-import com.github.ngodat0103.yamp.authsvc.persistence.entity.roles.Role;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.role.Role;
 import com.github.ngodat0103.yamp.authsvc.persistence.repository.RoleRepository;
 import com.github.ngodat0103.yamp.authsvc.service.EntityCrudService;
 import java.util.List;

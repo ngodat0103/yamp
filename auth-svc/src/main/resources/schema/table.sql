@@ -25,9 +25,9 @@ CREATE TABLE PERMISSIONS (
 
 -- TABLE: ROLES_PERMISSIONS
 CREATE TABLE ROLES_PERMISSIONS (
-                                   id SERIAL PRIMARY KEY,
                                    roles_id INT REFERENCES ROLES(id) ON DELETE CASCADE,
-                                   permissions_id INT REFERENCES PERMISSIONS(id) ON DELETE CASCADE
+                                   permissions_id INT REFERENCES PERMISSIONS(id) ON DELETE CASCADE,
+                                   PRIMARY KEY (roles_id,permissions_id)
 );
 
 -- TABLE: MODULES

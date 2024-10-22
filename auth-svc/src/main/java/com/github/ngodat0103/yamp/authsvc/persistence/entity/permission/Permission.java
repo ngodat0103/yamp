@@ -13,7 +13,7 @@ public class Permission {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(updatable = false)
+  @Column(updatable = false, name = "permission_id")
   private Long id;
 
   @Convert(converter = ToUppercaseConverter.class)

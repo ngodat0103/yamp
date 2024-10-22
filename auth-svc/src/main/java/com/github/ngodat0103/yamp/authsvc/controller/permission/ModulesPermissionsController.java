@@ -1,7 +1,8 @@
-package com.github.ngodat0103.yamp.authsvc.controller.module;
+package com.github.ngodat0103.yamp.authsvc.controller.permission;
 
-import com.github.ngodat0103.yamp.authsvc.dto.permission.ModulesPermissionsDto;
-import com.github.ngodat0103.yamp.authsvc.persistence.entity.permission.ModulesPermissions;
+import com.github.ngodat0103.yamp.authsvc.dto.permission.ModulePermissionDetailDto;
+import com.github.ngodat0103.yamp.authsvc.dto.permission.ModulePermissionDto;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.permission.ModulePermission;
 import com.github.ngodat0103.yamp.authsvc.service.impl.ModulesPermissionsServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,7 +13,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Optional;
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api/v1/modules-permissions")
 @AllArgsConstructor
 @SecurityRequirement(name = "oauth2")
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
 @Tag(
     name = "Modules Permissions",
     description = "Operations related to modules permissions management")
@@ -44,12 +46,11 @@ public class ModulesPermissionsController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = ModulesPermissions.class)))
+                    schema = @Schema(implementation = ModulePermissionDetailDto.class)))
       })
   @GetMapping(produces = "application/json")
-  public ResponseEntity<List<ModulesPermissionsDto>> getAllModulesPermissions() {
-    List<ModulesPermissionsDto> modulesPermissions = modulesPermissionsService.findAll();
-    return ResponseEntity.ok(modulesPermissions);
+  public List<ModulePermissionDetailDto> getAllModulesPermissions() {
+    return modulesPermissionsService.findAllDetail();
   }
 
   @Operation(
@@ -59,18 +60,13 @@ public class ModulesPermissionsController {
       value = {
         @ApiResponse(
             responseCode = "201",
-            description = "Module permission created successfully",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = ModulesPermissions.class))),
+            description = "Module permission created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
       })
   @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
-  public void createModulePermission(@RequestBody ModulesPermissionsDto modulePermission) {
-    log.debug("Controller createModulePermission method called");
-    modulesPermissionsService.create(modulePermission);
+  public ModulePermissionDto createModulePermission(@RequestBody @Valid ModulePermissionDto modulePermission) {
+   return  modulesPermissionsService.create(modulePermission);
   }
 
   @Operation(
@@ -84,15 +80,14 @@ public class ModulesPermissionsController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = ModulesPermissions.class))),
+                    schema = @Schema(implementation = ModulePermissionDetailDto.class))),
         @ApiResponse(responseCode = "404", description = "Module permission not found")
       })
   @GetMapping(path = "/{id}", produces = "application/json")
-  public ResponseEntity<ModulesPermissionsDto> getModulePermissionById(
+  public ModulePermissionDetailDto getModulePermissionById(
       @Parameter(description = "ID of the module permission to be retrieved") @PathVariable
           Long id) {
-
-      return ResponseEntity.ok( modulesPermissionsService.readById(id));
+    return modulesPermissionsService.readDetailById(id);
   }
 
   @Operation(
@@ -106,15 +101,19 @@ public class ModulesPermissionsController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = ModulesPermissions.class))),
+                    schema = @Schema(implementation = ModulePermissionDto.class))),
         @ApiResponse(responseCode = "404", description = "Module permission not found")
       })
   @PutMapping(path = "/{id}")
-  public ResponseEntity<ModulesPermissionsDto> updateModulePermission(
-      @Parameter(description = "ID of the module permission to be updated") @PathVariable Long id,
-      @RequestBody ModulesPermissionsDto modulePermission) {
-    ModulesPermissionsDto updatedModulePermission = modulesPermissionsService.update(id, modulePermission);
-    return ResponseEntity.ok(updatedModulePermission);
+  public ModulePermissionDto
+      updateModulePermission(
+          @Parameter(description = "ID of the module permission to be updated") @PathVariable
+              Long id,
+          @RequestBody
+          @Valid
+          ModulePermissionDto
+                  updateModulePermissionDto) {
+    return modulesPermissionsService.update(id,updateModulePermissionDto);
   }
 
   @Operation(

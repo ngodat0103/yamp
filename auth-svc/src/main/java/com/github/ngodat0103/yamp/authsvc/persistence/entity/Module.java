@@ -1,5 +1,6 @@
-package com.github.ngodat0103.yamp.authsvc.persistence.entity.module;
+package com.github.ngodat0103.yamp.authsvc.persistence.entity;
 
+import com.github.ngodat0103.yamp.authsvc.persistence.converter.ToUppercaseConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Table(name = "MODULES")
 @Getter
 @Setter
-public class Modules {
+public class Module {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,5 +17,6 @@ public class Modules {
   private Long id;
 
   @Column(nullable = false, unique = true)
+  @Convert(converter = ToUppercaseConverter.class)
   private String name;
 }

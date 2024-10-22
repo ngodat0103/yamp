@@ -1,8 +1,8 @@
-package com.github.ngodat0103.yamp.authsvc.controller.module;
+package com.github.ngodat0103.yamp.authsvc.controller;
 
-import com.github.ngodat0103.yamp.authsvc.dto.module.ModuleDto;
-import com.github.ngodat0103.yamp.authsvc.persistence.entity.module.Modules;
-import com.github.ngodat0103.yamp.authsvc.service.impl.ModulesServiceImpl;
+import com.github.ngodat0103.yamp.authsvc.dto.ModuleDto;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.Module;
+import com.github.ngodat0103.yamp.authsvc.service.impl.ModuleServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,7 +17,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,11 +24,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api/v1/modules")
 @AllArgsConstructor
 @SecurityRequirement(name = "oauth2")
-//@PreAuthorize("hasRole('ADMIN')")
+// @PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Modules", description = "Operations related to modules management")
-public class ModulesController {
+public class ModuleController {
 
-  private final ModulesServiceImpl modulesService;
+  private final ModuleServiceImpl modulesService;
 
   @Operation(summary = "Get all modules", description = "Retrieves a list of all modules.")
   @ApiResponses(
@@ -40,7 +39,7 @@ public class ModulesController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Modules.class)))
+                    schema = @Schema(implementation = Module.class)))
       })
   @GetMapping(produces = "application/json")
   public ResponseEntity<List<ModuleDto>> getAllModules() {
@@ -57,14 +56,14 @@ public class ModulesController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Modules.class))),
+                    schema = @Schema(implementation = Module.class))),
         @ApiResponse(responseCode = "400", description = "Invalid input")
       })
   @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
-  public void createModule(@RequestBody ModuleDto module) {
+  public ModuleDto createModule(@RequestBody ModuleDto module) {
     log.debug("Controller createModule method called");
-    modulesService.create(module);
+    return modulesService.create(module);
   }
 
   @Operation(summary = "Get module by ID", description = "Retrieves a module by its ID.")
@@ -76,7 +75,7 @@ public class ModulesController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Modules.class))),
+                    schema = @Schema(implementation = Module.class))),
         @ApiResponse(responseCode = "404", description = "Module not found")
       })
   @GetMapping(path = "/{id}", produces = "application/json")
@@ -95,14 +94,14 @@ public class ModulesController {
             content =
                 @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Modules.class))),
+                    schema = @Schema(implementation = Module.class))),
         @ApiResponse(responseCode = "404", description = "Module not found")
       })
   @PutMapping(path = "/{id}")
   public ResponseEntity<ModuleDto> updateModule(
       @Parameter(description = "ID of the module to be updated") @PathVariable Long id,
       @RequestBody ModuleDto module) {
-    ModuleDto updatedModule = modulesService.update(id,module);
+    ModuleDto updatedModule = modulesService.update(id, module);
     return ResponseEntity.ok(updatedModule);
   }
 

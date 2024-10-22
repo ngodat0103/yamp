@@ -1,6 +1,6 @@
 package com.github.ngodat0103.yamp.authsvc.persistence.entity.permission;
 
-import com.github.ngodat0103.yamp.authsvc.persistence.entity.module.Operations;
+import com.github.ngodat0103.yamp.authsvc.persistence.entity.Operation;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,11 +13,11 @@ public class PermissionsOperations {
 
   @ManyToOne
   @JoinColumn(name = "permission_id", nullable = false)
-  private Permissions permission;
+  private Permission permission;
 
   @ManyToOne
   @JoinColumn(name = "operations_id", nullable = false)
-  private Operations operations;
+  private Operation operation;
 
   // Getters and Setters
   public Long getId() {
@@ -28,19 +28,19 @@ public class PermissionsOperations {
     this.id = id;
   }
 
-  public Permissions getPermission() {
+  public Permission getPermission() {
     return permission;
   }
 
-  public void setPermission(Permissions permission) {
+  public void setPermission(Permission permission) {
     this.permission = permission;
   }
 
-  public Operations getOperations() {
-    return operations;
+  public Operation getOperations() {
+    return operation;
   }
 
-  public void setOperations(Operations operations) {
-    this.operations = operations;
+  public void setOperations(Operation operation) {
+    this.operation = operation;
   }
 }

@@ -1,4 +1,4 @@
-package com.github.ngodat0103.yamp.authsvc.controller.module;
+package com.github.ngodat0103.yamp.authsvc.controller.permission;
 
 import com.github.ngodat0103.yamp.authsvc.dto.permission.PermissionsOperationsDto;
 import com.github.ngodat0103.yamp.authsvc.persistence.entity.permission.PermissionsOperations;
@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -70,8 +69,8 @@ public class PermissionsOperationsController {
   public ResponseEntity<PermissionsOperationsDto> getPermissionOperationById(
       @Parameter(description = "ID of the permission operation to be retrieved") @PathVariable
           Long id) {
-      PermissionsOperationsDto permissionOperation = permissionsOperationsService.readById(id);
-        return new ResponseEntity<>(permissionOperation, HttpStatus.OK);
+    PermissionsOperationsDto permissionOperation = permissionsOperationsService.readById(id);
+    return new ResponseEntity<>(permissionOperation, HttpStatus.OK);
   }
 
   @Operation(
@@ -91,7 +90,7 @@ public class PermissionsOperationsController {
   @PostMapping(consumes = "application/json", produces = "application/json")
   public ResponseEntity<PermissionsOperationsDto> createPermissionOperation(
       @RequestBody PermissionsOperationsDto permissionsOperations) {
-      PermissionsOperationsDto createdPermissionOperation =
+    PermissionsOperationsDto createdPermissionOperation =
         permissionsOperationsService.create(permissionsOperations);
     return new ResponseEntity<>(createdPermissionOperation, HttpStatus.CREATED);
   }

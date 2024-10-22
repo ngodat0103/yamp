@@ -1,32 +1,22 @@
 package com.github.ngodat0103.yamp.authsvc.persistence.entity.permission;
 
+import com.github.ngodat0103.yamp.authsvc.persistence.converter.ToUppercaseConverter;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "PERMISSIONS")
-public class Permissions {
+@Getter
+@Setter
+public class Permission {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(updatable = false)
   private Long id;
 
+  @Convert(converter = ToUppercaseConverter.class)
   @Column(nullable = false)
   private String name;
-
-  // Getters and Setters
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
 }

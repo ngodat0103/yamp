@@ -17,7 +17,7 @@ public class RolesPermissions {
 
   @ManyToOne
   @JoinColumn(name = "permissions_id", nullable = false)
-  private Permissions permissions;
+  private Permission permission;
 
   // Getters and Setters
   public Long getId() {
@@ -36,11 +36,11 @@ public class RolesPermissions {
     this.roles = roles;
   }
 
-  public Permissions getPermissions() {
-    return permissions;
+  public Permission getPermissions() {
+    return permission;
   }
 
-  public void setPermissions(Permissions permissions) {
-    this.permissions = permissions;
+  public void setPermissions(Permission permission) {
+    this.permission = permission;
   }
 }

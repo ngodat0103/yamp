@@ -1,11 +1,12 @@
-package com.github.ngodat0103.yamp.authsvc.controller.permission;
+package com.github.ngodat0103.yamp.authsvc.controller;
 
 import com.github.ngodat0103.yamp.authsvc.dto.permission.PermissionDto;
+import com.github.ngodat0103.yamp.authsvc.dto.permission.PermissionOperationsDto;
 import com.github.ngodat0103.yamp.authsvc.service.impl.PermissionServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -48,7 +49,27 @@ public class PermissionController {
 
   @GetMapping
   @Operation(summary = "Get all permissions")
-  public List<PermissionDto> getAllPermissions() {
+  public Set<PermissionDto> getAllPermissions() {
     return permissionService.findAll();
+  }
+
+  @GetMapping("/list-operations/{permission_id}")
+  public PermissionOperationsDto getOperationsByPermissionId(
+          @PathVariable(name = "permission_id") Long permissionId) {
+    return permissionService.getOperations(permissionId);
+  }
+
+  @PostMapping("/add-operations/{permission_id}")
+  @ResponseStatus(HttpStatus.CREATED)
+  public PermissionOperationsDto addOperations(
+      @PathVariable(name = "permission_id") Long permissionId, @RequestBody Set<Long> operationIds) {
+    return permissionService.addOperations(permissionId, operationIds);
+  }
+
+  @DeleteMapping("/delete-operations/{permissionId}")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public PermissionOperationsDto deleteOperations(
+      @PathVariable Long permissionId, Set<Long> operationIds) {
+    return permissionService.deleteOperations(permissionId, operationIds);
   }
 }

@@ -15,9 +15,10 @@ on:
       - "gateway-svc/**"
 jobs:
   send-webhook:
-    name: Send webhook
-    uses: distributhor/workflow-webhook@v3.0.7
+    name: Send Webhook to Jenkins
+    uses: distributhor/workflow-webhook@v3
     with:
-      webhook_url: "https://${{secrets.WEBHOOK_ENDPOINT}}"
-      webhook_auth: "https://${{secrets.WEBHOOK_GATEWAY_SVC_AUTH}}"
+      webhook_url: ${{ secrets.WEBHOOK_ENDPOINT }}
+      webhook_auth: ${{ secrets.WEBHOOK_GATEWAY_SVC_AUTH }}
       webhook_auth_type: "header"
+      webhook_type: "json"

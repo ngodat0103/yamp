@@ -1,47 +1,49 @@
 package com.example.yamp.usersvc.persistence.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity
 @Getter
 @Setter
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"customerUuid", "name"})})
-public class Address {
+@Entity
+@Table(name = "address", schema = "public")
+public class Address extends BaseEntity {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private UUID uuid;
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-  @Column(nullable = false)
-  private UUID customerUuid;
+  @Size(max = 10)
+  @Column(name = "unit_number", length = 10)
+  private String unitNumber;
 
-  @Column(nullable = false)
-  private String name;
+  @Size(max = 10)
+  @Column(name = "street_number", length = 10)
+  private String streetNumber;
 
-  @Column(nullable = false)
-  private String cityName;
+  @Size(max = 255)
+  @Column(name = "address_line1")
+  private String addressLine1;
 
-  @Column(nullable = false)
-  private String phoneNumber;
+  @Size(max = 255)
+  @Column(name = "address_line2")
+  private String addressLine2;
 
-  @Column(nullable = false)
-  private String province;
+  @Size(max = 100)
+  @Column(name = "city", length = 100)
+  private String city;
 
-  @Column(nullable = false)
-  private String street;
+  @Size(max = 100)
+  @Column(name = "region", length = 100)
+  private String region;
 
-  @Column(nullable = false)
-  private String ward;
+  @Size(max = 20)
+  @Column(name = "postal_code", length = 20)
+  private String postalCode;
 
-  @Column(nullable = false)
-  private String district;
-
-  @Column(nullable = false)
-  private String addressType;
-
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "customerUuid", insertable = false, updatable = false)
-  private Customer customer;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "country_id")
+  private Country country;
 }

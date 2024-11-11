@@ -1,16 +1,17 @@
 package com.example.yamp.usersvc.service;
 
-import com.example.yamp.usersvc.dto.address.AddressDto;
-import com.example.yamp.usersvc.dto.address.AddressResponseDto;
+import com.example.yamp.usersvc.dto.AddressDto;
+import java.util.List;
 import java.util.UUID;
-import javax.security.auth.login.AccountNotFoundException;
 
 public interface AddressService {
-  void createAddress(AddressDto addressDto) throws AccountNotFoundException;
+  AddressDto createAddress(AddressDto addressDto);
 
-  AddressResponseDto getAddresses() throws AccountNotFoundException;
+  AddressDto getAddressById(UUID id);
 
-  void updateAddress(UUID addresssUuid, AddressDto addressDto) throws AccountNotFoundException;
+  List<AddressDto> getAllAddresses();
 
-  void deleteAddress(UUID addressUuid) throws AccountNotFoundException;
+  AddressDto updateAddress(AddressDto addressDto);
+
+  void deleteAddress(UUID id);
 }

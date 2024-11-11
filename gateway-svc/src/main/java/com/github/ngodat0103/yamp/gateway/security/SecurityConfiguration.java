@@ -1,16 +1,11 @@
 package com.github.ngodat0103.yamp.gateway.security;
 
-import com.github.ngodat0103.yamp.gateway.security.filter.AddJwtHeaderFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
@@ -47,19 +42,10 @@ public class SecurityConfiguration {
     return http.build();
   }
 
-  @Bean
-  SecurityWebFilterChain grafanaFilterChain(ServerHttpSecurity http) {
-    http.cors(ServerHttpSecurity.CorsSpec::disable);
-    http.csrf(ServerHttpSecurity.CsrfSpec::disable);
-    http.securityMatcher(new PathPatternParserServerWebExchangeMatcher("/grafana/**"));
-    http.authorizeExchange(exchange -> exchange.anyExchange().permitAll());
-    return http.build();
-  }
 
   @Bean
   SecurityWebFilterChain apiFilterChain(
-      ServerHttpSecurity http,
-      ReactiveOAuth2AuthorizedClientService reactiveOAuth2AuthorizedClientService) {
+      ServerHttpSecurity http) {
     http.csrf(ServerHttpSecurity.CsrfSpec::disable);
     ServerWebExchangeMatcher apiMatcher =
         new PathPatternParserServerWebExchangeMatcher("/api/v1/**");
@@ -93,18 +79,6 @@ public class SecurityConfiguration {
                 .permitAll()
                 .anyExchange()
                 .permitAll());
-    //        http.oauth2Client(Customizer.withDefaults());
-    //        http.oauth2Login(Customizer.withDefaults());
-    //        http.logout(logout -> logout.logoutUrl("/api/v1/auth/logout"));
-    http.oauth2ResourceServer(resource -> resource.jwt(Customizer.withDefaults()));
-
-    http.addFilterAfter(
-        new AddJwtHeaderFilter(reactiveOAuth2AuthorizedClientService),
-        SecurityWebFiltersOrder.AUTHORIZATION);
-    WebSessionServerSecurityContextRepository webSessionServerSecurityContextRepository =
-        new WebSessionServerSecurityContextRepository();
-    webSessionServerSecurityContextRepository.setCacheSecurityContext(false);
-    http.securityContextRepository(webSessionServerSecurityContextRepository);
     return http.build();
   }
 }

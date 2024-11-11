@@ -1,0 +1,39 @@
+on:
+  push:
+    branches:
+      - "feature/**"
+      - "fix/**"
+    paths:
+      - "auth-svc/**"
+  pull_request_target:
+    types: [opened,reopened]
+    branches:
+      - "feature/**"
+      - "fix/**"
+    paths:
+      - "auth-svc/**"
+jobs:
+  push:
+    name: auth-svc-push
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/CI_template.yaml
+    with:
+      SERVICE_NAME: auth-svc
+      SERVICE_PORT: 8001
+    secrets: inherit
+  pr-integration-test:
+    name: auth-svc-integration-test
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: [push]
+    steps:
+      - name: Will be implemented
+        run: echo "Will be implemented"
+  pr-push-image:
+    name: auth-svc-pr-push-image
+    if: github.event_name == 'pull_request'
+    needs: [pr-integration-test]
+    uses: ./.github/workflows/ci-pr-workflow-call.yaml
+    with:
+      SERVICE_NAME: auth-svc
+      SERVICE_PORT: 8001

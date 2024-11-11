@@ -1,0 +1,64 @@
+on:
+  push:
+    branches:
+      - "features/**"
+      - "fix/**"
+    paths:
+      - "product-svc/**"
+  pull_request_target:
+    types: [ opened,reopened ]
+    branches:
+      - "feature/**"
+      - "fix/**"
+    paths:
+      - "product-svc/**"
+jobs:
+  push:
+    name: product-svc-commit
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/CI_template.yaml
+    with:
+      SERVICE_NAME: product-svc
+      SERVICE_PORT: 8003
+    secrets: inherit
+
+  pr-integration-test:
+    name: product-svc-integration-test
+    if: github.event_name == 'pull_request'
+    runs-on: cloud-uit
+    services:
+      share-db:
+        image: postgres:16.3-bullseye
+        volumes:
+          - /home/github-runner/yamp-integration/init.sql:/docker-entrypoint-initdb.d/init.sql
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+    container:
+      image: maven:3.8.4-openjdk-17
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Cache Maven packages
+        uses: actions/cache@v4.0.2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-v1-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2-v1-
+      - name: Running integration test
+        working-directory: product-svc
+        run: mvn test -q -Dtest=*IntegrationTest
+
+
+  pr:
+    name: product-svc-pr
+    needs: [pr-integration-test]
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/ci-pr-workflow-call.yaml
+    with:
+      SERVICE_NAME: product-svc
+      SERVICE_PORT: 8003
+    secrets: inherit

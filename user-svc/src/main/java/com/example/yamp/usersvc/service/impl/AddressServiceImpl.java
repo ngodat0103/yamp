@@ -1,128 +1,91 @@
 package com.example.yamp.usersvc.service.impl;
 
-import static com.example.yamp.usersvc.exception.Util.addressNotFoundExceptionSupplier;
-import static com.example.yamp.usersvc.exception.Util.customerNotFoundExceptionSupplier;
-
-import com.example.yamp.usersvc.dto.address.AddressDto;
-import com.example.yamp.usersvc.dto.address.AddressResponseDto;
+import com.example.yamp.usersvc.dto.AddressDto;
 import com.example.yamp.usersvc.dto.mapper.AddressMapper;
 import com.example.yamp.usersvc.exception.ConflictException;
 import com.example.yamp.usersvc.exception.NotFoundException;
 import com.example.yamp.usersvc.persistence.entity.Address;
-import com.example.yamp.usersvc.persistence.entity.Customer;
+import com.example.yamp.usersvc.persistence.entity.Country;
 import com.example.yamp.usersvc.persistence.repository.AddressRepository;
-import com.example.yamp.usersvc.persistence.repository.CustomerRepository;
+import com.example.yamp.usersvc.persistence.repository.CountryRepository;
 import com.example.yamp.usersvc.service.AddressService;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
+@AllArgsConstructor
 public class AddressServiceImpl implements AddressService {
-  private final AddressRepository addressRepository;
-  private final CustomerRepository customerRepository;
-  private final AddressMapper addressMapper;
+
+  private final CountryRepository countryRepository;
+  private AddressRepository addressRepository;
+
+  private AddressMapper addressMapper;
 
   @Override
-  @Transactional
-  public void createAddress(AddressDto addressDto) {
-    UUID customerUuid = getCustomerUuidFromAuthentication();
-    Customer customer =
-        customerRepository
-            .findCustomerByCustomerUuid(customerUuid)
-            .orElseThrow(customerNotFoundExceptionSupplier(log, customerUuid));
+  public AddressDto createAddress(AddressDto addressDto) {
 
-    addressRepository
-        .findAddressByCustomerUuidAndName(customerUuid, addressDto.getName())
-        .ifPresent(
-            address -> {
-              log.debug(
-                  "Address name conflict for customer UUID: {} and address name: {}",
-                  customerUuid,
-                  addressDto.getName());
-              throw new ConflictException("Address name conflict");
-            });
-    Address address = addressMapper.mapToEntity(addressDto);
-    address.setCustomerUuid(customerUuid);
-    customer.setLastModifiedDate(LocalDateTime.now());
-    customerRepository.save(customer);
-    addressRepository.save(address);
-  }
-
-  @Override
-  public AddressResponseDto getAddresses() {
-    UUID customerUuid = getCustomerUuidFromAuthentication();
-    customerRepository
-        .findCustomerByCustomerUuid(customerUuid)
-        .orElseThrow(customerNotFoundExceptionSupplier(log, customerUuid));
-
-    Set<Address> addresses = addressRepository.findAddressByCustomerUuid(customerUuid);
-    if (addresses.isEmpty()) {
-      log.debug("No address found for customer UUID: {}", customerUuid);
+    if (addressRepository.existsByStreetNumberAndAddressLine1AndCity(
+        addressDto.getStreetNumber(), addressDto.getAddressLine1(), addressDto.getCity())) {
+      throw new ConflictException("Address already exists.");
     }
-    Set<AddressDto> addressDtos = addressMapper.mapToDtos(addresses);
-    return AddressResponseDto.builder()
-        .customerUuid(customerUuid)
-        .addresses(addressDtos)
-        .currentElements(addressDtos.size())
-        .totalElements(addresses.size())
-        .currentPage(1)
-        .totalPages(1)
-        .build();
+
+    Address address = addressMapper.toEntity(addressDto);
+    address.setLastModifiedAt(LocalDateTime.now());
+    address.setCreatedAt(LocalDateTime.now());
+    Address savedAddress = addressRepository.save(address);
+
+    return addressMapper.toDto(savedAddress);
   }
 
   @Override
-  @Transactional
-  public void updateAddress(UUID addressUuid, AddressDto addressDto) {
-
-    UUID customerUuid = getCustomerUuidFromAuthentication();
-    Customer customer =
-        customerRepository
-            .findCustomerByCustomerUuid(customerUuid)
-            .orElseThrow(customerNotFoundExceptionSupplier(log, customerUuid));
-    addressRepository
-        .findById(addressUuid)
-        .orElseThrow(addressNotFoundExceptionSupplier(log, addressUuid));
-    Address address = addressMapper.mapToEntity(addressDto);
-
-    address.setCustomerUuid(customerUuid);
-    address.setUuid(addressUuid);
-    addressRepository.save(address);
-    customer.setLastModifiedDate(LocalDateTime.now());
-    customerRepository.save(customer);
+  public AddressDto getAddressById(UUID id) {
+    Address address = addressRepository.findById(id).orElse(null);
+    return address != null ? addressMapper.toDto(address) : null;
   }
 
-  @Transactional
   @Override
-  public void deleteAddress(UUID addressUuid) {
-    UUID customerUuid = getCustomerUuidFromAuthentication();
-    customerRepository
-        .findCustomerByCustomerUuid(customerUuid)
-        .orElseThrow(customerNotFoundExceptionSupplier(log, customerUuid));
+  public List<AddressDto> getAllAddresses() {
+    List<Address> addresses = addressRepository.findAll();
+    return addresses.stream().map(addressMapper::toDto).toList();
+  }
 
-    if (!addressRepository.existsById(addressUuid)) {
-      log.debug(
-          "Address not found for customer UUID: {} and address UUID: {}",
-          customerUuid,
-          addressUuid);
-      throw new NotFoundException("Address not found");
+  @Override
+  public AddressDto updateAddress(AddressDto addressDto) {
+
+    // Check for conflicts
+    if (addressRepository.existsByStreetNumberAndAddressLine1AndCityAndIdNot(
+        addressDto.getStreetNumber(),
+        addressDto.getAddressLine1(),
+        addressDto.getCity(),
+        addressDto.getId())) {
+      throw new ConflictException("Address already exists.");
     }
-    addressRepository.deleteByUuid(addressUuid);
+
+    Address address =
+        addressRepository
+            .findById(addressDto.getId())
+            .orElseThrow(() -> new NotFoundException("Address not found."));
+
+    Country country =
+        countryRepository
+            .findById(addressDto.getCountryId())
+            .orElseThrow(() -> new NotFoundException("Country not found."));
+    address.setAddressLine2(addressDto.getAddressLine2());
+    address.setCity(addressDto.getCity());
+    address.setCountry(country);
+    address.setStreetNumber(addressDto.getStreetNumber());
+    address.setUnitNumber(addressDto.getUnitNumber());
+    address.setPostalCode(addressDto.getPostalCode());
+    address.setRegion(addressDto.getRegion());
+    address.setLastModifiedAt(LocalDateTime.now());
+    return addressMapper.toDto(address);
   }
 
-  private UUID getCustomerUuidFromAuthentication() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Assert.notNull(authentication, "Authentication is required");
-    Assert.notNull(authentication.getName(), "Customer UUID is required");
-    return UUID.fromString(authentication.getName());
+  @Override
+  public void deleteAddress(UUID id) {
+    addressRepository.deleteById(id);
   }
 }

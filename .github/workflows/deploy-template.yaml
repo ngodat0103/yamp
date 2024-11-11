@@ -1,0 +1,75 @@
+name: Deploy template
+on:
+  workflow_call:
+    inputs:
+      SERVICE_PORT:
+        description: "port of the service to trigger the CD"
+        required: true
+        type: string
+      SERVICE_NAME:
+        description: "name of the service to trigger the CD"
+        required: true
+        type: string
+      VERSION:
+        description: "next version of the service"
+        required: true
+        type: string
+jobs:
+  build-push:
+#    environment: pre-production
+    name: Build and push container image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: set up buildx
+        uses: docker/setup-buildx-action@v3.4.0
+      - name: docker login credential
+        uses: docker/login-action@v3.2.0
+        with:
+          registry: ghcr.io
+          username: ${{github.repository_owner}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5.5.1
+        with:
+          images: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}
+      - name: build and push with specific tag
+        uses: docker/build-push-action@v6.9.0
+        with:
+          file: Dockerfile-For-CI
+          push: true
+          tags: ghcr.io/${{github.repository}}/${{inputs.SERVICE_NAME}}:${{inputs.VERSION}}
+          labels: ${{steps.meta.outputs.labels}}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            SERVICE_NAME=${{inputs.SERVICE_NAME}}
+            SERVICE_PORT=${{inputs.SERVICE_PORT}}
+            VERSION=${{inputs.VERSION}}
+  deploy:
+    name: Deploying ${{inputs.SERVICE_NAME}}
+    needs: [build-push]
+    runs-on: ubuntu-latest
+    steps:
+      - name: will be implemented later
+        run: echo "will be implemented later"
+
+  clean-up-packages:
+    needs: [deploy]
+    name: Clean up old packages, and untag old images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean up untagged package_name
+        uses: actions/delete-package-versions@v5.0.0
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          package-name: yamp/${{inputs.SERVICE_NAME}}
+          package-type: container
+          delete-only-untagged-versions: true
+          min-versions-to-keep: 10
+
+
+

@@ -1,54 +1,82 @@
 package com.example.yamp.usersvc.controller;
 
-import com.example.yamp.usersvc.dto.address.AddressDto;
-import com.example.yamp.usersvc.dto.address.AddressResponseDto;
+import com.example.yamp.usersvc.dto.AddressDto;
 import com.example.yamp.usersvc.service.AddressService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import java.util.UUID;
-import javax.security.auth.login.AccountNotFoundException;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.util.Assert;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/address")
-@SecurityRequirement(name = "oauth2")
+@RequestMapping("/api/v1/addresses")
+@RequiredArgsConstructor
+@Tag(name = "Address", description = "The Address API")
 public class AddressController {
+
   private final AddressService addressService;
 
-  public AddressController(AddressService addressService) {
-    this.addressService = addressService;
+  @PostMapping
+  @Operation(
+      summary = "Create a new address",
+      description = "Creates a new address and returns the created address.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "201", description = "Address created successfully"),
+        @ApiResponse(responseCode = "409", description = "Address already exists")
+      })
+  public ResponseEntity<AddressDto> createAddress(@RequestBody AddressDto addressDto) {
+    AddressDto createdAddress = addressService.createAddress(addressDto);
+    return ResponseEntity.status(201).body(createdAddress);
   }
 
-  @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public void createAddress(@RequestBody @Valid AddressDto addressDto)
-      throws AccountNotFoundException {
-    addressService.createAddress(addressDto);
+  @GetMapping("/{id}")
+  @Operation(summary = "Get address by ID", description = "Retrieves an address by its ID.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Address found"),
+        @ApiResponse(responseCode = "404", description = "Address not found")
+      })
+  public ResponseEntity<AddressDto> getAddressById(@PathVariable UUID id) {
+    AddressDto address = addressService.getAddressById(id);
+    return address != null ? ResponseEntity.ok(address) : ResponseEntity.notFound().build();
   }
 
   @GetMapping
-  public AddressResponseDto getAddresses() throws AccountNotFoundException {
-
-    return addressService.getAddresses();
+  @Operation(summary = "Get all addresses", description = "Retrieves all addresses.")
+  @ApiResponse(responseCode = "200", description = "Addresses retrieved successfully")
+  public ResponseEntity<List<AddressDto>> getAllAddresses() {
+    List<AddressDto> addresses = addressService.getAllAddresses();
+    return ResponseEntity.ok(addresses);
   }
 
-  @PutMapping("/{addressUuid}")
-  @ResponseStatus(HttpStatus.ACCEPTED)
-  public void updateAddress(
-      @RequestBody @Valid AddressDto addressDto, @PathVariable UUID addressUuid)
-      throws AccountNotFoundException {
-    addressService.updateAddress(addressUuid, addressDto);
+  @PutMapping
+  @Operation(
+      summary = "Update an address",
+      description = "Updates an existing address and returns the updated address.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Address updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Address not found")
+      })
+  public ResponseEntity<AddressDto> updateAddress(@RequestBody AddressDto addressDto) {
+    AddressDto updatedAddress = addressService.updateAddress(addressDto);
+    return ResponseEntity.ok(updatedAddress);
   }
 
-  @DeleteMapping(path = "/{addressUuid}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteAddress(Authentication authentication, @PathVariable UUID addressUuid)
-      throws AccountNotFoundException {
-    Assert.notNull(authentication, "Authentication must not be null");
-    Assert.notNull(authentication.getName(), "Authentication name must not be null");
-    addressService.deleteAddress(addressUuid);
+  @DeleteMapping("/{id}")
+  @Operation(summary = "Delete an address", description = "Deletes an address by its ID.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "Address deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Address not found")
+      })
+  public ResponseEntity<Void> deleteAddress(@PathVariable UUID id) {
+    addressService.deleteAddress(id);
+    return ResponseEntity.noContent().build();
   }
 }

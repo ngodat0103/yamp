@@ -1,49 +1,99 @@
 package com.github.ngodat0103.yamp.authsvc.controller;
 
-import com.github.ngodat0103.yamp.authsvc.dto.RoleDto;
-import com.github.ngodat0103.yamp.authsvc.service.RoleService;
+import com.github.ngodat0103.yamp.authsvc.dto.permission.RolePermissionsDto;
+import com.github.ngodat0103.yamp.authsvc.dto.role.RoleDto;
+import com.github.ngodat0103.yamp.authsvc.service.impl.RoleServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.Set;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@Slf4j
-@RequestMapping(value = "/roles")
-@AllArgsConstructor
-@SecurityRequirement(name = "oauth2")
-@PreAuthorize("hasRole('ADMIN')")
+@RequestMapping("/api/v1/auth/roles")
 public class RoleController {
 
-  private RoleService roleService;
+  private final RoleServiceImpl roleService;
 
-  @Operation(summary = "Get all roles", description = "Retrieves a list of all roles.")
-  @GetMapping(produces = "application/json")
-  public Set<RoleDto> getRole() {
-    return roleService.getRole();
+  public RoleController(RoleServiceImpl roleService) {
+    this.roleService = roleService;
   }
 
-  @Operation(summary = "Create a new role", description = "Adds a new role to the system.")
-  @ApiResponse(responseCode = "201", description = "Role created successfully")
-  @PostMapping()
+  @Operation(summary = "Create a new role")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "201", description = "Role created successfully"),
+        @ApiResponse(responseCode = "409", description = "Role already exists")
+      })
+  @PostMapping
+  public RoleDto createRole(@RequestBody @Valid RoleDto roleDto) {
+    return roleService.create(roleDto);
+  }
+
+  @Operation(summary = "Get all roles")
+  @ApiResponse(responseCode = "200", description = "Found roles")
+  @GetMapping
+  public Set<RoleDto> getAllRoles() {
+    return roleService.findAll();
+  }
+
+  @Operation(summary = "Get a role by ID")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "200", description = "Role found"),
+        @ApiResponse(responseCode = "404", description = "Role not found")
+      })
+  @GetMapping("/permissions/{roleId}")
+  public RolePermissionsDto getRoleById(
+      @Parameter(description = "ID of the role to be obtained") @PathVariable Long roleId) {
+    return roleService.getPermissions(roleId);
+  }
+
+  @PostMapping(path = "/add-permissions/{roleId}")
+  @Operation(summary = "Add permissions to a role")
   @ResponseStatus(HttpStatus.CREATED)
-  public void createRole(@RequestBody RoleDto roleDto) {
-    log.debug("Controller createRole method called");
-    roleService.addRole(roleDto);
+  public RolePermissionsDto addPermissions(
+      @Parameter(description = "ID of the role to be updated") @PathVariable Long roleId,
+      @RequestBody Set<Long> permissionIds) {
+    return roleService.addPermissions(roleId, permissionIds);
   }
 
-  @Operation(summary = "Delete a role", description = "Removes a role from the system by its UUID.")
-  @ApiResponse(responseCode = "202", description = "Role deleted successfully")
-  @DeleteMapping(path = "/{uuid}")
+  @DeleteMapping(path = "/delete-permissions/{roleId}")
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public void deleteRole(@PathVariable UUID uuid) {
-    log.debug("Controller updateRole method called");
-    roleService.deleteRole(uuid);
+  public RolePermissionsDto deletePermissions(
+      @Parameter(description = "ID of the role to be updated") @PathVariable Long roleId,
+      @RequestBody Set<Long> permissionIds) {
+    return roleService.deletePermissions(roleId, permissionIds);
+  }
+
+  @Operation(summary = "Update a role")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "202", description = "Role updated successfully"),
+        @ApiResponse(responseCode = "404", description = "Role not found"),
+        @ApiResponse(responseCode = "409", description = "Role name conflict")
+      })
+  @PutMapping("/{id}")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public RoleDto updateRole(
+      @Parameter(description = "ID of the role to be updated") @PathVariable Long id,
+      @RequestBody @Valid RoleDto roleDto) {
+    return roleService.update(id, roleDto);
+  }
+
+  @Operation(summary = "Delete a role")
+  @ApiResponses(
+      value = {
+        @ApiResponse(responseCode = "204", description = "Role deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Role not found")
+      })
+  @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteRole(
+      @Parameter(description = "ID of the role to be deleted") @PathVariable Long id) {
+    roleService.deleteById(id);
   }
 }

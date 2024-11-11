@@ -1,7 +1,6 @@
 package com.example.yamp.usersvc.security;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -28,9 +27,9 @@ public class SecurityConfiguration {
             authorize
                 .requestMatchers(HttpMethod.POST, "/register")
                 .permitAll()
-                .requestMatchers("/ui-docs/**")
+                .requestMatchers("**/ui-docs/**")
                 .permitAll()
-                .requestMatchers("/api-docs/**")
+                .requestMatchers("**/api-docs/**")
                 .permitAll()
                 .requestMatchers("/actuator/prometheus")
                 .permitAll()
@@ -40,8 +39,11 @@ public class SecurityConfiguration {
                 .permitAll()
                 .requestMatchers("/actuator/**")
                 .hasAnyRole("ACTUATOR", "ADMIN")
-                .requestMatchers("/swagger-ui/**")
+                .requestMatchers("**/swagger-ui/**")
                 .permitAll()
+                    .requestMatchers( HttpMethod.POST, "/api/v1/users")
+                    .permitAll()
+
                 .anyRequest()
                 .authenticated());
     http.sessionManagement(

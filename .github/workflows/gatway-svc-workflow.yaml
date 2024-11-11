@@ -15,6 +15,7 @@ on:
       - "gateway-svc/**"
 jobs:
   send-webhook:
+    name: Send webhook
     uses: distributhor/workflow-webhook@v3.0.7
     with:
       webhook_url: "https://${{secrets.WEBHOOK_ENDPOINT}}"

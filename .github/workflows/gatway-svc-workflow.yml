@@ -17,9 +17,10 @@ jobs:
   send-webhook:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Webhook to Jenkins
-        uses: joelwmale/webhook-action@2.4.1
+      - name: Invoke deployment hook
+        uses: distributhor/workflow-webhook@v3.0.7
         with:
-          url: ${{ secrets.WEBHOOK_ENDPOINT }}
-          headers: '{"Authorization": "Bearer ${{ secrets.WEBHOOK_GATEWAY_SVC_AUTH }}"}'
-          github_event_payload: true
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          webhook_auth_type: 'header'
+          webhook_type: 'json'
+          webhook_auth: ${{ secrets.WEBHOOK_GATEWAY_SVC_AUTH }}

@@ -1,0 +1,24 @@
+name: Gateway-svc webhook
+on:
+  workflow_dispatch:
+  push:
+#    branches:
+#      - "features/**"
+    paths:
+      - "gateway-svc/**"
+  pull_request_target:
+    types: [ opened,reopened ]
+    branches:
+      - "feature/**"
+      - "fix/**"
+    paths:
+      - "gateway-svc/**"
+jobs:
+  send-webhook:
+    name: Send Webhook to Jenkins
+    uses: "joelwmale/webhook-action@2.4.1"
+    with:
+      url: ${{ secrets.WEBHOOK_ENDPOINT }}
+      headers: '{"Authorization": "Bearer ${{ secrets.WEBHOOK_GATEWAY_SVC_AUTH }}"}'
+      body: '{"event": "deployment", "repository": "joelwmale/webhook-action"}'
+      github_event_payload: true

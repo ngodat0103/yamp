@@ -1,0 +1,17 @@
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+hcp:
+  auth:
+    organizationID: cbe1cf74-4825-4a1b-8c63-c685c98f813c
+    projectID: d0064e9e-e611-4d22-8151-d54a515c513d
+    servicePrincipal:
+      secretRef: hcp-k8s-operator-principal-secret
+vault-secrets-operator:
+  fullnameOverride: vault-secrets-operator
+labels:
+  app.kubernetes.io/name: hcp-secret-management
+  app.kubernetes.io/version: "0.0.1"
+  app.kubernetes.io/component: secret-operator
+  app.kubernetes.io/part-of: hcp
+  app.kubernetes.io/managed-by: helm

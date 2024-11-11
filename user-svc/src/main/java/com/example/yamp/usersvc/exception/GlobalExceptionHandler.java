@@ -35,16 +35,6 @@ public class GlobalExceptionHandler {
     }
   }
 
-  @ExceptionHandler(WebClientResponseException.class)
-  public ProblemDetail handleWebClientRequestException(
-      WebClientResponseException e, HttpServletRequest request, HttpServletResponse response) {
-    ProblemDetail problemDetails = e.getResponseBodyAs(ProblemDetail.class);
-    assert problemDetails != null;
-    log.debug("WebClientResponseException: {}", problemDetails);
-    problemDetails.setInstance(URI.create(request.getServletPath()));
-    response.setStatus(problemDetails.getStatus());
-    return problemDetails;
-  }
 
   @ExceptionHandler({ConflictException.class, DataIntegrityViolationException.class})
   @ResponseStatus(HttpStatus.CONFLICT)

@@ -55,14 +55,15 @@ public class PermissionController {
 
   @GetMapping("/list-operations/{permission_id}")
   public PermissionOperationsDto getOperationsByPermissionId(
-          @PathVariable(name = "permission_id") Long permissionId) {
+      @PathVariable(name = "permission_id") Long permissionId) {
     return permissionService.getOperations(permissionId);
   }
 
   @PostMapping("/add-operations/{permission_id}")
   @ResponseStatus(HttpStatus.CREATED)
   public PermissionOperationsDto addOperations(
-      @PathVariable(name = "permission_id") Long permissionId, @RequestBody Set<Long> operationIds) {
+      @PathVariable(name = "permission_id") Long permissionId,
+      @RequestBody Set<Long> operationIds) {
     return permissionService.addOperations(permissionId, operationIds);
   }
 

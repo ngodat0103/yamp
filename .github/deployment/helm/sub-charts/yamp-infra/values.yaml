@@ -1,0 +1,12 @@
+kafka:
+  fullnameOverride: kafka-svc
+  listeners:
+    client:
+      protocol: PLAINTEXT
+redis:
+  fullnameOverride: redis-svc
+  architecture: standalone
+  auth:
+    existingSecret: redis-secret
+    existingSecretPasswordKey: REDIS_PASSWORD
+    sentinel: false

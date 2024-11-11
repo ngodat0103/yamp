@@ -21,7 +21,7 @@ public class Module {
   @Convert(converter = ToUppercaseConverter.class)
   private String name;
 
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "MODULES_PERMISSIONS",
       joinColumns = @JoinColumn(name = "module_id_fk"),

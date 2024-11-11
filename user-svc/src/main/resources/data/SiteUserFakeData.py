@@ -8,9 +8,12 @@ from tqdm import tqdm
 # Initialize Faker
 fake = Faker()
 
+# Counters for response codes
+success_count = 0
+error_count = 0
+
 # Function to generate a random request body
 def generate_request():
-    test = fake.items()
     request_data = {
         "emailAddress": fake.email(),
         "phoneNumber": fake.phone_number(),
@@ -22,12 +25,23 @@ def generate_request():
 
 # Function to send POST request to API endpoint
 def send_post_request(api_endpoint, data):
+    global success_count, error_count
     try:
         response = requests.post(api_endpoint, json=data)
 
-        if response.status_code == 409:
+        if response.status_code == 201:
+            success_count += 1
+            return True  # Continue on 200 OK
+        elif response.status_code == 409:
             print(f"Conflict (409): {response.text} - Continuing to next request...")
             return True  # Continue on 409
+        elif response.status_code == 500:
+            error_count += 1
+            trace_id = response.headers.get("x-traceid", "No trace ID available")
+            with open("error_log.txt", mode="a") as log_file:
+                log_file.write(f"500 Error - x-traceid: {trace_id}\n")
+            print(f"Server Error (500): {response.text} - Logged trace ID.")
+            return True  # Continue on 500
         else:
             print(f"Stopping program. Status: {response.status_code} - {response.text}")
             return False  # Stop on any other status code
@@ -68,6 +82,8 @@ def generate_worker(_):
 
 # Generate and send the data to the specified API endpoint
 def main(api_endpoint, num_requests=1, data_only=False, from_file=None):
+    global success_count, error_count
+
     if from_file:
         # Load data from CSV file
         generated_requests = load_data_from_csv(from_file)
@@ -84,6 +100,10 @@ def main(api_endpoint, num_requests=1, data_only=False, from_file=None):
             generated_requests = [generate_request() for _ in range(num_requests)]
             with Pool(cpu_count()) as pool:
                 list(tqdm(pool.starmap(worker, [(api_endpoint,) for _ in range(num_requests)]), total=num_requests, desc="Sending requests"))
+
+    # Print the final counts of 200 and 500 responses
+    print(f"Total 201 OK responses: {success_count}")
+    print(f"Total 500 Server Error responses: {error_count}")
 
 if __name__ == "__main__":
     # Setup command-line argument parsing

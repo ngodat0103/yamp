@@ -1,0 +1,9 @@
+dependencies:
+- name: yamp-hcp-secret
+  repository: file://../sub-charts/yamp-hcp-secret
+  version: 0.0.1
+- name: product-svc
+  repository: file://../sub-charts/product-svc
+  version: 0.0.1
+digest: sha256:6e1942961eadda6c389c0cbb8dc1e7ec671f3b7fe0eee74211cc1e5cf34d09a0
+generated: "2024-10-11T09:24:03.5908577+07:00"

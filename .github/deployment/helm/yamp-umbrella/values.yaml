@@ -1,0 +1,50 @@
+yamp-hcp-secret:
+  fullnameOverride: yamp-hcp-secret
+
+kube-prometheus-stack:
+  fullnameOverride: kube-prometheus-stack
+  prometheus:
+    prometheusSpec:
+      scrapeInterval: 5s
+      additionalScrapeConfigs:
+        - job_name: "auth-svc"
+          metrics_path: '/api/v1/auth/actuator/prometheus'
+          static_configs:
+            - targets: [ 'auth-svc.prod-yamp.svc.cluster.local:8001' ]
+        - job_name: 'user-svc'
+          metrics_path: '/api/v1/user/actuator/prometheus'
+          static_configs:
+            - targets: [ 'user-svc.prod-yamp.svc.cluster.local:8002' ]
+        - job_name: 'gateway-svc'
+          metrics_path: '/actuator/prometheus'
+          static_configs:
+            - targets: [ 'gateway-svc.prod-yamp.svc.cluster.local:8000' ]
+        - job_name: 'product-svc'
+          metrics_path: '/api/v1/product/actuator/prometheus'
+          static_configs:
+            - targets: [ 'product-svc.prod-yamp.svc.cluster.local:8003' ]
+  grafana:
+    additionalDataSources:
+      - name: Tempo
+        type: tempo
+        uid: tempo
+        url: http://tempo-release.monitoring.svc.cluster.local:3100
+        access: proxy
+        orgId: 1
+        basicAuth: false
+        isDefault: false
+        version: 1
+        editable: true
+        jsonData:
+          httpMethod: GET
+          serviceMap:
+            datasourceUid: 'prometheus'
+
+product-svc:
+  fullnameOverride: product-svc
+  app:
+    profile: "prod"
+  image:
+    tag: "0.0.1"
+  postgresql:
+    fullnameOverride: product-svc-postgresql

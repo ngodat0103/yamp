@@ -1,7 +1,9 @@
+name: Gateway-svc webhook
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - "features/**"
+#    branches:
+#      - "features/**"
     paths:
       - "gateway-svc/**"
   pull_request_target:
@@ -12,20 +14,9 @@ on:
     paths:
       - "gateway-svc/**"
 jobs:
-  push:
-    name: gateway-svc-push
-    if: github.event_name == 'push'
-    uses: ./.github/workflows/CI_template.yaml
+  send-webhook:
+    uses: distributhor/workflow-webhook@v3.0.7
     with:
-      SERVICE_NAME: gateway-svc
-      SERVICE_PORT: 8000
-    secrets: inherit
-
-  pr:
-    name: gateway-svc-pr
-    if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/ci-pr-workflow-call.yaml
-    with:
-      SERVICE_NAME: gateway-svc
-      SERVICE_PORT: 8000
-    secrets: inherit
+      webhook_url: "https://${{secrets.WEBHOOK_ENDPOINT}}"
+      webhook_auth: "https://${{secrets.WEBHOOK_GATEWAY_SVC_AUTH}}"
+      webhook_auth_type: "header"

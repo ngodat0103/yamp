@@ -1,0 +1,149 @@
+---
+# Source: user-svc/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-svc-configmap
+  labels:
+    helm.sh/chart: user-svc-0.0.1
+    app.kubernetes.io/name: user-svc
+    app.kubernetes.io/instance: user-svc
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://share-db.yamp-infra:5432/product-svc-db"
+  SPRING_PROFILES_ACTIVE: "pre-prod"
+  APP_VERSION: "0.0.1"
+---
+# Source: user-svc/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-svc
+  labels:
+    helm.sh/chart: user-svc-0.0.1
+    app.kubernetes.io/name: user-svc
+    app.kubernetes.io/instance: user-svc
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8002
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: user-svc
+    app.kubernetes.io/instance: user-svc
+---
+# Source: user-svc/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-svc
+  labels:
+    helm.sh/chart: user-svc-0.0.1
+    app.kubernetes.io/name: user-svc
+    app.kubernetes.io/instance: user-svc
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: user-svc
+      app.kubernetes.io/instance: user-svc
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: user-svc-0.0.1
+        app.kubernetes.io/name: user-svc
+        app.kubernetes.io/instance: user-svc
+        app.kubernetes.io/version: "0.0.1"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: user-svc
+          envFrom:
+            - configMapRef:
+                name: user-svc-configmap
+                optional: true
+            - configMapRef:
+                name: tempo-common-config
+                optional: true
+            - secretRef:
+                name: user-svc-secret
+                optional: true
+          securityContext:
+            {}
+          image: "ghcr.io/ngodat0103/yamp/user-svc:0.0.1"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8002
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/v1/user/actuator/health/liveness
+              port: 8002
+          readinessProbe:
+            httpGet:
+              path: /api/v1/user/actuator/health/readiness
+              port: 8002
+          resources:
+            {}
+---
+# Source: user-svc/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: user-svc
+  labels:
+    helm.sh/chart: user-svc-0.0.1
+    app.kubernetes.io/name: user-svc
+    app.kubernetes.io/instance: user-svc
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user-svc
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+---
+# Source: user-svc/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "user-svc-test-connection"
+  labels:
+    helm.sh/chart: user-svc-0.0.1
+    app.kubernetes.io/name: user-svc
+    app.kubernetes.io/instance: user-svc
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['user-svc:8002']
+  restartPolicy: Never

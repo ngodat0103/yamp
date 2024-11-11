@@ -21,7 +21,7 @@ public class Role {
   @Convert(converter = ToUppercaseConverter.class)
   private String name;
 
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "ROLES_PERMISSIONS",
       joinColumns = @JoinColumn(name = "role_id_fk"),

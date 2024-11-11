@@ -1,0 +1,23 @@
+Thank you for installing yamp-hcp-secret!
+
+This Helm chart deploys the HCP Vault Secrets Operator to manage secrets for the Yamp project using HashiCorp Vault.
+
+Your release is named: {{ .Release.Name }}
+
+To learn more about the release, you can run:
+
+  helm status {{ .Release.Name }}
+  helm get all {{ .Release.Name }}
+
+To get the logs of the HCP Vault Secrets Operator pods, you can run:
+
+  kubectl logs -l app.kubernetes.io/instance={{ .Release.Name }} -n {{ .Release.Namespace }}
+
+To check the status of the HCP Vault Secrets Operator, you can run:
+
+  kubectl get pods -l app.kubernetes.io/instance={{ .Release.Name }} -n {{ .Release.Namespace }}
+
+For more information on the HCP Vault Secrets Operator, please refer to the official documentation: 
+https://www.vaultproject.io/docs/platform/k8s/helm
+
+Thank you for using yamp-hcp-secret!

@@ -1,0 +1,160 @@
+---
+# Source: gateway-svc/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-svc-dev-configmap
+  namespace: staging-yamp
+  labels:
+    helm.sh/chart: gateway-svc-0.0.1
+    app.kubernetes.io/name: gateway-svc
+    app.kubernetes.io/instance: gateway-svc-dev
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+data:
+  SPRING_PROFILES_ACTIVE: "pre-prod"
+  APP_VERSION: "0.0.1"
+---
+# Source: gateway-svc/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: staging-yamp
+  name: gateway-svc-dev
+  labels:
+    helm.sh/chart: gateway-svc-0.0.1
+    app.kubernetes.io/name: gateway-svc
+    app.kubernetes.io/instance: gateway-svc-dev
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: gateway-svc
+    app.kubernetes.io/instance: gateway-svc-dev
+---
+# Source: gateway-svc/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: staging-yamp
+  name: gateway-svc-dev
+  labels:
+    helm.sh/chart: gateway-svc-0.0.1
+    app.kubernetes.io/name: gateway-svc
+    app.kubernetes.io/instance: gateway-svc-dev
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gateway-svc
+      app.kubernetes.io/instance: gateway-svc-dev
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: gateway-svc-0.0.1
+        app.kubernetes.io/name: gateway-svc
+        app.kubernetes.io/instance: gateway-svc-dev
+        app.kubernetes.io/version: "0.0.1"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: gateway-svc
+          envFrom:
+            - configMapRef:
+                name: tempo-common-configmap
+                optional: true
+            - configMapRef:
+                name: gateway-svc-dev-configmap
+                optional: true
+            - secretRef:
+                name: gateway-svc-secret
+                optional: true
+          securityContext:
+            {}
+          image: "ghcr.io/ngodat0103/yamp/gateway-svc:0.0.1"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            {}
+---
+# Source: gateway-svc/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: gateway-svc-dev
+  namespace: staging-yamp
+  labels:
+    helm.sh/chart: gateway-svc-0.0.1
+    app.kubernetes.io/name: gateway-svc
+    app.kubernetes.io/instance: gateway-svc-dev
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: gateway-svc-dev
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+---
+# Source: gateway-svc/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "gateway-svc-dev-test-connection"
+  labels:
+    helm.sh/chart: gateway-svc-0.0.1
+    app.kubernetes.io/name: gateway-svc
+    app.kubernetes.io/instance: gateway-svc-dev
+    app.kubernetes.io/version: "0.0.1"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['gateway-svc-dev:8000']
+  restartPolicy: Never

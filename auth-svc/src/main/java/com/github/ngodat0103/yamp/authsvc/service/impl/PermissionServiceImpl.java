@@ -12,7 +12,6 @@ import com.github.ngodat0103.yamp.authsvc.persistence.repository.PermissionRepos
 import com.github.ngodat0103.yamp.authsvc.service.AbstractCrudService;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +21,12 @@ public class PermissionServiceImpl extends AbstractCrudService<PermissionDto, Pe
   private final PermissionRepository permissionRepository;
   private final OperationMapper operationMapper;
   private final OperationRepository operationRepository;
+
   public PermissionServiceImpl(
-          PermissionMapper permissionMapper,
-          PermissionRepository permissionRepository,
-          OperationMapper operationMapper,
-          OperationRepository operationRepository) {
+      PermissionMapper permissionMapper,
+      PermissionRepository permissionRepository,
+      OperationMapper operationMapper,
+      OperationRepository operationRepository) {
     super(permissionMapper);
     this.permissionRepository = permissionRepository;
     this.operationMapper = operationMapper;

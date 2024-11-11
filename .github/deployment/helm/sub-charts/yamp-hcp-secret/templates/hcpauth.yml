@@ -1,0 +1,11 @@
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: HCPAuth
+metadata:
+  name: hcpauth
+  labels:
+      {{- include "hcp-secret-operator.labels" . | nindent 4}}
+spec:
+  organizationID: {{ .Values.hcp.auth.organizationID}}
+  projectID: {{.Values.hcp.auth.projectID}}
+  servicePrincipal:
+    secretRef: {{ .Values.hcp.auth.servicePrincipal.secretRef}}

@@ -1,0 +1,13 @@
+apiVersion: v2
+name: yamp-hcp-secret
+description: >
+  Helm chart for managing Yamp project secrets using HashiCorp Vault. 
+  Deploys the HCP Vault Secrets Operator for secure and automated secret management in Kubernetes.
+
+type: application
+version: 0.0.1
+appVersion: "0.0.1"
+dependencies:
+  - name: vault-secrets-operator
+    version: 0.8.1
+    repository: https://helm.releases.hashicorp.com

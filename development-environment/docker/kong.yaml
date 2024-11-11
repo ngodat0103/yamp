@@ -1,0 +1,27 @@
+_format_version: "3.0"
+plugins:
+  - name: opentelemetry
+    config:
+      propagation:
+        extract: [ w3c]
+        inject: [ w3c ]
+        default_format: w3c
+      traces_endpoint: http://tempo:4318/v1/traces
+      resource_attributes:
+        service.name: "kong-gateway"
+services:
+  - name: auth-svc
+    url: http://auth-svc:8001
+    routes:
+      - name: auth-svc-docs
+        strip_path: false
+        paths: [ "~/api/v1/auth/*","~/api/v1/auth/swagger-ui/*"]
+        methods: [ "GET" ]
+
+  - name: user-svc
+    url: http://user-svc:8002
+    routes:
+      - name: user-svc-docs
+        strip_path: false
+        paths: ["~/api/v1/users/*","~/api/v1/users/swagger-ui/*"]
+        methods: ["GET"]

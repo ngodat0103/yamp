@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prod-yamp-application
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: yamp
+    repoURL: https://charts.ngodat0103.live/yamp
+    targetRevision: 0.0.1
+    helm:
+      parameters:
+        - name: spring.profiles.active
+          value: prod
+        - name: cloudflared.secretKey
+          value: CLOUDFLARED_TOKEN_PROD
+        - name: kafka.consumerURL
+          value: kafka-svc.prod-infra-yamp.svc.cluster.local:9092
+        - name: kafka.producerURL
+          value: kafka-svc-controller-headless.prod-infra-yamp.svc.cluster.local:9092
+      values: |
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1024Mi
+          requests:
+            cpu: 100m
+            memory: 512Mi
+        autoscaling:
+          enabled: true
+          minReplicas: 2
+          maxReplicas: 10
+          targetCPUUtilizationPercentage: 80
+          targetMemoryUtilizationPercentage: 80
+        tempo:
+          URL: "http://tempo-release.monitoring.svc.cluster.local:4317"
+          agentClassPath: "-javaagent:/opt/app/BOOT-INF/lib/opentelemetry-javaagent-1.33.5.jar"
+        yamp:
+          authsvc:
+            datasourceUrl: jdbc:postgresql://postgresql-prod-infra-yamp-application.prod-infra-yamp.svc.cluster.local:5432/auth-svc-db
+          usersvc:
+            datasourceUrl: jdbc:postgresql://postgresql-prod-infra-yamp-application.prod-infra-yamp.svc.cluster.local:5432/user-svc-db
+          productsvc:
+            datasourceUrl: jdbc:postgresql://postgresql-prod-infra-yamp-application.prod-infra-yamp.svc.cluster.local:5432/product-svc-db
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prod-yamp
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true

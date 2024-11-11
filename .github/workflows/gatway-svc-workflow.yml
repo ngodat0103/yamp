@@ -20,7 +20,7 @@ jobs:
       - name: Invoke deployment hook
         uses: distributhor/workflow-webhook@v3.0.7
         with:
-          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          webhook_url: ${{ secrets.WEBHOOK_ENDPOINT }}
           webhook_auth_type: 'header'
           webhook_type: 'json'
           webhook_auth: ${{ secrets.WEBHOOK_GATEWAY_SVC_AUTH }}

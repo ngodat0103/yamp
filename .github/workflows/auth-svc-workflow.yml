@@ -2,10 +2,10 @@ name: Gateway-svc webhook
 on:
   workflow_dispatch:
   push:
-#    branches:
-#      - "features/**"
+    branches:
+      - "dev"
     paths:
-      - "gateway-svc/**"
+      - "auth-svc-svc/**"
   pull_request_target:
     types: [ opened,reopened ]
     branches:
@@ -17,10 +17,10 @@ jobs:
   send-webhook:
     runs-on: ubuntu-latest
     steps:
-      - name: Invoke deployment hook
+      - name: Send webhook to Jenkins
         uses: distributhor/workflow-webhook@v3.0.7
         with:
           webhook_url: ${{ secrets.WEBHOOK_ENDPOINT }}
           webhook_auth_type: 'bearer'
           webhook_type: 'json'
-          webhook_auth: ${{ secrets.WEBHOOK_GATEWAY_SVC_AUTH }}
+          webhook_auth: ${{ secrets.WEBHOOK_AUTH_SVC_TOKEN }}

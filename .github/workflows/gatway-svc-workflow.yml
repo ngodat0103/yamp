@@ -15,10 +15,12 @@ on:
       - "gateway-svc/**"
 jobs:
   send-webhook:
-    name: Send Webhook to Jenkins
-    uses: "joelwmale/webhook-action@2.4.1"
-    with:
-      url: ${{ secrets.WEBHOOK_ENDPOINT }}
-      headers: '{"Authorization": "Bearer ${{ secrets.WEBHOOK_GATEWAY_SVC_AUTH }}"}'
-      body: '{"event": "deployment", "repository": "joelwmale/webhook-action"}'
-      github_event_payload: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Webhook to Jenkins
+        uses: joelwmale/webhook-action@2.4.1
+        with:
+          url: ${{ secrets.WEBHOOK_ENDPOINT }}
+          headers: '{"Authorization": "Bearer ${{ secrets.WEBHOOK_GATEWAY_SVC_AUTH }}"}'
+          body: '{"event": "deployment", "repository": "joelwmale/webhook-action"}'
+          github_event_payload: true

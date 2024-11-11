@@ -22,5 +22,4 @@ jobs:
         with:
           url: ${{ secrets.WEBHOOK_ENDPOINT }}
           headers: '{"Authorization": "Bearer ${{ secrets.WEBHOOK_GATEWAY_SVC_AUTH }}"}'
-          body: '{"event": "deployment", "repository": "joelwmale/webhook-action"}'
           github_event_payload: true
